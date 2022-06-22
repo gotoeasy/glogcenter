@@ -8,7 +8,21 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+	"unsafe"
 )
+
+func StringToBytes(s string) []byte {
+	return *(*[]byte)(unsafe.Pointer(
+		&struct {
+			string
+			Cap int
+		}{s, len(s)},
+	))
+}
+
+func BytesToString(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
+}
 
 func Uint32ToBytes(num uint32) []byte {
 	bkey := make([]byte, 4)
@@ -79,5 +93,5 @@ func GetenvBool(name string, defaultValue bool) bool {
 // 字符串哈希处理后取模(余数)，返回值最大不超过mod值
 func HashMod(str string, mod uint32) string {
 	txt := "添油" + str + "加醋"
-	return fmt.Sprint(crc32.ChecksumIEEE([]byte(txt)) % mod)
+	return fmt.Sprint(crc32.ChecksumIEEE(StringToBytes(txt)) % mod)
 }

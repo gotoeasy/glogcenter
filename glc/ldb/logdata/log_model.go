@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"encoding/json"
+	"glc/cmn"
 )
 
 // Text是必须有的日志内容，Id自增，内置其他属性可选
@@ -26,7 +27,7 @@ type LogDataModel struct {
 
 func (d *LogDataModel) ToJson() string {
 	bt, _ := json.Marshal(d)
-	return string(bt)
+	return cmn.BytesToString(bt)
 }
 
 func (d *LogDataModel) ToBytes() []byte {
@@ -41,7 +42,7 @@ func (d *LogDataModel) ToBytes() []byte {
 
 func ParseJson(jsonstr string) *LogDataModel {
 	d := new(LogDataModel)
-	json.Unmarshal([]byte(jsonstr), d)
+	json.Unmarshal(cmn.StringToBytes(jsonstr), d)
 	return d
 }
 

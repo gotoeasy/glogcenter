@@ -31,14 +31,3 @@ func ParseBytes(data []byte) *LdbDocument {
 	}
 	return d
 }
-
-// func (d *LdbDocument) ToJson() string {
-// 	bt, _ := json.Marshal(d)
-// 	return string(bt)
-// }
-
-// func ParseJson(jsonstr string) *LdbDocument {
-// 	d := new(LdbDocument)
-// 	json.Unmarshal([]byte(jsonstr), d)
-// 	return d
-// }

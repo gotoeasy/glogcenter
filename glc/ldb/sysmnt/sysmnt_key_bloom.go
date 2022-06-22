@@ -1,6 +1,9 @@
 package sysmnt
 
-import "glc/ldb/storage"
+import (
+	"glc/cmn"
+	"glc/ldb/storage"
+)
 
 // 管理用存储结构体
 type SysmntStorage struct {
@@ -24,7 +27,7 @@ func GetSysmntStorage(storeName string) *SysmntStorage {
 // 检查指定关键词是否都有数据
 func (s *SysmntStorage) HasKeyWord(kws []string) bool {
 	for _, k := range kws {
-		_, err := s.storage.Get([]byte(k))
+		_, err := s.storage.Get(cmn.StringToBytes(k))
 		if err != nil {
 			return false
 		}
@@ -35,7 +38,7 @@ func (s *SysmntStorage) HasKeyWord(kws []string) bool {
 // 添加关键词
 func (s *SysmntStorage) AddKeyWords(kws []string) {
 	for _, k := range kws {
-		_, err := s.storage.Get([]byte(k))
+		_, err := s.storage.Get(cmn.StringToBytes(k))
 		if err == nil {
 			return
 		}
@@ -45,6 +48,6 @@ func (s *SysmntStorage) AddKeyWords(kws []string) {
 
 // 关键词作为key保存，值为空串
 func fnSave(store *storage.LdbStorage, keyWord any) (*storage.LdbDocument, any) {
-	store.Put([]byte(keyWord.(string)), []byte(""))
+	store.Put(cmn.StringToBytes(keyWord.(string)), cmn.StringToBytes(""))
 	return nil, nil
 }
