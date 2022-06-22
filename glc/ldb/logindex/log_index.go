@@ -51,7 +51,10 @@ func fnSave(store *storage.LdbStorage, id any) (*storage.LdbDocument, any) {
 
 // 取日志id
 func (s *LogIndexStorage) Get(id uint32) uint32 {
-	bytes, _ := s.storage.Get(cmn.Uint32ToBytes(id))
+	bytes, err := s.storage.Get(cmn.Uint32ToBytes(id))
+	if err != nil {
+		log.Println("id=", id, err)
+	}
 	return cmn.BytesToUint32(bytes)
 }
 

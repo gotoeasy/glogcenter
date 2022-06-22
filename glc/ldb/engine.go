@@ -56,5 +56,5 @@ func (e *Engine) Search(searchKey string) *search.SearchResult {
 	}
 
 	// 关键词检索模式
-	return search.Search(e.storeName, tokenizer.CutForSearch(searchKey), 1, 20)
+	return search.Search(e.storeName, tokenizer.CutForSearch(searchKey), 20, "4900", false)
 }
