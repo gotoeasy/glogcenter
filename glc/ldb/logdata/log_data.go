@@ -69,9 +69,10 @@ func fnBeforeSave(store *storage.LdbStorage, logDataModel any) any {
 // 日志保存处理
 func fnSave(store *storage.LdbStorage, logDataModel any) (*storage.LdbDocument, any) {
 	model := logDataModel.(*LogDataModel)
-	d := new(storage.LdbDocument)
-	d.Id = store.TotalCount()                       // 已递增好的值
-	d.Content = model.ToJson()                      // 转json作为内容
+	model.Id = store.TotalCount()                   // 已递增好的值
+	d := new(storage.LdbDocument)                   // 文档
+	d.Id = model.Id                                 // 已递增好的值
+	d.Content = model.ToJson()                      // 转json作为内容(含Id)
 	store.Put(cmn.Uint32ToBytes(d.Id), d.ToBytes()) // 保存
 	log.Println("保存日志数据 ", d.Id)
 	return d, logDataModel
