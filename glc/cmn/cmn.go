@@ -11,6 +11,16 @@ import (
 	"unsafe"
 )
 
+// 字符串(10进制无符号整数形式)转uint32，超过uint32最大值会丢失精度
+// 转换失败时返回默认值
+func StringToUint32(s string, defaultVal uint32) uint32 {
+	v, err := strconv.ParseUint(s, 10, 32)
+	if err != nil {
+		return defaultVal
+	}
+	return uint32(v & 0xFFFFFFFF)
+}
+
 func StringToBytes(s string) []byte {
 	return *(*[]byte)(unsafe.Pointer(
 		&struct {
