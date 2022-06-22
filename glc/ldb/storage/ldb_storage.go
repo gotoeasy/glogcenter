@@ -34,9 +34,9 @@ func init() {
 	mapStorage = make(map[string](*LdbStorage))
 
 	// 检查环境变量设定配置
-	timeout = cmn.GetenvInt("TIMEOUT", 300)                    // 默认秒
-	storeChanBuffer = cmn.GetenvInt("STORE_CHAN_BUFFER", 1024) // 默认秒
-	storePath = cmn.Getenv("STORE_PATH", "e:\\222")            // 默认‘/glogcenter’
+	timeout = cmn.GetenvInt("TIMEOUT", 300)                  // 默认秒
+	storeChanBuffer = cmn.GetenvInt("STORE_CHAN_BUFFER", 64) // 默认秒
+	storePath = cmn.Getenv("STORE_PATH", "e:\\222")          // 默认‘/glogcenter’
 }
 
 func getCacheStore(cacheName string) *LdbStorage {
