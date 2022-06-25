@@ -19,9 +19,9 @@ var storeNameAutoAddDate bool
 
 func init() {
 	// 读取环境变量初始化配置，各配置都有默认值
-	storeRoot = Getenv("STORE_ROOT", "e:/222")                          // 存储根目录
+	storeRoot = Getenv("STORE_ROOT", "/glogcenter")                     // 存储根目录
 	storeChanLength = GetenvInt("STORE_CHAN_LENGTH", 64)                // 存储通道长度
-	maxIdleTime = GetenvInt("MAX_IDLE_TIME", 10)                        // 最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
+	maxIdleTime = GetenvInt("MAX_IDLE_TIME", 180)                       // 最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
 	storeNameAutoAddDate = GetenvBool("STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
 }
 
@@ -35,7 +35,7 @@ func GetStoreChanLength() int {
 	return storeChanLength
 }
 
-// 取配置：最大闲置时间（秒），可通过环境变量“MAX_IDLE_TIME”设定，默认值“300”，超过闲置时间将自动关闭存储器，0时表示不关闭
+// 取配置：最大闲置时间（秒），可通过环境变量“MAX_IDLE_TIME”设定，默认值“180”，超过闲置时间将自动关闭存储器，0时表示不关闭
 func GetMaxIdleTime() int {
 	return maxIdleTime
 }
