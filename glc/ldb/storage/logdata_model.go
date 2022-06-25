@@ -1,8 +1,10 @@
-package logdata
+/**
+ * 日志模型
+ * 1）面向日志接口，设定常用属性方便扩充
+ */
+package storage
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"glc/cmn"
 )
@@ -11,7 +13,7 @@ import (
 // 其中Tags是空格分隔的标签，日期外各属性值会按空格分词
 // 对应的json属性统一全小写
 type LogDataModel struct {
-	Id         uint32   `json:"id,omitempty"`         // 从1开始递增
+	Id         uint64   `json:"id,omitempty"`         // 从1开始递增
 	Text       string   `json:"text,omitempty"`       // 【必须】日志内容，多行时仅为首行，直接显示用，是全文检索对象
 	Detail     string   `json:"detail,omitempty"`     // 多行时的详细日志信息，通常是包含错误堆栈等的日志内容
 	Date       string   `json:"date,omitempty"`       // 多行时的详细日志信息，通常是包含错误堆栈等的日志内容
@@ -30,29 +32,6 @@ func (d *LogDataModel) ToJson() string {
 	return cmn.BytesToString(bt)
 }
 
-func (d *LogDataModel) ToBytes() []byte {
-	buffer := new(bytes.Buffer)
-	encoder := gob.NewEncoder(buffer)
-	err := encoder.Encode(d)
-	if err != nil {
-		panic(err)
-	}
-	return buffer.Bytes()
-}
-
-func ParseJson(jsonstr string) *LogDataModel {
-	d := new(LogDataModel)
+func (d *LogDataModel) LoadJson(jsonstr string) {
 	json.Unmarshal(cmn.StringToBytes(jsonstr), d)
-	return d
-}
-
-func ParseBytes(data []byte) *LogDataModel {
-	d := new(LogDataModel)
-	buffer := bytes.NewBuffer(data)
-	decoder := gob.NewDecoder(buffer)
-	err := decoder.Decode(d)
-	if err != nil {
-		return nil
-	}
-	return d
 }

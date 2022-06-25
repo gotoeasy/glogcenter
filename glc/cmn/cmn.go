@@ -1,12 +1,15 @@
 package cmn
 
 import (
+	"bytes"
 	"encoding/binary"
+	"encoding/gob"
 	"fmt"
+	"glc/ldb/conf"
 	"hash/crc32"
 	"os"
 	"strconv"
-	"strings"
+	"time"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -19,6 +22,16 @@ func StringToUint32(s string, defaultVal uint32) uint32 {
 		return defaultVal
 	}
 	return uint32(v & 0xFFFFFFFF)
+}
+
+// 字符串(10进制无符号整数形式)转uint64
+// 转换失败时返回默认值
+func StringToUint64(s string, defaultVal uint64) uint64 {
+	v, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return defaultVal
+	}
+	return v
 }
 
 func StringToBytes(s string) []byte {
@@ -44,6 +57,16 @@ func BytesToUint32(bytes []byte) uint32 {
 	return uint32(binary.BigEndian.Uint32(bytes))
 }
 
+func Uint64ToBytes(num uint64) []byte {
+	bkey := make([]byte, 8)
+	binary.BigEndian.PutUint64(bkey, num)
+	return bkey
+}
+
+func BytesToUint64(bytes []byte) uint64 {
+	return binary.BigEndian.Uint64(bytes)
+}
+
 func LenRune(str string) int {
 	return utf8.RuneCountInString(str)
 }
@@ -67,41 +90,25 @@ func PathSeparator() string {
 	return string(os.PathSeparator)
 }
 
-func Getenv(name string, defaultValue string) string {
-	s := os.Getenv(name)
-	if s == "" {
-		return defaultValue
-	}
-	return s
-}
-
-func GetenvInt(name string, defaultValue int) int {
-	s := os.Getenv(name)
-	if s == "" {
-		return defaultValue
-	}
-
-	v, err := strconv.Atoi(s)
-	if err != nil {
-		return defaultValue
-	}
-	return v
-}
-
-func GetenvBool(name string, defaultValue bool) bool {
-	s := os.Getenv(name)
-	if s == "" {
-		return defaultValue
-	}
-
-	if strings.ToLower(s) == "true" {
-		return true
-	}
-	return false
-}
-
 // 字符串哈希处理后取模(余数)，返回值最大不超过mod值
-func HashMod(str string, mod uint32) string {
+func HashAndMod(str string, mod uint32) string {
 	txt := "添油" + str + "加醋"
 	return fmt.Sprint(crc32.ChecksumIEEE(StringToBytes(txt)) % mod)
+}
+
+func ToBytes(data any) []byte {
+	buffer := new(bytes.Buffer)
+	encoder := gob.NewEncoder(buffer)
+	err := encoder.Encode(data)
+	if err != nil {
+		panic(err)
+	}
+	return buffer.Bytes()
+}
+
+func GeyStoreNameByDate(name string) string {
+	if conf.IsStoreNameAutoAddDate() {
+		return fmt.Sprint(name, "-", time.Now().Format("20060102")) // name-yyyymmdd
+	}
+	return name
 }

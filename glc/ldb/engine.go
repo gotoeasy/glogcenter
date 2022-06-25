@@ -1,31 +1,34 @@
 package ldb
 
 import (
-	"glc/ldb/logdata"
+	"glc/cmn"
 	"glc/ldb/search"
+	"glc/ldb/storage"
 	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"
+	"log"
 )
 
 type Engine struct {
 	storeName  string
-	logStorage *logdata.LogDataStorage // 日志存储器
-	sysStorage *sysmnt.SysmntStorage   // 系统存储器
+	logStorage *storage.LogDataStorageHandle // 日志存储控制器
+	sysStorage *sysmnt.SysmntStorage         // 系统存储器
 }
 
 func NewEngine(storeName string) *Engine {
+	storeName = cmn.GeyStoreNameByDate(storeName)
 	return &Engine{
 		storeName:  storeName,
-		logStorage: logdata.NewLogDataStorage(storeName),
+		logStorage: storage.NewLogDataStorageHandle(storeName),
 		sysStorage: sysmnt.GetSysmntStorage(storeName),
 	}
 }
 
 func NewDefaultEngine() *Engine {
-	var storeName string = "default"
+	var storeName string = cmn.GeyStoreNameByDate("default")
 	return &Engine{
 		storeName:  storeName,
-		logStorage: logdata.NewLogDataStorage(storeName),
+		logStorage: storage.NewLogDataStorageHandle(storeName),
 		sysStorage: sysmnt.GetSysmntStorage(storeName),
 	}
 }
@@ -38,23 +41,21 @@ func (e *Engine) AddTextLog(logText string) {
 func (e *Engine) Search(searchKey string) *search.SearchResult {
 
 	// 分词后检索
-	kws := tokenizer.CutForSearch(searchKey)
+	kws := tokenizer.CutForSearch(searchKey) // TODO 检索用关键词处理
+
+	log.Println("查询", kws)
 
 	// 无数据判断，同布隆判断效果
-	if !e.sysStorage.HasKeyWord(kws) {
+	if !e.sysStorage.ContainsKeyWord(kws) {
+		log.Println("检索条件布隆检查发现有不存在的关键词，直接返回空结果", kws)
 		return new(search.SearchResult)
 	}
 
 	// 无条件浏览模式
 	if len(kws) == 0 {
-		return search.BrowsePage(e.storeName, 1, 50)
+		return search.Search(e.storeName, "", 20, 0, true)
 	}
 
 	// 单关键词查询模式
-	if len(kws) == 1 {
-		return search.BrowsePageByOneWord(e.storeName, kws[0], 1, 50)
-	}
-
-	// 关键词检索模式
-	return search.Search(e.storeName, tokenizer.CutForSearch(searchKey), 20, "4900", false)
+	return search.Search(e.storeName, kws[0], 20, 11, false)
 }

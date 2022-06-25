@@ -1,0 +1,131 @@
+/**
+ * 系统管理存储器
+ * 1）提供无序的KV形式读写功能，利用leveldb自动序列化存盘
+ * 2）使用需自行控制避免发生Key的冲突问题
+ */
+package sysmnt
+
+import (
+	"errors"
+	"glc/cmn"
+	"glc/ldb/conf"
+	"log"
+	"sync"
+	"time"
+
+	"github.com/syndtr/goleveldb/leveldb"
+)
+
+// 存储结构体
+type SysmntStorage struct {
+	storeName string      // 存储目录
+	subPath   string      // 存储目录下的相对路径（存放数据）
+	leveldb   *leveldb.DB // leveldb
+	lastTime  int64       // 最后一次访问时间
+	closing   bool        // 是否关闭中状态
+}
+
+var sdbMu sync.Mutex             // 锁
+var sysmntStorage *SysmntStorage // 缓存用存储器
+
+// 获取存储对象，线程安全（带缓存无则创建有则直取）
+func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档，自定义对象
+
+	// 缓存有则取用
+	subPath := "sysmnt"
+	cacheName := storeName + cmn.PathSeparator() + subPath
+	if sysmntStorage != nil && !sysmntStorage.IsClose() { // 尝试用缓存实例存储器
+		return sysmntStorage
+	}
+
+	// 缓存无则锁后创建返回并存缓存
+	sdbMu.Lock()                                          // 上锁
+	if sysmntStorage != nil && !sysmntStorage.IsClose() { // 再次尝试用缓存实例存储器
+		sdbMu.Unlock() // 解锁
+		return sysmntStorage
+	}
+
+	store := new(SysmntStorage)
+	store.storeName = storeName
+	store.subPath = subPath
+	store.closing = false
+	store.lastTime = time.Now().Unix()
+
+	dbPath := conf.GetStorageRoot() + cmn.PathSeparator() + cacheName
+	db, err := leveldb.OpenFile(dbPath, nil) // 打开（在指定子目录中存放数据）
+	if err != nil {
+		log.Println("打开SysmntStorage失败：", dbPath)
+		panic(err)
+	}
+	store.leveldb = db
+	sysmntStorage = store // 缓存起来
+
+	// 逐秒判断，若闲置超时则自动关闭
+	go autoCloseSysmntStorageWhenMaxIdle(store)
+
+	sdbMu.Unlock() // 解锁
+	log.Println("打开SysmntStorage：", cacheName)
+	return store
+}
+
+func autoCloseSysmntStorageWhenMaxIdle(store *SysmntStorage) {
+	if conf.GetMaxIdleTime() > 0 {
+		ticker := time.NewTicker(time.Second)
+		for {
+			<-ticker.C
+			if time.Now().Unix()-store.lastTime > int64(conf.GetMaxIdleTime()) {
+				store.Close()
+				ticker.Stop()
+				break
+			}
+		}
+	}
+}
+
+// 关闭Storage
+func (s *SysmntStorage) Close() {
+	if s.closing {
+		return
+	}
+
+	sdbMu.Lock() // 锁
+	if s.closing {
+		sdbMu.Unlock() // 解锁
+		return
+	}
+
+	s.closing = true
+	s.leveldb.Close()
+	sysmntStorage = nil
+	sdbMu.Unlock() // 解锁
+
+	log.Println("关闭SysmntStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
+}
+
+// 直接存入数据到leveldb
+func (s *SysmntStorage) Put(key []byte, value []byte) error {
+	if s.closing {
+		return errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
+	}
+	s.lastTime = time.Now().Unix()
+	return s.leveldb.Put(key, value, nil)
+}
+
+// 直接从leveldb取数据
+func (s *SysmntStorage) Get(key []byte) ([]byte, error) {
+	if s.closing {
+		return nil, errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
+	}
+	s.lastTime = time.Now().Unix()
+	return s.leveldb.Get(key, nil)
+}
+
+// 存储目录名
+func (s *SysmntStorage) StoreName() string {
+	return s.storeName
+}
+
+// 是否关闭中状态
+func (s *SysmntStorage) IsClose() bool {
+	return s.closing
+}

@@ -1,7 +1,10 @@
+/**
+ * TODO 待整理
+ */
 package tokenizer
 
 import (
-	"glc/cmn"
+	"glc/ldb/conf"
 	"log"
 	"os"
 	"regexp"
@@ -26,13 +29,13 @@ func init() {
 	ignoreWords = strings.Split("`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n", "")
 
 	// 有些关键词是要按规则忽略的，支持通过环境变量“INGORE_WORDS”设定，以半角逗号分隔
-	strWords := cmn.Getenv("INGORE_WORDS", "")
+	strWords := conf.Getenv("INGORE_WORDS", "")
 	if strWords != "" {
 		ignoreWords = append(ignoreWords, strings.Split(strWords, ",")...)
 	}
 	log.Println("默认忽略的单词: ", ignoreWords)
 
-	simpleCutMode = cmn.GetenvBool("SIMPLE_CUT_MODE", true)
+	simpleCutMode = conf.GetenvBool("SIMPLE_CUT_MODE", true)
 
 	seg.LoadDictionary(dictFile)
 }
@@ -107,4 +110,32 @@ func replaceByRegex(str string, rule string, replace string) string {
 		// return ""
 	}
 	return reg.ReplaceAllString(str, replace)
+}
+
+// 检索用文字进行分词，以及针对检索特殊场景的优化
+func CutSearchKey(searchKey string) []string {
+	var mapKey = make(map[string]string)
+	kws := CutForSearch(searchKey)
+
+	for _, k := range kws {
+		mapKey[k] = ""
+	}
+
+	for _, kw := range kws {
+		ks := CutForSearch(kw)
+		if len(ks) > 1 {
+			for _, k := range ks {
+				delete(mapKey, k)
+			}
+			mapKey[kw] = ""
+		}
+	}
+
+	var rs []string
+	for k := range mapKey {
+		rs = append(rs, k)
+	}
+
+	log.Println("搜索关键词", kws, "优化后搜索", rs)
+	return rs
 }
