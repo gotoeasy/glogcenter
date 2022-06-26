@@ -19,15 +19,6 @@ type SearchResult struct {
 
 // 单关键词浏览日志
 func Search(storeName string, word string, pageSize int, currentId uint64, forward bool) *SearchResult {
-
-	// 检查修正pageSize
-	if pageSize < 1 {
-		pageSize = 1
-	}
-	if pageSize > 1000 {
-		pageSize = 1000
-	}
-
 	if word == "" {
 		return searchLogData(storeName, pageSize, currentId, forward)
 	}

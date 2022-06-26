@@ -38,7 +38,15 @@ func (e *Engine) AddTextLog(logText string) {
 	e.logStorage.AddTextLog(logText)
 }
 
-func (e *Engine) Search(searchKey string) *search.SearchResult {
+func (e *Engine) Search(searchKey string, pageSize int, currentId uint64, forward bool) *search.SearchResult {
+
+	// 检查修正pageSize
+	if pageSize < 1 {
+		pageSize = 1
+	}
+	if pageSize > 1000 {
+		pageSize = 1000
+	}
 
 	// 分词后检索
 	kws := tokenizer.CutForSearch(searchKey) // TODO 检索用关键词处理
@@ -53,9 +61,9 @@ func (e *Engine) Search(searchKey string) *search.SearchResult {
 
 	// 无条件浏览模式
 	if len(kws) == 0 {
-		return search.Search(e.storeName, "", 20, 0, true)
+		return search.Search(e.storeName, "", pageSize, currentId, forward)
 	}
 
 	// 单关键词查询模式
-	return search.Search(e.storeName, kws[0], 20, 11, false)
+	return search.Search(e.storeName, kws[0], pageSize, currentId, forward)
 }
