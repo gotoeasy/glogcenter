@@ -130,14 +130,15 @@ func readyGo(store *LogDataStorage) {
 
 func saveLogData(store *LogDataStorage, model *LogDataModel) {
 	//store.wg.Done()
-	store.currentCount++          // ID递增
-	doc := new(LogDataDocument)   // 文档
-	doc.Id = store.currentCount   // 已递增好的值
-	model.Id = store.currentCount // 模型数据要转Json存，也得更新ID
-	doc.Content = model.ToJson()  // 转json作为内容(含Id)
+	store.currentCount++                                  // ID递增
+	doc := new(LogDataDocument)                           // 文档
+	doc.Id = store.currentCount                           // 已递增好的值
+	model.Id = cmn.Uint64ToString(store.currentCount, 36) // 模型数据要转Json存，也得更新ID,ID用36进制字符串形式表示
+	doc.Content = model.ToJson()                          // 转json作为内容(含Id)
+
 	// 保存
 	store.put(cmn.Uint64ToBytes(doc.Id), doc.ToBytes())                                 // 日志数据
-	store.leveldb.Put(cmn.Uint32ToBytes(0), cmn.Uint64ToBytes(store.currentCount), nil) // 保存日志总件数
+	store.leveldb.Put(cmn.Uint64ToBytes(0), cmn.Uint64ToBytes(store.currentCount), nil) // 保存日志总件数
 	log.Println("保存日志数据 ", doc.Id)
 }
 
@@ -169,7 +170,7 @@ func createInvertedIndex(s *LogDataStorage) int {
 	// 每个关键词都创建反向索引
 	for _, word := range kws {
 		idx := NewWordIndexStorage(s.StoreName(), word)
-		idx.Add(m.Id) // 日志ID加入索引
+		idx.Add(cmn.StringToUint64(m.Id, 36, 0)) // 日志ID加入索引
 	}
 
 	// 保存索引信息
@@ -265,7 +266,7 @@ func (s *LogDataStorage) Close() {
 }
 
 func (s *LogDataStorage) loadTotalCount() uint64 {
-	bytes, err := s.leveldb.Get(cmn.Uint32ToBytes(0), nil)
+	bytes, err := s.leveldb.Get(cmn.Uint64ToBytes(0), nil)
 	if err != nil || bytes == nil {
 		return 0
 	}

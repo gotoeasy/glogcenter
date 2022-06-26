@@ -7,14 +7,15 @@
 package search
 
 import (
+	"glc/cmn"
 	"glc/ldb/storage"
 )
 
 type SearchResult struct {
-	TotalCount  uint64                     // 总件数
-	PageFirstId uint64                     // 当前页第一条的文档ID或索引ID
-	PageLastId  uint64                     // 当前页最后一条的文档ID或索引ID
-	Data        []*storage.LogDataDocument // 检索结果数据（日志文档数组）
+	Total       string                  `json:"total,omitempty"`       // 总件数（用10进制字符串形式以避免出现科学计数法）
+	PageFirstId string                  `json:"pageFirstId,omitempty"` // 当前页第一条的文档ID或索引ID
+	PageLastId  string                  `json:"pageLastId,omitempty"`  // 当前页最后一条的文档ID或索引ID
+	Data        []*storage.LogDataModel `json:"data,omitempty"`        // 检索结果数据（日志文档数组）
 }
 
 // 单关键词浏览日志
@@ -30,16 +31,17 @@ func searchLogData(storeName string, pageSize int, currentId uint64, forward boo
 
 	var rs = new(SearchResult)                                 // 检索结果
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
-	rs.TotalCount = storeLogData.TotalCount()                  // 总件数
+	totalCount := storeLogData.TotalCount()                    // 总件数
+	rs.Total = cmn.Uint64ToString(totalCount, 10)              // 返回的总件数用10进制字符串形式以避免出现科学计数法
 
-	if rs.TotalCount == 0 {
+	if totalCount == 0 {
 		return rs
 	}
 
 	if currentId == 0 {
 		// 第一页
 		var min, max uint64
-		max = rs.TotalCount
+		max = totalCount
 		if max > uint64(pageSize) {
 			min = max - uint64(pageSize) + 1
 		} else {
@@ -47,15 +49,19 @@ func searchLogData(storeName string, pageSize int, currentId uint64, forward boo
 		}
 
 		for i := max; i >= min; i-- {
-			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i)) // 件数等同日志文档ID
+			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i).ToLogDataModel()) // 件数等同日志文档ID
 		}
-		rs.PageFirstId = max
-		rs.PageLastId = min
+		rs.PageFirstId = cmn.Uint64ToString(max, 36)
+		rs.PageLastId = cmn.Uint64ToString(min, 36)
 	} else if forward {
 		// 后一页
 		if currentId > 1 {
 			var min, max uint64
-			max = currentId - 1
+			if currentId > totalCount {
+				max = totalCount
+			} else {
+				max = currentId - 1
+			}
 			if max > uint64(pageSize) {
 				min = max - uint64(pageSize) + 1
 			} else {
@@ -63,26 +69,26 @@ func searchLogData(storeName string, pageSize int, currentId uint64, forward boo
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i).ToLogDataModel())
 			}
-			rs.PageFirstId = max
-			rs.PageLastId = min
+			rs.PageFirstId = cmn.Uint64ToString(max, 36)
+			rs.PageLastId = cmn.Uint64ToString(min, 36)
 		}
 	} else {
 		// 前一页
-		if rs.TotalCount > currentId {
+		if totalCount > currentId {
 			var min, max uint64
 			min = currentId + 1
 			max = min + uint64(pageSize) - 1
-			if max > rs.TotalCount {
-				max = rs.TotalCount
+			if max > totalCount {
+				max = totalCount
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i).ToLogDataModel())
 			}
-			rs.PageFirstId = max
-			rs.PageLastId = min
+			rs.PageFirstId = cmn.Uint64ToString(max, 36)
+			rs.PageLastId = cmn.Uint64ToString(min, 36)
 		}
 	}
 
@@ -95,16 +101,17 @@ func searchWordIndex(storeName string, word string, pageSize int, currentId uint
 	var rs = new(SearchResult)                                 // 检索结果
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 	storeIndex := storage.NewWordIndexStorage(storeName, word) // 索引
-	rs.TotalCount = storeIndex.TotalCount()                    // 总件数
+	totalCount := storeIndex.TotalCount()                      // 总件数
+	rs.Total = cmn.Uint64ToString(totalCount, 10)              // 返回的总件数用10进制字符串形式以避免出现科学计数法
 
-	if rs.TotalCount == 0 {
+	if totalCount == 0 {
 		return rs
 	}
 
 	if currentId == 0 {
 		// 第一页
 		var min, max uint64
-		max = rs.TotalCount
+		max = totalCount
 		if max > uint64(pageSize) {
 			min = max - uint64(pageSize) + 1
 		} else {
@@ -112,15 +119,19 @@ func searchWordIndex(storeName string, word string, pageSize int, currentId uint
 		}
 
 		for i := max; i >= min; i-- {
-			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i))) // 经索引取日志文档ID
+			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)).ToLogDataModel()) // 经索引取日志文档ID
 		}
-		rs.PageFirstId = max
-		rs.PageLastId = min
+		rs.PageFirstId = cmn.Uint64ToString(max, 36)
+		rs.PageLastId = cmn.Uint64ToString(min, 36)
 	} else if forward {
 		// 后一页
 		if currentId > 1 {
 			var min, max uint64
-			max = currentId - 1
+			if currentId > totalCount {
+				max = totalCount
+			} else {
+				max = currentId - 1
+			}
 			if max > uint64(pageSize) {
 				min = max - uint64(pageSize) + 1
 			} else {
@@ -128,26 +139,26 @@ func searchWordIndex(storeName string, word string, pageSize int, currentId uint
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)).ToLogDataModel())
 			}
-			rs.PageFirstId = max
-			rs.PageLastId = min
+			rs.PageFirstId = cmn.Uint64ToString(max, 36)
+			rs.PageLastId = cmn.Uint64ToString(min, 36)
 		}
 	} else {
 		// 前一页
-		if rs.TotalCount > currentId {
+		if totalCount > currentId {
 			var min, max uint64
 			min = currentId + 1
 			max = min + uint64(pageSize) - 1
-			if max > rs.TotalCount {
-				max = rs.TotalCount
+			if max > totalCount {
+				max = totalCount
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)).ToLogDataModel())
 			}
-			rs.PageFirstId = max
-			rs.PageLastId = min
+			rs.PageFirstId = cmn.Uint64ToString(max, 36)
+			rs.PageLastId = cmn.Uint64ToString(min, 36)
 		}
 	}
 
