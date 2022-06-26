@@ -48,6 +48,10 @@ func CutForSearch(text string) []string {
 // 按搜索引擎模式进行分词后返回分词数组，可自定义添加或删除分词
 func CutForSearchEx(text string, addWords []string, delWords []string) []string {
 
+	if strings.TrimSpace(text) == "" {
+		return []string{}
+	}
+
 	txt := strings.ToLower(text)
 
 	// 结巴分词
@@ -113,7 +117,11 @@ func replaceByRegex(str string, rule string, replace string) string {
 }
 
 // 检索用文字进行分词，以及针对检索特殊场景的优化
-func CutSearchKey(searchKey string) []string {
+func GetSearchKey(searchKey string) string {
+	if searchKey == "" {
+		return ""
+	}
+
 	var mapKey = make(map[string]string)
 	kws := CutForSearch(searchKey)
 
@@ -136,6 +144,7 @@ func CutSearchKey(searchKey string) []string {
 		rs = append(rs, k)
 	}
 
+	// TODO
 	log.Println("搜索关键词", kws, "优化后搜索", rs)
-	return rs
+	return rs[0]
 }
