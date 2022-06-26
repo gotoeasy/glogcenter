@@ -14,7 +14,7 @@ type SearchResult struct {
 	TotalCount  uint64                     // 总件数
 	PageFirstId uint64                     // 当前页第一条的文档ID或索引ID
 	PageLastId  uint64                     // 当前页最后一条的文档ID或索引ID
-	Result      []*storage.LogDataDocument // 检索结果数据（日志文档数组）
+	Data        []*storage.LogDataDocument // 检索结果数据（日志文档数组）
 }
 
 // 单关键词浏览日志
@@ -56,7 +56,7 @@ func searchLogData(storeName string, pageSize int, currentId uint64, forward boo
 		}
 
 		for i := max; i >= min; i-- {
-			rs.Result = append(rs.Result, storeLogData.GetLogDataDocument(i)) // 件数等同日志文档ID
+			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i)) // 件数等同日志文档ID
 		}
 		rs.PageFirstId = max
 		rs.PageLastId = min
@@ -72,7 +72,7 @@ func searchLogData(storeName string, pageSize int, currentId uint64, forward boo
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Result = append(rs.Result, storeLogData.GetLogDataDocument(i))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i))
 			}
 			rs.PageFirstId = max
 			rs.PageLastId = min
@@ -88,7 +88,7 @@ func searchLogData(storeName string, pageSize int, currentId uint64, forward boo
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Result = append(rs.Result, storeLogData.GetLogDataDocument(i))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i))
 			}
 			rs.PageFirstId = max
 			rs.PageLastId = min
@@ -121,7 +121,7 @@ func searchWordIndex(storeName string, word string, pageSize int, currentId uint
 		}
 
 		for i := max; i >= min; i-- {
-			rs.Result = append(rs.Result, storeLogData.GetLogDataDocument(storeIndex.Get(i))) // 经索引取日志文档ID
+			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i))) // 经索引取日志文档ID
 		}
 		rs.PageFirstId = max
 		rs.PageLastId = min
@@ -137,7 +137,7 @@ func searchWordIndex(storeName string, word string, pageSize int, currentId uint
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Result = append(rs.Result, storeLogData.GetLogDataDocument(storeIndex.Get(i)))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)))
 			}
 			rs.PageFirstId = max
 			rs.PageLastId = min
@@ -153,7 +153,7 @@ func searchWordIndex(storeName string, word string, pageSize int, currentId uint
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Result = append(rs.Result, storeLogData.GetLogDataDocument(storeIndex.Get(i)))
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)))
 			}
 			rs.PageFirstId = max
 			rs.PageLastId = min
