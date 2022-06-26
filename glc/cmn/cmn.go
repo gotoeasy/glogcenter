@@ -9,29 +9,49 @@ import (
 	"hash/crc32"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 	"unicode/utf8"
 	"unsafe"
 )
 
-// 字符串(10进制无符号整数形式)转uint32，超过uint32最大值会丢失精度
+// 字符串(10进制无符号整数形式)转int，超过int最大值会丢失精度
 // 转换失败时返回默认值
-func StringToUint32(s string, defaultVal uint32) uint32 {
-	v, err := strconv.ParseUint(s, 10, 32)
-	if err != nil {
-		return defaultVal
-	}
-	return uint32(v & 0xFFFFFFFF)
-}
-
-// 字符串(10进制无符号整数形式)转uint64
-// 转换失败时返回默认值
-func StringToUint64(s string, defaultVal uint64) uint64 {
-	v, err := strconv.ParseUint(s, 10, 64)
+func StringToInt(s string, defaultVal int) int {
+	v, err := strconv.Atoi(s)
 	if err != nil {
 		return defaultVal
 	}
 	return v
+}
+
+// // 字符串(10进制无符号整数形式)转uint32，超过uint32最大值会丢失精度
+// // 转换失败时返回默认值
+// func StringToUint32(s string, defaultVal uint32) uint32 {
+// 	v, err := strconv.ParseUint(s, 10, 32)
+// 	if err != nil {
+// 		return defaultVal
+// 	}
+// 	return uint32(v & 0xFFFFFFFF)
+// }
+
+// 字符串(指定进制无符号整数形式)转uint64，进制base范围为2~36
+// 参数错误或转换失败都返回默认值
+func StringToUint64(s string, base int, defaultVal uint64) uint64 {
+	if s == "" || base < 2 || base > 36 {
+		return defaultVal
+	}
+
+	v, err := strconv.ParseUint(s, base, 64)
+	if err != nil {
+		return defaultVal
+	}
+	return v
+}
+
+// Uint64转指定进制形式字符串
+func Uint64ToString(val uint64, base int) string {
+	return strconv.FormatUint(val, base)
 }
 
 func StringToBytes(s string) []byte {
@@ -42,20 +62,30 @@ func StringToBytes(s string) []byte {
 		}{s, len(s)},
 	))
 }
+func StringToBool(s string, defaultVal bool) bool {
+	lower := strings.ToLower(s)
+	if lower == "true" {
+		return true
+	}
+	if lower == "false" {
+		return false
+	}
+	return defaultVal
+}
 
 func BytesToString(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-func Uint32ToBytes(num uint32) []byte {
-	bkey := make([]byte, 4)
-	binary.BigEndian.PutUint32(bkey, num)
-	return bkey
-}
+// func Uint32ToBytes(num uint32) []byte {
+// 	bkey := make([]byte, 4)
+// 	binary.BigEndian.PutUint32(bkey, num)
+// 	return bkey
+// }
 
-func BytesToUint32(bytes []byte) uint32 {
-	return uint32(binary.BigEndian.Uint32(bytes))
-}
+// func BytesToUint32(bytes []byte) uint32 {
+// 	return uint32(binary.BigEndian.Uint32(bytes))
+// }
 
 func Uint64ToBytes(num uint64) []byte {
 	bkey := make([]byte, 8)
