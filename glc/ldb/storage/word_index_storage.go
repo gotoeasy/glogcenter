@@ -142,16 +142,18 @@ func (s *WordIndexStorage) Close() {
 		return
 	}
 
-	s.mu.Lock() // 锁
+	s.mu.Lock() // 对象锁
 	if s.closing {
-		s.mu.Unlock() // 解锁
+		s.mu.Unlock() // 对象解锁
 		return
 	}
 
 	s.closing = true
 	s.leveldb.Close()                      // 走到这里时没有db操作了，可以关闭
+	idxMu.Lock()                           // map锁
 	mapWordIndexStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
-	s.mu.Unlock()                          // 解锁
+	idxMu.Unlock()                         // map解锁
+	s.mu.Unlock()                          // 对象解锁
 
 	log.Println("关闭WordIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
