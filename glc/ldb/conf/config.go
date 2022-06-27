@@ -34,9 +34,9 @@ func UpdateConfigByEnv() {
 	storeNameAutoAddDate = GetenvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
 	serverPort = GetenvInt("GLC_SERVER_PORT", 8080)                         // web服务端口
 	contextPath = Getenv("GLC_CONTEXT_PATH", "/glc")                        // web服务contextPath
-	enableSecurityKey = GetenvBool("GLC_ENABLE_SECURITY_KEY", true)         // web服务是否开启API秘钥校验，默认false
-	securityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")           // web服务API秘钥的header键名
-	headerSecurityKey = Getenv("GLC_SECURITY_KEY", "glogcenter")            // web服务API秘钥
+	enableSecurityKey = GetenvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
+	headerSecurityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")     // web服务API秘钥的header键名
+	securityKey = Getenv("GLC_SECURITY_KEY", "glogcenter")                  // web服务API秘钥
 }
 
 // 取配置： web服务API秘钥的header键名，可通过环境变量“GLC_HEADER_SECURITY_KEY”设定，默认值“X-GLC-AUTH”
