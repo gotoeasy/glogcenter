@@ -1,6 +1,7 @@
 package gweb
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -53,4 +54,8 @@ func (r *HttpRequest) GetUrlParameter(name string) string {
 
 func (r *HttpRequest) GetFormParameter(name string) string {
 	return r.ginCtx.Request.PostFormValue(name)
+}
+
+func (r *HttpRequest) Redirect(url string) {
+	r.ginCtx.Redirect(http.StatusMovedPermanently, url)
 }

@@ -1,6 +1,8 @@
 package gweb
 
 import (
+	"fmt"
+	"glc/ldb/conf"
 	"net/http"
 	"strings"
 
@@ -22,9 +24,11 @@ func Run() {
 		}
 
 		rs := handle.Controller(req)
-		c.JSON(rs.Code, rs)
+		if rs != nil {
+			c.JSON(rs.Code, rs)
+		}
 	})
 
-	server.Run(":8080")
+	server.Run(fmt.Sprintf(":%d", conf.GetServerPort()))
 
 }
