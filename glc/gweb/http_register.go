@@ -13,6 +13,7 @@ type HttpController struct {
 
 var mapHandleGet map[string]*HttpController
 var mapHandlePost map[string]*HttpController
+var filters []func(*HttpRequest) *HttpResult
 
 func init() {
 	mapHandleGet = make(map[string]*HttpController)
@@ -50,4 +51,12 @@ func RegisterController(methodType string, path string, fnController func(*HttpR
 		panic("unsuport method: " + methodType)
 	}
 
+}
+
+func RegisterFilter(fnFilter func(*HttpRequest) *HttpResult) {
+	filters = append(filters, fnFilter)
+}
+
+func getFilters() []func(*HttpRequest) *HttpResult {
+	return filters
 }

@@ -14,9 +14,20 @@ func Run() {
 
 	server.NoRoute(func(c *gin.Context) {
 		req := NewHttpRequest(c)
+
+		// filter
+		filters := getFilters()
+		for _, fnFilter := range filters {
+			rs := fnFilter(req)
+			if rs != nil {
+				c.JSON(rs.Code, rs) // 过滤器返回有内容时直接返回处理结果，结束
+				return
+			}
+		}
+
+		// controller
 		path := strings.ToLower(c.Request.URL.Path)
 		method := strings.ToUpper(c.Request.Method)
-
 		handle := getHttpController(method, path)
 		if handle == nil {
 			c.JSON(http.StatusNotFound, Error404())
