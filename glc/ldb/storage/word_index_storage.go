@@ -129,7 +129,7 @@ func (s *WordIndexStorage) Add(docId uint64) error {
 		log.Println("保存索引件数失败", err)
 		return err // 忽略事务问题，可下回重建
 	}
-	log.Println("创建日志索引：", docId, "，关键词：", s.word)
+	// log.Println("创建日志索引：", docId, "，关键词：", s.word)
 	return nil
 }
 

@@ -33,7 +33,7 @@ func init() {
 	if strWords != "" {
 		ignoreWords = append(ignoreWords, strings.Split(strWords, ",")...)
 	}
-	log.Println("默认忽略的单词: ", ignoreWords)
+	//log.Println("默认忽略的单词: ", ignoreWords)
 
 	simpleCutMode = conf.GetenvBool("SIMPLE_CUT_MODE", true)
 
