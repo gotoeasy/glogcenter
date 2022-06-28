@@ -9,6 +9,7 @@ import (
 	"errors"
 	"glc/cmn"
 	"glc/ldb/conf"
+	"glc/onexit"
 	"log"
 	"sync"
 	"time"
@@ -27,6 +28,10 @@ type SysmntStorage struct {
 
 var sdbMu sync.Mutex             // 锁
 var sysmntStorage *SysmntStorage // 缓存用存储器
+
+func init() {
+	onexit.RegisterExitHandle(onExit) // 优雅退出
+}
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）
 func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档，自定义对象
@@ -126,4 +131,11 @@ func (s *SysmntStorage) StoreName() string {
 // 是否关闭中状态
 func (s *SysmntStorage) IsClose() bool {
 	return s.closing
+}
+
+func onExit() {
+	if sysmntStorage != nil {
+		sysmntStorage.Close()
+	}
+	log.Println("退出SysmntStorage")
 }

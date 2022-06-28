@@ -12,6 +12,7 @@ import (
 	"glc/ldb/conf"
 	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"
+	"glc/onexit"
 	"log"
 	"sync"
 	"time"
@@ -37,6 +38,7 @@ var mapLogDataStorage map[string](*LogDataStorage)
 
 func init() {
 	mapLogDataStorage = make(map[string](*LogDataStorage))
+	onexit.RegisterExitHandle(onExit4LogDataStorage) // 优雅退出
 }
 
 func getCacheStore(cacheName string) *LogDataStorage {
@@ -284,4 +286,11 @@ func (s *LogDataStorage) StoreName() string {
 // 是否关闭中状态
 func (s *LogDataStorage) IsClose() bool {
 	return s.closing
+}
+
+func onExit4LogDataStorage() {
+	for k := range mapLogDataStorage {
+		mapLogDataStorage[k].Close()
+	}
+	log.Println("退出LogDataStorage")
 }

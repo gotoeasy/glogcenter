@@ -8,6 +8,7 @@ package storage
 import (
 	"glc/cmn"
 	"glc/ldb/conf"
+	"glc/onexit"
 	"log"
 	"math"
 	"sync"
@@ -33,6 +34,7 @@ var mapWordIndexStorage map[string](*WordIndexStorage)
 
 func init() {
 	mapWordIndexStorage = make(map[string](*WordIndexStorage))
+	onexit.RegisterExitHandle(onExit4WordIndexStorage) // 优雅退出
 }
 
 func getWidxStorage(cacheName string) *WordIndexStorage {
@@ -177,4 +179,11 @@ func (s *WordIndexStorage) StoreName() string {
 // 是否关闭中状态
 func (s *WordIndexStorage) IsClose() bool {
 	return s.closing
+}
+
+func onExit4WordIndexStorage() {
+	for k := range mapLogDataStorage {
+		mapLogDataStorage[k].Close()
+	}
+	log.Println("退出WordIndexStorage")
 }
