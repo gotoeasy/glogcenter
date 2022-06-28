@@ -53,10 +53,9 @@ func Run() {
 	onexit.RegisterExitHandle(func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
+		log.Println("退出Web服务")
 		if err := httpServer.Shutdown(ctx); err != nil {
-			log.Println("退出Web服务:", err)
-		} else {
-			log.Println("退出Web服务")
+			log.Println(err)
 		}
 	})
 
