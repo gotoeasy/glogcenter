@@ -1,18 +1,22 @@
 package gweb
 
 import (
+	"context"
 	"fmt"
 	"glc/ldb/conf"
+	"glc/onexit"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Run() {
-	server := gin.Default()
+	ginEngine := gin.Default()
 
-	server.NoRoute(func(c *gin.Context) {
+	ginEngine.NoRoute(func(c *gin.Context) {
 		req := NewHttpRequest(c)
 
 		// filter
@@ -40,6 +44,25 @@ func Run() {
 		}
 	})
 
-	server.Run(fmt.Sprintf(":%d", conf.GetServerPort()))
+	httpServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", conf.GetServerPort()), // :8080
+		Handler: ginEngine,
+	}
 
+	// 优雅退出
+	onexit.RegisterExitHandle(func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := httpServer.Shutdown(ctx); err != nil {
+			log.Println("退出Web服务:", err)
+		} else {
+			log.Println("退出Web服务")
+		}
+	})
+
+	// 启动Web服务
+	err := httpServer.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		log.Fatalf("%s", err) // 启动失败的话打印错误信息后退出
+	}
 }

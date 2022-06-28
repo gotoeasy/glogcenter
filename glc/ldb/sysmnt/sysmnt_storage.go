@@ -88,7 +88,7 @@ func autoCloseSysmntStorageWhenMaxIdle(store *SysmntStorage) {
 
 // 关闭Storage
 func (s *SysmntStorage) Close() {
-	if s.closing {
+	if s == nil || s.closing { // 优雅退出时可能会正好nil，判断一下优雅点
 		return
 	}
 

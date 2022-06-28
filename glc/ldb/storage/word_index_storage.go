@@ -158,7 +158,7 @@ func (s *WordIndexStorage) Get(id uint64) uint64 {
 
 // 关闭Storage
 func (s *WordIndexStorage) Close() {
-	if s.closing {
+	if s == nil || s.closing { // 优雅退出时可能会正好nil，判断一下优雅点
 		return
 	}
 

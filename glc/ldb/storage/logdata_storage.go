@@ -245,7 +245,7 @@ func (s *LogDataStorage) Add(model *LogDataModel) error {
 
 // 关闭Storage
 func (s *LogDataStorage) Close() {
-	if s.closing {
+	if s == nil || s.closing { // 优雅退出时可能会正好nil，判断一下优雅点
 		return
 	}
 
