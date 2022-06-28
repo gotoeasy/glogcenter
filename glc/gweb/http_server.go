@@ -14,6 +14,9 @@ import (
 )
 
 func Run() {
+
+	gin.SetMode(gin.ReleaseMode) // 开启Release模式
+
 	ginEngine := gin.Default()
 
 	ginEngine.NoRoute(func(c *gin.Context) {
