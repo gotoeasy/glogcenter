@@ -48,7 +48,7 @@ func (s *LogDataStorageHandle) AddTextLog(logText string) {
 	ary := strings.Split(txt, "\n")
 
 	d := new(LogDataModel)
-	d.Text = ary[0]
+	d.Text = strings.TrimSpace(ary[0])
 	if len(ary) > 1 {
 		d.Detail = txt
 	}
