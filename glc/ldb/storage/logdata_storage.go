@@ -59,9 +59,9 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 
 	// 缓存无则锁后创建返回并存缓存
 	ldbMu.Lock()                          // 上锁
+	defer ldbMu.Unlock()                  // 解锁
 	cacheStore = getCacheStore(cacheName) // 再次尝试取用缓存中存储器
 	if cacheStore != nil && !cacheStore.IsClose() {
-		ldbMu.Unlock() // 解锁
 		return cacheStore
 	}
 
@@ -88,7 +88,6 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 	// 逐秒判断，若闲置超时则自动关闭
 	go autoCloseLogDataStorageWhenMaxIdle(store)
 
-	ldbMu.Unlock() // 解锁
 	log.Println("打开LogDataStorage：", cacheName)
 	return store
 }
@@ -248,9 +247,9 @@ func (s *LogDataStorage) Close() {
 		return
 	}
 
-	s.mu.Lock() // 锁
+	s.mu.Lock()         // 锁
+	defer s.mu.Unlock() // 解锁
 	if s.closing {
-		s.mu.Unlock() // 解锁
 		return
 	}
 
@@ -260,7 +259,6 @@ func (s *LogDataStorage) Close() {
 	s.storeChan <- nil                   // 通道正在在阻塞等待接收，给个nil让它接收后关闭
 	s.leveldb.Close()                    // 走到这里时没有db操作了，可以关闭
 	mapLogDataStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
-	s.mu.Unlock()                        // 解锁
 
 	log.Println("关闭LogDataStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }

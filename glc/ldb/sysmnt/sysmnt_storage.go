@@ -40,8 +40,8 @@ func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档�
 
 	// 缓存无则锁后创建返回并存缓存
 	sdbMu.Lock()                                          // 上锁
+	defer sdbMu.Unlock()                                  // 解锁
 	if sysmntStorage != nil && !sysmntStorage.IsClose() { // 再次尝试用缓存实例存储器
-		sdbMu.Unlock() // 解锁
 		return sysmntStorage
 	}
 
@@ -63,7 +63,6 @@ func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档�
 	// 逐秒判断，若闲置超时则自动关闭
 	go autoCloseSysmntStorageWhenMaxIdle(store)
 
-	sdbMu.Unlock() // 解锁
 	log.Println("打开SysmntStorage：", cacheName)
 	return store
 }
@@ -88,16 +87,15 @@ func (s *SysmntStorage) Close() {
 		return
 	}
 
-	sdbMu.Lock() // 锁
+	sdbMu.Lock()         // 锁
+	defer sdbMu.Unlock() // 解锁
 	if s.closing {
-		sdbMu.Unlock() // 解锁
 		return
 	}
 
 	s.closing = true
 	s.leveldb.Close()
 	sysmntStorage = nil
-	sdbMu.Unlock() // 解锁
 
 	log.Println("关闭SysmntStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }

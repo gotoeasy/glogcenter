@@ -56,9 +56,9 @@ func NewWordIndexStorage(storeName string, word string) *WordIndexStorage { // �
 
 	// 缓存无则锁后创建返回并存缓存
 	idxMu.Lock()                           // 上锁
+	defer idxMu.Unlock()                   // 解锁
 	cacheStore = getWidxStorage(cacheName) // 再次尝试取用缓存中存储器
 	if cacheStore != nil && !cacheStore.IsClose() {
-		idxMu.Unlock() // 解锁
 		return cacheStore
 	}
 
@@ -82,7 +82,6 @@ func NewWordIndexStorage(storeName string, word string) *WordIndexStorage { // �
 	// 逐秒判断，若闲置超时则自动关闭
 	go autoCloseWordIndexStorageWhenMaxIdle(store)
 
-	idxMu.Unlock() // 解锁
 	log.Println("打开WordIndexStorage：", cacheName)
 	return store
 }
@@ -142,18 +141,17 @@ func (s *WordIndexStorage) Close() {
 		return
 	}
 
-	s.mu.Lock() // 对象锁
+	s.mu.Lock()         // 对象锁
+	defer s.mu.Unlock() // 对象解锁
 	if s.closing {
-		s.mu.Unlock() // 对象解锁
 		return
 	}
 
 	s.closing = true
 	s.leveldb.Close()                      // 走到这里时没有db操作了，可以关闭
 	idxMu.Lock()                           // map锁
+	defer idxMu.Unlock()                   // map解锁
 	mapWordIndexStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
-	idxMu.Unlock()                         // map解锁
-	s.mu.Unlock()                          // 对象解锁
 
 	log.Println("关闭WordIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
