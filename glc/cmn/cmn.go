@@ -121,8 +121,8 @@ func PathSeparator() string {
 }
 
 // 字符串哈希处理后取模(余数)，返回值最大不超过mod值
-func HashAndMod(str string, mod uint32) string {
-	txt := "添油" + str + "加醋"
+func HashAndMod(str string, mod uint32, prefix string) string {
+	txt := prefix + "_" + str
 	return fmt.Sprint(crc32.ChecksumIEEE(StringToBytes(txt)) % mod)
 }
 
