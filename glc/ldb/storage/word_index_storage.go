@@ -6,6 +6,7 @@
 package storage
 
 import (
+	"fmt"
 	"glc/cmn"
 	"glc/ldb/conf"
 	"glc/onexit"
@@ -49,7 +50,7 @@ func getWidxStorage(cacheName string) *WordIndexStorage {
 func NewWordIndexStorage(storeName string, word string) *WordIndexStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
-	subPath := "inverted" + cmn.PathSeparator() + cmn.HashAndMod(word, 100) + cmn.PathSeparator() + "k_" + cmn.HashAndMod(word, math.MaxUint32)
+	subPath := getIndexSubPath(word)
 	cacheName := storeName + cmn.PathSeparator() + subPath
 	cacheStore := getWidxStorage(cacheName)
 	if cacheStore != nil && !cacheStore.IsClose() {
@@ -103,12 +104,20 @@ func autoCloseWordIndexStorageWhenMaxIdle(store *WordIndexStorage) {
 }
 
 // 日志ID添加到索引
-func (s *WordIndexStorage) Add(id uint64) error {
+func (s *WordIndexStorage) Add(docId uint64) error {
 
 	// 加索引
 	s.lastTime = time.Now().Unix()
 	s.currentCount++ // ID递增
-	err := s.leveldb.Put(cmn.Uint64ToBytes(s.currentCount), cmn.Uint64ToBytes(id), nil)
+	err := s.leveldb.Put(cmn.Uint64ToBytes(s.currentCount), cmn.Uint64ToBytes(docId), nil)
+	if err != nil {
+		log.Println("保存索引失败", err)
+		return err
+	}
+
+	// docId加盐为键保存索引位置（反向索引再建反向索引之意）
+	keyDocId := fmt.Sprintf("d%d", docId)
+	err = s.leveldb.Put(cmn.StringToBytes(keyDocId), cmn.Uint64ToBytes(s.currentCount), nil)
 	if err != nil {
 		log.Println("保存索引失败", err)
 		return err
@@ -120,8 +129,18 @@ func (s *WordIndexStorage) Add(id uint64) error {
 		log.Println("保存索引件数失败", err)
 		return err // 忽略事务问题，可下回重建
 	}
-	log.Println("创建日志索引：", id, "，关键词：", s.word)
+	log.Println("创建日志索引：", docId, "，关键词：", s.word)
 	return nil
+}
+
+// 按日志文档ID找索引位置(找不到返回0)
+func (s *WordIndexStorage) GetPosByDocId(id uint64) uint64 {
+	keyDocId := fmt.Sprintf("d%d", id)
+	idx, err := s.leveldb.Get(cmn.StringToBytes(keyDocId), nil)
+	if err != nil {
+		return 0
+	}
+	return cmn.BytesToUint64(idx)
 }
 
 // 通过索引ID取日志ID（返回0表示有问题）
@@ -186,4 +205,12 @@ func onExit4WordIndexStorage() {
 		mapLogDataStorage[k].Close()
 	}
 	log.Println("退出WordIndexStorage")
+}
+
+// 反向索引的子目录（多级目录散列处理避免冲突）
+func getIndexSubPath(word string) string {
+	return "inverted" + cmn.PathSeparator() +
+		cmn.HashAndMod(word, 100, "添油") + cmn.PathSeparator() +
+		cmn.HashAndMod(word, 100, "加醋") + cmn.PathSeparator() +
+		"k_" + cmn.HashAndMod(word, math.MaxUint32, "原味")
 }

@@ -8,6 +8,7 @@ package storage
 
 import (
 	"glc/cmn"
+	"log"
 	"strings"
 )
 
@@ -56,7 +57,14 @@ func (s *LogDataStorageHandle) AddTextLog(logText string) {
 	if s.storage.IsClose() {
 		s.storage = NewLogDataStorage(s.storage.storeName, "data")
 	}
-	s.storage.Add(d)
+	err := s.storage.Add(d)
+	if err != nil {
+		log.Println("竟然失败，再来一次", s.storage.IsClose(), err)
+		if s.storage.IsClose() {
+			s.storage = NewLogDataStorage(s.storage.storeName, "data")
+		}
+		s.storage.Add(d)
+	}
 }
 
 // // 添加日志（参数是LogDataModel形式的json字符串）

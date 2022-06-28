@@ -38,7 +38,7 @@ func (e *Engine) AddTextLog(logText string) {
 	e.logStorage.AddTextLog(logText)
 }
 
-func (e *Engine) Search(searchKey string, pageSize int, currentId uint64, forward bool) *search.SearchResult {
+func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint64, forward bool) *search.SearchResult {
 
 	// 检查修正pageSize
 	if pageSize < 1 {
@@ -59,11 +59,15 @@ func (e *Engine) Search(searchKey string, pageSize int, currentId uint64, forwar
 		return new(search.SearchResult)
 	}
 
-	// 无条件浏览模式
 	if len(kws) == 0 {
-		return search.Search(e.storeName, "", pageSize, currentId, forward)
+		// 无条件浏览模式
+		return search.SearchLogData(e.storeName, pageSize, currentDocId, forward)
+	} else if len(kws) == 1 {
+		// 单关键词查询模式
+		return search.SearchWordIndex(e.storeName, kws[0], pageSize, currentDocId, forward)
+	} else {
+		// 多关键词查询模式
+		return search.Search(e.storeName, kws, pageSize, currentDocId, forward)
 	}
 
-	// 单关键词查询模式
-	return search.Search(e.storeName, kws[0], pageSize, currentId, forward)
 }
