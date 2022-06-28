@@ -24,10 +24,7 @@ func (s *SysmntStorage) ContainsKeyWord(kws []string) bool {
 // 添加关键词
 func (s *SysmntStorage) AddKeyWords(kws []string) {
 	for _, k := range kws {
-		_, err := s.Get(cmn.StringToBytes(_PREFIX + k))
-		if err == nil {
-			return
-		}
-		s.Put(cmn.StringToBytes(_PREFIX+k), cmn.StringToBytes(""))
+		s.Put(cmn.StringToBytes(_PREFIX+k), cmn.StringToBytes("")) // TODO 这个是否有性能问题？
+		// log.Println("关键词已标记存在数据：", k)
 	}
 }
