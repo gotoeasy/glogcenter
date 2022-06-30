@@ -1,10 +1,25 @@
 # ----------------------------
-# 编译
+# 编译Web
 # ----------------------------
-FROM golang:alpine AS builder
+FROM node:14-alpine3.15 AS webbuilder
+
+WORKDIR /webproject
+COPY . /webproject
+
+RUN cd www/web && \
+    yarn install --registry https://registry.npm.taobao.org && \
+    yarn run build
+
+
+# ----------------------------
+# 编译Go
+# ----------------------------
+FROM golang:alpine AS gobuilder
 
 WORKDIR /goproject
 COPY . /goproject
+
+COPY --from=webbuilder /webproject/www/web/dist www/web/
 
 ENV GOPROXY https://goproxy.cn,direct
 # 编译，关闭CGO(重要)
@@ -18,7 +33,7 @@ FROM alpine AS runner
 MAINTAINER gotoeasy <gotoeasy@163.com>
 
 # 复制编译好的glc可执行文件
-COPY --from=builder /goproject/glc /usr/local/bin/
+COPY --from=gobuilder /goproject/glc /usr/local/bin/
 
 # 安装bash以便能进入容器
 RUN alpine_version=`cat /etc/issue | head -1 | awk '{print $5}'` \
