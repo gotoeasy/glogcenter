@@ -51,7 +51,11 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint64, for
 	// 分词后检索
 	kws := tokenizer.CutForSearch(searchKey) // TODO 检索用关键词处理
 
-	log.Println("查询", kws)
+	if searchKey == "" {
+		log.Println("无条件查询")
+	} else {
+		log.Println("查询", searchKey, "，分词后检索", kws)
+	}
 
 	// 无数据判断，同布隆判断效果
 	if !e.sysStorage.ContainsKeyWord(kws) {
