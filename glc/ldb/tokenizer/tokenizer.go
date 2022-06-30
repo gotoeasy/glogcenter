@@ -5,7 +5,6 @@ package tokenizer
 
 import (
 	"glc/ldb/conf"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -55,7 +54,7 @@ func CutForSearchEx(text string, addWords []string, delWords []string) []string 
 	txt := strings.ToLower(text)
 
 	// 结巴分词
-	sch := seg.CutForSearch(txt, true)
+	sch := seg.CutForSearch(txt+" "+strings.Join(addWords, " "), true) // TODO 暂且补丁
 	var mapStr = make(map[string]string)
 	tmp := ""
 	for word := range sch {
@@ -67,8 +66,8 @@ func CutForSearchEx(text string, addWords []string, delWords []string) []string 
 
 	// 简单分词
 	if simpleCutMode {
-		// 针对日志再保留特殊字符（【.】用于包名，【/】用工于路径或日期，【_】常用于表名）
-		txt = replaceByRegex(txt, "[,/;\\-\"'?？，。!！=@#\\[\\]【】\\\\:]", " ") // 【-】相对杂乱会出现少许冲突，不方便保留
+		// 针对日志再保留特殊字符（【.】用于包名，【/】用工于路径或日期，【_】常用于表名，【-】常用于日期或连词）
+		txt = replaceByRegex(txt, "[,/;\"'?？，。!！=@#\\[\\]【】\\\\:]", " ")
 		//log.Println(txt)
 		keys := strings.Split(txt, " ")
 		for _, word := range keys {
@@ -116,35 +115,35 @@ func replaceByRegex(str string, rule string, replace string) string {
 	return reg.ReplaceAllString(str, replace)
 }
 
-// 检索用文字进行分词，以及针对检索特殊场景的优化
-func GetSearchKey(searchKey string) string {
-	if searchKey == "" {
-		return ""
-	}
+// // 检索用文字进行分词，以及针对检索特殊场景的优化
+// func GetSearchKey(searchKey string) string {
+// 	if searchKey == "" {
+// 		return ""
+// 	}
 
-	var mapKey = make(map[string]string)
-	kws := CutForSearch(searchKey)
+// 	var mapKey = make(map[string]string)
+// 	kws := CutForSearch(searchKey)
 
-	for _, k := range kws {
-		mapKey[k] = ""
-	}
+// 	for _, k := range kws {
+// 		mapKey[k] = ""
+// 	}
 
-	for _, kw := range kws {
-		ks := CutForSearch(kw)
-		if len(ks) > 1 {
-			for _, k := range ks {
-				delete(mapKey, k)
-			}
-			mapKey[kw] = ""
-		}
-	}
+// 	for _, kw := range kws {
+// 		ks := CutForSearch(kw)
+// 		if len(ks) > 1 {
+// 			for _, k := range ks {
+// 				delete(mapKey, k)
+// 			}
+// 			mapKey[kw] = ""
+// 		}
+// 	}
 
-	var rs []string
-	for k := range mapKey {
-		rs = append(rs, k)
-	}
+// 	var rs []string
+// 	for k := range mapKey {
+// 		rs = append(rs, k)
+// 	}
 
-	// TODO
-	log.Println("搜索关键词", kws, "优化后搜索", rs)
-	return strings.Join(rs, " ")
-}
+// 	// TODO
+// 	log.Println("搜索关键词", kws, "优化后搜索", rs)
+// 	return strings.Join(rs, " ")
+// }
