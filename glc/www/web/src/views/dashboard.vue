@@ -33,8 +33,7 @@
               </template>
             </el-table-column>
 
-            <!-- <el-table-column prop="id" label="ID" width="80"/> -->
-            <!-- <el-table-column prop="system" label="系统" width="100"/> -->
+            <el-table-column prop="system" label="系统" width="120"/>
             <el-table-column prop="date" label="日期时间" width="208"/>
             <el-table-column prop="text" label="内容">
               <template #default="scope">
