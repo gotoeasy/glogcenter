@@ -26,8 +26,8 @@
             <el-table-column fixed type="expand" width="60">
               <template #default="scope">
                 <div class="x-detail">
-                  <el-scrollbar :class="{'x-scrollbar':(scope.row.detail && scope.row.detail.split('\n').length>20)}">
-                  <div v-html="scope.row.detail"></div>
+                  <el-scrollbar v-if="scope.row.detail" :class="{'x-scrollbar':(scope.row.detail && scope.row.detail.split('\n').length>20)}">
+                    <div v-html="scope.row.detail.replace(/\n/g, '<br>')"></div>
                   </el-scrollbar>
                 </div>
               </template>
