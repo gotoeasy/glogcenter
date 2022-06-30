@@ -5,15 +5,16 @@
 package sysmnt
 
 import (
+	"bytes"
 	"glc/cmn"
 )
 
-const _PREFIX = "?"
+var zero6Bytes []byte = cmn.Uint64ToBytes(0) // 避免键冲突，加前缀
 
 // 检查指定关键词是否都有数据
 func (s *SysmntStorage) ContainsKeyWord(kws []string) bool {
 	for _, k := range kws {
-		_, err := s.Get(cmn.StringToBytes(_PREFIX + k))
+		_, err := s.Get(getKeyBytes(k))
 		if err != nil {
 			return false
 		}
@@ -24,7 +25,15 @@ func (s *SysmntStorage) ContainsKeyWord(kws []string) bool {
 // 添加关键词
 func (s *SysmntStorage) AddKeyWords(kws []string) {
 	for _, k := range kws {
-		s.Put(cmn.StringToBytes(_PREFIX+k), cmn.StringToBytes("")) // TODO 这个是否有性能问题？
+		s.Put(getKeyBytes(k), cmn.StringToBytes("")) // TODO 这个是否有性能问题？
 		// log.Println("关键词已标记存在数据：", k)
 	}
+}
+
+func getKeyBytes(k string) []byte {
+	return joinBytes(zero6Bytes, cmn.StringToBytes(k))
+}
+
+func joinBytes(bts ...[]byte) []byte {
+	return bytes.Join(bts, []byte(""))
 }
