@@ -3,6 +3,7 @@ package gweb
 import (
 	"context"
 	"fmt"
+	"glc/cmn"
 	"glc/ldb/conf"
 	"glc/onexit"
 	"log"
@@ -19,6 +20,12 @@ func Run() {
 
 	ginEngine := gin.Default()
 
+	// ginEngine.GET("/assets/*filepath", func(c *gin.Context) {
+	// 	staticServer := http.FileServer(http.FS(assets.Static))
+	// 	c.Request.URL = &url.URL{Path: "web/dist" + c.Request.RequestURI}
+	// 	staticServer.ServeHTTP(c.Writer, c.Request)
+	// })
+
 	ginEngine.NoRoute(func(c *gin.Context) {
 		req := NewHttpRequest(c)
 
@@ -32,8 +39,21 @@ func Run() {
 			}
 		}
 
-		// controller
+		// 静态文件
 		path := strings.ToLower(c.Request.URL.Path)
+		if cmn.EndwithsRune(path, ".html") {
+			path = "/**/*.html"
+		} else if cmn.EndwithsRune(path, ".css") {
+			path = "/**/*.css"
+		} else if cmn.EndwithsRune(path, ".js") {
+			path = "/**/*.js"
+		} else if cmn.EndwithsRune(path, ".png") {
+			path = "/**/*.png"
+		} else if cmn.EndwithsRune(path, ".ico") {
+			path = "/**/*.ico"
+		}
+
+		// controller
 		method := strings.ToUpper(c.Request.Method)
 		handle := getHttpController(method, path)
 		if handle == nil {

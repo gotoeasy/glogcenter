@@ -34,8 +34,8 @@ func NewDefaultEngine() *Engine {
 }
 
 // 添加日志
-func (e *Engine) AddTextLog(logText string) {
-	e.logStorage.AddTextLog(logText)
+func (e *Engine) AddTextLog(date string, logText string, system string) {
+	e.logStorage.AddTextLog(date, logText, system)
 }
 
 func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint64, forward bool) *search.SearchResult {

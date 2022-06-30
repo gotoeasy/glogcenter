@@ -145,3 +145,41 @@ func GeyStoreNameByDate(name string) string {
 	}
 	return name
 }
+
+func EndwithsRune(str string, endstr string) bool {
+
+	if endstr == "" || str == endstr {
+		return true
+	}
+
+	strs := []rune(str)
+	ends := []rune(endstr)
+	lens := len(strs)
+	lene := len(ends)
+	if lens < lene {
+		return false
+	}
+
+	dif := lens - lene
+	for i := lene - 1; i >= 0; i-- {
+		if strs[dif+i] != ends[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func SubStringRune(str string, start int, end int) string {
+	srune := []rune(str)
+	slen := len(srune)
+	if start >= slen || start >= end || start < 0 {
+		return ""
+	}
+
+	rs := ""
+	for i := start; i < slen && i < end; i++ {
+		rs += string(srune[i])
+	}
+	return rs
+}

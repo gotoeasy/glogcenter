@@ -32,6 +32,10 @@ func NewHttpRequest(c *gin.Context) *HttpRequest {
 	}
 }
 
+func (r *HttpRequest) SetHeader(key string, value string) {
+	r.ginCtx.Header(key, value)
+}
+
 func (r *HttpRequest) GetHeader(name string) string {
 	ary := r.mapHead[strings.ToLower(name)]
 	if ary == nil {
@@ -58,4 +62,24 @@ func (r *HttpRequest) GetFormParameter(name string) string {
 
 func (r *HttpRequest) Redirect(url string) {
 	r.ginCtx.Redirect(http.StatusMovedPermanently, url)
+}
+
+func (r *HttpRequest) ResponseData(code int, contentType string, bytes []byte) {
+	r.ginCtx.Data(code, contentType, bytes)
+}
+
+func (r *HttpRequest) GetMethod() string {
+	return r.ginCtx.Request.Method
+}
+
+func (r *HttpRequest) AbortWithStatus(code int) {
+	r.ginCtx.AbortWithStatus(code)
+}
+
+func (r *HttpRequest) RequestURI() string {
+	return r.ginCtx.Request.RequestURI
+}
+
+func (r *HttpRequest) RequestUrlPath() string {
+	return r.ginCtx.Request.URL.Path
 }

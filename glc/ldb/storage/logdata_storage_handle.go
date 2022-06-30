@@ -41,7 +41,7 @@ func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 }
 
 // 添加日志（参数是普通文本日志）
-func (s *LogDataStorageHandle) AddTextLog(logText string) {
+func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system string) {
 	txt := strings.TrimSpace(logText)
 	if txt == "" {
 		return
@@ -53,6 +53,8 @@ func (s *LogDataStorageHandle) AddTextLog(logText string) {
 	if len(ary) > 1 {
 		d.Detail = txt
 	}
+	d.Date = date
+	d.System = system
 
 	if s.storage.IsClose() {
 		s.storage = NewLogDataStorage(s.storage.storeName, "data")

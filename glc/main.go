@@ -1,10 +1,7 @@
 package main
 
-import (
-	"glc/gweb/http"
-	"glc/web/router"
-)
+import "glc/onstart"
 
 func main() {
-	http.StartHttpServer(router.Register)
+	onstart.Run()
 }

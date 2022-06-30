@@ -146,5 +146,5 @@ func GetSearchKey(searchKey string) string {
 
 	// TODO
 	log.Println("搜索关键词", kws, "优化后搜索", rs)
-	return rs[0]
+	return strings.Join(rs, " ")
 }

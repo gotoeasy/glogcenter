@@ -173,7 +173,7 @@ func createInvertedIndex(s *LogDataStorage) int {
 		idx := NewWordIndexStorage(s.StoreName(), word)
 		idx.Add(cmn.StringToUint64(m.Id, 36, 0)) // 日志ID加入索引
 	}
-	log.Println("创建日志索引：", m.Id)
+	log.Println("创建日志索引：", cmn.StringToUint64(m.Id, 36, 0))
 
 	// 保存索引信息
 	mnt.AddKeyWords(kws)          // 关键词信息
