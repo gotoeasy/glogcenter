@@ -19,6 +19,11 @@
 - [x] 提供`java`项目日志收集包，日志都发来发来发来
 - [x] 提供简洁的日志查询界面
 
+<div align=center>
+<img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
+</div>
+
+<br>
 
 # `docker`运行
 ```
