@@ -104,8 +104,10 @@ export default {
   },
   methods: {
     searchMore() {
-      if (this.data.length>10000) {
-        console.info("当前表格数据已达1万条，不再自动加载数据了")
+      if (this.data.length > 10000) {
+        if (this.info.indexOf('请考虑') < 0){
+          this.info += `（不再自动加载数据，请考虑输入过滤关键词检索）`
+        }
         return
       }
       let params = Object.assign({}, this.params);
