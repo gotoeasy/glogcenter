@@ -104,9 +104,9 @@ export default {
   },
   methods: {
     searchMore() {
-      if (this.data.length > 10000) {
+      if (this.data.length >= 10000) {
         if (this.info.indexOf('请考虑') < 0){
-          this.info += `（不再自动加载数据，请考虑输入过滤关键词检索）`
+          this.info += ` （不再自动加载更多数据，更精确查询请考虑修改检索条件）`
         }
         return
       }
@@ -116,7 +116,7 @@ export default {
 
       api.search(params).then(rs => {
         let res = rs.data
-        if (res.success && res.result.length) {
+        if (res.success && res.result.data.length) {
           this.data.push(...res.result.data)
           this.info = `日志总量 ${res.result.total} 条，当前匹配展示前 ${this.data.length} 条`
         }
