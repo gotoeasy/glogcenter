@@ -104,7 +104,7 @@ export default {
   },
   methods: {
     searchMore() {
-      if (this.data.length >= 10000) {
+      if (this.data.length >= 5000) {
         if (this.info.indexOf('请考虑') < 0){
           this.info += ` （不再自动加载更多数据，更精确查询请考虑修改检索条件）`
         }
