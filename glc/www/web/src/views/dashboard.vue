@@ -21,7 +21,7 @@
           </template>
  
 
-          <el-table :stripe="true" v-loading="loading" :data="data" :height="tableHeight" ref="table" style="width: 100%">
+          <el-table :stripe="true" v-loading="loading" :data="data" :height="tableHeight" style="width: 100%">
 
             <el-table-column fixed type="expand" width="60">
               <template #default="scope">
@@ -43,6 +43,14 @@
 
           </el-table>
 
+   
+            <div class="header">
+              <div style="display:flex;justify-content:space-between;">
+                <div v-html="info" class="x-info"></div>
+              </div>
+            </div>
+
+ 
         </el-card>
       </div>
     </el-main>
@@ -53,13 +61,15 @@
 import api from '../api'
 //import jsonViewer from 'vue-json-viewer'
 
+const FixHeight = 215  // 177
+
 export default {
   name: 'dashboard',
   components: {  },
   data() {
     return {
       loading: false,
-      tableHeight: (window.innerHeight - 177) + 'px',
+      tableHeight: (window.innerHeight - FixHeight) + 'px',
       params: {
         storeName: '',
         searchKey: '',
@@ -68,6 +78,7 @@ export default {
         forward: true,
       },
       data: [],
+      info: '',
     }
   },
   mounted(){
@@ -75,7 +86,7 @@ export default {
     // 自适应表格高度
     let that = this;
     window.onresize = () => {
-      that.tableHeight = (window.innerHeight - 177) + 'px';
+      that.tableHeight = (window.innerHeight - FixHeight) + 'px';
     };
 
     // 
@@ -104,7 +115,8 @@ export default {
       api.search(params).then(rs => {
         let res = rs.data
         if (res.success && res.result.length) {
-          this.data.push(...res.result)
+          this.data.push(...res.result.data)
+          this.info = `日志总量 ${res.result.total} 条，当前匹配展示前 ${this.data.length} 条`
         }
       })
     },
@@ -116,18 +128,17 @@ export default {
       api.search(this.params).then(rs => {
         let res = rs.data
         if (res.success) {
-          this.data = res.result;
+         // console.info(res,"xxxxxxxxxxxxxxxxxxxxxxx")
+          this.data = res.result.data;
           document.querySelector('.el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
+          this.info = `日志总量 ${res.result.total} 条，当前匹配展示前 ${this.data.length} 条`
         }
+
       }).finally(() => {
         this.loading = false
       })
     },
-    getTableHeight() {
-      let tableH = window.innerHeight - 142;
-    },
-  }
-  ,
+  },
 }
 </script>
 
@@ -173,4 +184,12 @@ button.el-button.x-search{
     height:420px;
 }
 
+.x-info{
+  min-height:42px;
+  line-height:42px;
+  padding-top:5px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #909399;
+}
 </style>

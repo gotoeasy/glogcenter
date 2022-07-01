@@ -103,6 +103,6 @@ func findSame(pageSize int, currentDocId uint64, forward bool, storeLogData *sto
 		}
 	}
 
-	rs.Total = fmt.Sprintf("%d", rsCnt)
+	rs.Total = fmt.Sprintf("%d", storeLogData.TotalCount())
 	return rs
 }

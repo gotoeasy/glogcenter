@@ -11,7 +11,7 @@ func Test_all(t *testing.T) {
 
 	engine := NewDefaultEngine()
 	for i := 1; i <= 100; i++ {
-		engine.AddTextLog("date", fmt.Sprintf(` java.sql.SQLException:  ddduse them aalav_%d`, i), "sssss_ssss")
+		engine.AddTextLog("date", fmt.Sprintf(`java.sql.SQLException:  ddduse them aalav_%d`, i), "sssss_ssss")
 	}
 	time.Sleep(time.Duration(5) * time.Second)
 

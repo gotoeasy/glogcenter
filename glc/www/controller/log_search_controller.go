@@ -17,5 +17,5 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	eng := ldb.NewEngine(storeNmae)
 	rs := eng.Search(searchKey, pageSize, currentId, forward)
-	return gweb.Result(rs.Data)
+	return gweb.Result(rs)
 }

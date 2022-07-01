@@ -92,11 +92,11 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint64, forward 
 // 有关键词时走索引检索
 func SearchWordIndex(storeName string, word string, pageSize int, currentDocId uint64, forward bool) *SearchResult {
 
-	var rs = new(SearchResult)                                 // 检索结果
-	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
-	storeIndex := storage.NewWordIndexStorage(storeName, word) // 索引
-	totalCount := storeIndex.TotalCount()                      // 总件数
-	rs.Total = cmn.Uint64ToString(totalCount, 10)              // 返回的总件数用10进制字符串形式以避免出现科学计数法
+	var rs = new(SearchResult)                                   // 检索结果
+	storeLogData := storage.NewLogDataStorageHandle(storeName)   // 数据
+	storeIndex := storage.NewWordIndexStorage(storeName, word)   // 索引
+	totalCount := storeIndex.TotalCount()                        // 总件数
+	rs.Total = cmn.Uint64ToString(storeLogData.TotalCount(), 10) // 返回的总件数用10进制字符串形式以避免出现科学计数法
 
 	if totalCount == 0 {
 		return rs
