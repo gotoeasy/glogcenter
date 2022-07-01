@@ -179,6 +179,7 @@ button.el-button.x-search{
 .x-detail{
     padding-top:5px;
     padding-left:30px;
+    padding-right:5px;
     padding-bottom:5px;
     background-color: floralwhite;
 }
