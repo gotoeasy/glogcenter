@@ -26,16 +26,16 @@
             <el-table-column fixed type="expand" width="60">
               <template #default="scope">
                 <div class="x-detail">
-                  <el-scrollbar v-if="scope.row.detail" :class="{'x-scrollbar':(scope.row.detail && scope.row.detail.split('\n').length>20)}">
-                    <div v-html="scope.row.detail.replace(/\n/g, '<br>')"></div>
+                  <el-scrollbar :class="{'x-scrollbar':(scope.row.detail && scope.row.detail.split('\n').length>20)}">
+                    <div v-html="(scope.row.detail || scope.row.text).replace(/\n/g, '<br>')" style="word-break: break-all;"></div>
                   </el-scrollbar>
                 </div>
               </template>
             </el-table-column>
 
-            <el-table-column prop="system" label="系统" width="120"/>
+            <el-table-column prop="system" label="分类" width="120"/>
             <el-table-column prop="date" label="日期时间" width="208"/>
-            <el-table-column prop="text" label="内容">
+            <el-table-column prop="text" label="内容" :show-overflow-tooltip="true">
               <template #default="scope">
                 <span v-html="scope.row.text"></span>
               </template>
@@ -194,5 +194,11 @@ button.el-button.x-search{
   font-size: 14px;
   font-weight: 500;
   color: #909399;
+}
+</style>
+
+<style>
+.el-popper.is-dark{
+  display: none;
 }
 </style>
