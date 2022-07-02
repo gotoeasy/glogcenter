@@ -22,7 +22,6 @@ COPY . /goproject
 COPY --from=webbuilder /webproject/www/web/dist www/web/
 
 ENV GOPROXY https://goproxy.cn,direct
-# 编译，关闭CGO(重要)
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
 
 
@@ -32,10 +31,9 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
 FROM alpine AS runner
 MAINTAINER gotoeasy <gotoeasy@163.com>
 
-# 复制编译好的glc可执行文件
 COPY --from=gobuilder /goproject/glc /usr/local/bin/
 
-# 安装bash以便能进入容器
+# 安装bash
 RUN alpine_version=`cat /etc/issue | head -1 | awk '{print $5}'` \
     && echo "https://mirrors.aliyun.com/alpine/v${alpine_version}/main/" > /etc/apk/repositories \
     && apk update && apk upgrade && apk add --no-cache bash bash-doc bash-completion \
