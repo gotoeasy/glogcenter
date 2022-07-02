@@ -21,6 +21,7 @@ var contextPath string
 var enableSecurityKey bool
 var securityKey string
 var headerSecurityKey string
+var enableWebGzip bool
 
 func init() {
 	UpdateConfigByEnv()
@@ -37,6 +38,12 @@ func UpdateConfigByEnv() {
 	enableSecurityKey = GetenvBool("GLC_ENABLE_SECURITY_KEY", false)         // web服务是否开启API秘钥校验，默认false
 	headerSecurityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")      // web服务API秘钥的header键名
 	securityKey = Getenv("GLC_SECURITY_KEY", "glogcenter")                   // web服务API秘钥
+	enableWebGzip = GetenvBool("GLC_ENABLE_WEB_GZIP", true)                  // web服务是否开启Gzip
+}
+
+// 取配置： web服务API秘钥的header键名，可通过环境变量“GLC_HEADER_SECURITY_KEY”设定，默认值“X-GLC-AUTH”
+func IsEnableWebGzip() bool {
+	return enableWebGzip
 }
 
 // 取配置： web服务API秘钥的header键名，可通过环境变量“GLC_HEADER_SECURITY_KEY”设定，默认值“X-GLC-AUTH”

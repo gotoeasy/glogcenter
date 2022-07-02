@@ -4,6 +4,7 @@ import (
 	"glc/gweb"
 	"glc/gweb/http"
 	"glc/gweb/method"
+	"glc/ldb"
 	"glc/ldb/conf"
 	"glc/www/controller"
 	"glc/www/filter"
@@ -37,4 +38,7 @@ func Run() {
 		gweb.RegisterController(method.POST, contextPath+"/add", controller.LogAddController)
 
 	})
+
+	// 默认引擎空转一下，触发未建索引继续建
+	ldb.NewDefaultEngine().AddTextLog("", "", "")
 }

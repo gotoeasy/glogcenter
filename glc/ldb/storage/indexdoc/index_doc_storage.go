@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/filter"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 )
 
 type DocIndexStorage struct {
@@ -67,7 +69,9 @@ func NewDocIndexStorage(storeName string, word string) *DocIndexStorage { // 存
 	store.lastTime = time.Now().Unix()
 
 	dbPath := conf.GetStorageRoot() + cmn.PathSeparator() + cacheName
-	db, err := leveldb.OpenFile(dbPath, nil) // 打开（在指定子目录中存放数据）
+	option := new(opt.Options)                  // leveldb选项
+	option.Filter = filter.NewBloomFilter(10)   // 使用布隆过滤器
+	db, err := leveldb.OpenFile(dbPath, option) // 打开（在指定子目录中存放数据）
 	if err != nil {
 		log.Println("打开DocIndexStorage失败：", dbPath)
 		panic(err)

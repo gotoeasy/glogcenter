@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,11 +21,10 @@ func Run() {
 
 	ginEngine := gin.Default()
 
-	// ginEngine.GET("/assets/*filepath", func(c *gin.Context) {
-	// 	staticServer := http.FileServer(http.FS(assets.Static))
-	// 	c.Request.URL = &url.URL{Path: "web/dist" + c.Request.RequestURI}
-	// 	staticServer.ServeHTTP(c.Writer, c.Request)
-	// })
+	// 按配置判断启用GZIP压缩
+	if conf.IsEnableWebGzip() {
+		ginEngine.Use(gzip.Gzip(gzip.DefaultCompression))
+	}
 
 	ginEngine.NoRoute(func(c *gin.Context) {
 		req := NewHttpRequest(c)
