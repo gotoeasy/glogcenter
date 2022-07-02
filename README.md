@@ -9,7 +9,7 @@
 <br>
 
 
-# 特点
+## 特点
 - [x] 使用`golang`实现，就是快
 - [x] 借助`goleveldb`做数据保存，结合日志写多读少特点稍加设计，真是快
 - [x] 日志量虽大，却是真心节省内存资源
@@ -25,10 +25,13 @@
 
 <br>
 
-# `docker`运行
+## `docker`运行
 ```
 // 简单示例
-docker run -d -p 8080:8080 -v /logdata:/glogcenter gotoeasy/glc
+docker run -d -p 8080:8080 gotoeasy/glc
+
+// 外挂数据目录
+docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
 
@@ -38,7 +41,7 @@ docker run -d -p 8080:8080 -v /logdata:/glogcenter gotoeasy/glc
 
 
 
-# 使用`logback`的`java`项目，支持日志收集
+## 使用`logback`的`java`项目，支持日志收集
 ```xml
 <!-- pom坐标 -->
 <dependency>
@@ -61,15 +64,20 @@ docker run -d -p 8080:8080 -v /logdata:/glogcenter gotoeasy/glc
 ```
 
 
-# TODO
-- [ ] 为了性能，好像把空间代价有搞大了
+## TODO
 - [ ] 还好多
 
 
 
-# 更新履历
+## 更新履历
 
-### 版本`0.2.0`，`latest`
+### 版本`0.3.0`，`latest`
+
+- [x] 全面重构，不考虑旧版兼容
+- [x] 控制索引文件数，避免大量日志时打开文件过多而崩溃
+- [x] 降低索引文件的磁盘空间占用，或许有察觉不出的性能差异
+
+### 版本`0.2.0`
 
 - [x] DIY了一个`logo`
 - [x] 接口`/glc/add`添加`system`参数
