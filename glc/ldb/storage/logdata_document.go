@@ -11,7 +11,7 @@ import (
 
 // 日志的文档索引
 type LogDataDocument struct {
-	Id      uint64 `json:"id,omitempty"`      // 文档ID，从1开始递增
+	Id      uint32 `json:"id,omitempty"`      // 文档ID，从1开始递增
 	Content string `json:"content,omitempty"` // 文档内容，内容格式自行定义
 }
 

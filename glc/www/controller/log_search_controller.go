@@ -12,7 +12,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	//searchKey := tokenizer.GetSearchKey(req.GetFormParameter("searchKey"))
 	searchKey := req.GetFormParameter("searchKey")
 	pageSize := cmn.StringToInt(req.GetFormParameter("pageSize"), 20)
-	currentId := cmn.StringToUint64(req.GetFormParameter("currentId"), 36, 0)
+	currentId := cmn.StringToUint32(req.GetFormParameter("currentId"), 0)
 	forward := cmn.StringToBool(req.GetFormParameter("forward"), true)
 
 	eng := ldb.NewEngine(storeNmae)

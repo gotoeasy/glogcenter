@@ -9,7 +9,7 @@ import (
 )
 
 // 参数widxs长度要求大于1，currentDocId不传就是查第一页
-func findSame(pageSize int, currentDocId uint64, forward bool, storeLogData *storage.LogDataStorageHandle, widxs ...*storage.WordIndexStorage) *SearchResult {
+func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *storage.LogDataStorageHandle, widxs ...*storage.WordIndexStorage) *SearchResult {
 
 	var rs = new(SearchResult)
 

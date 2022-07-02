@@ -38,7 +38,7 @@ func (e *Engine) AddTextLog(date string, logText string, system string) {
 	e.logStorage.AddTextLog(date, logText, system)
 }
 
-func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint64, forward bool) *search.SearchResult {
+func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, forward bool) *search.SearchResult {
 
 	// 检查修正pageSize
 	if pageSize < 1 {

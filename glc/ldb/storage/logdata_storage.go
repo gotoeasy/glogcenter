@@ -26,7 +26,7 @@ type LogDataStorage struct {
 	subPath      string             // 存储目录下的相对路径（存放数据）
 	storeChan    chan *LogDataModel // 存储通道
 	leveldb      *leveldb.DB        // leveldb
-	currentCount uint64             // 当前件数
+	currentCount uint32             // 当前件数
 	lastTime     int64              // 最后一次访问时间
 	closing      bool               // 是否关闭中状态
 	mu           sync.Mutex         // 锁
@@ -131,15 +131,15 @@ func readyGo(store *LogDataStorage) {
 
 func saveLogData(store *LogDataStorage, model *LogDataModel) {
 	//store.wg.Done()
-	store.currentCount++                                  // ID递增
-	doc := new(LogDataDocument)                           // 文档
-	doc.Id = store.currentCount                           // 已递增好的值
-	model.Id = cmn.Uint64ToString(store.currentCount, 36) // 模型数据要转Json存，也得更新ID,ID用36进制字符串形式表示
-	doc.Content = model.ToJson()                          // 转json作为内容(含Id)
+	store.currentCount++                              // ID递增
+	doc := new(LogDataDocument)                       // 文档
+	doc.Id = store.currentCount                       // 已递增好的值
+	model.Id = cmn.Uint32ToString(store.currentCount) // 模型数据要转Json存，也得更新ID,ID用36进制字符串形式表示
+	doc.Content = model.ToJson()                      // 转json作为内容(含Id)
 
 	// 保存
-	store.put(cmn.Uint64ToBytes(doc.Id), doc.ToBytes())                                 // 日志数据
-	store.leveldb.Put(cmn.Uint64ToBytes(0), cmn.Uint64ToBytes(store.currentCount), nil) // 保存日志总件数
+	store.put(cmn.Uint32ToBytes(doc.Id), doc.ToBytes())                                 // 日志数据
+	store.leveldb.Put(cmn.Uint32ToBytes(0), cmn.Uint32ToBytes(store.currentCount), nil) // 保存日志总件数
 	log.Println("保存日志数据 ", doc.Id)
 }
 
@@ -171,9 +171,9 @@ func createInvertedIndex(s *LogDataStorage) int {
 	// 每个关键词都创建反向索引
 	for _, word := range kws {
 		idx := NewWordIndexStorage(s.StoreName(), word)
-		idx.Add(cmn.StringToUint64(m.Id, 36, 0)) // 日志ID加入索引
+		idx.Add(cmn.StringToUint32(m.Id, 0)) // 日志ID加入索引
 	}
-	log.Println("创建日志索引：", cmn.StringToUint64(m.Id, 36, 0))
+	log.Println("创建日志索引：", cmn.StringToUint32(m.Id, 0))
 
 	// 保存索引信息
 	mnt.AddKeyWords(kws)          // 关键词信息
@@ -215,12 +215,12 @@ func (s *LogDataStorage) Get(key []byte) ([]byte, error) {
 }
 
 // 直接从leveldb取数据并转换为LogDataModel
-func (s *LogDataStorage) GetLogDataModel(id uint64) (*LogDataModel, error) {
+func (s *LogDataStorage) GetLogDataModel(id uint32) (*LogDataModel, error) {
 	if s.closing {
 		return nil, errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
 	}
 	s.lastTime = time.Now().Unix()
-	bts, err := s.leveldb.Get(cmn.Uint64ToBytes(id), nil)
+	bts, err := s.leveldb.Get(cmn.Uint32ToBytes(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -266,16 +266,16 @@ func (s *LogDataStorage) Close() {
 	log.Println("关闭LogDataStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
-func (s *LogDataStorage) loadTotalCount() uint64 {
-	bytes, err := s.leveldb.Get(cmn.Uint64ToBytes(0), nil)
+func (s *LogDataStorage) loadTotalCount() uint32 {
+	bytes, err := s.leveldb.Get(cmn.Uint32ToBytes(0), nil)
 	if err != nil || bytes == nil {
 		return 0
 	}
-	return cmn.BytesToUint64(bytes)
+	return cmn.BytesToUint32(bytes)
 }
 
 // 总件数
-func (s *LogDataStorage) TotalCount() uint64 {
+func (s *LogDataStorage) TotalCount() uint32 {
 	return s.currentCount
 }
 

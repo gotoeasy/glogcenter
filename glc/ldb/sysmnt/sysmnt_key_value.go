@@ -12,8 +12,8 @@ import (
 )
 
 type SysmntData struct {
-	Count   uint64
-	Value   uint64
+	Count   uint32
+	Value   uint32
 	Flag    bool
 	Content string
 }

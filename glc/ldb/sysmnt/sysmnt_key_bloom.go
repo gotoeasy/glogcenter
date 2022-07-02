@@ -9,7 +9,7 @@ import (
 	"glc/cmn"
 )
 
-var zero6Bytes []byte = cmn.Uint64ToBytes(0) // 避免键冲突，加前缀
+var zero6Bytes []byte = cmn.Uint32ToBytes(0) // 避免键冲突，加前缀
 
 // 检查指定关键词是否都有数据
 func (s *SysmntStorage) ContainsKeyWord(kws []string) bool {

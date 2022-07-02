@@ -24,7 +24,7 @@ type WordIndexStorage struct {
 	subPath      string      // 存储目录下的相对路径（存放数据）
 	word         string      // 索引关键词
 	leveldb      *leveldb.DB // leveldb
-	currentCount uint64      // 当前件数
+	currentCount uint32      // 当前件数
 	lastTime     int64       // 最后一次访问时间
 	closing      bool        // 是否关闭中状态
 	mu           sync.Mutex  // 锁
@@ -104,12 +104,12 @@ func autoCloseWordIndexStorageWhenMaxIdle(store *WordIndexStorage) {
 }
 
 // 日志ID添加到索引
-func (s *WordIndexStorage) Add(docId uint64) error {
+func (s *WordIndexStorage) Add(docId uint32) error {
 
 	// 加索引
 	s.lastTime = time.Now().Unix()
 	s.currentCount++ // ID递增
-	err := s.leveldb.Put(cmn.Uint64ToBytes(s.currentCount), cmn.Uint64ToBytes(docId), nil)
+	err := s.leveldb.Put(cmn.Uint32ToBytes(s.currentCount), cmn.Uint32ToBytes(docId), nil)
 	if err != nil {
 		log.Println("保存索引失败", err)
 		return err
@@ -117,14 +117,14 @@ func (s *WordIndexStorage) Add(docId uint64) error {
 
 	// docId加盐为键保存索引位置（反向索引再建反向索引之意）
 	keyDocId := fmt.Sprintf("d%d", docId)
-	err = s.leveldb.Put(cmn.StringToBytes(keyDocId), cmn.Uint64ToBytes(s.currentCount), nil)
+	err = s.leveldb.Put(cmn.StringToBytes(keyDocId), cmn.Uint32ToBytes(s.currentCount), nil)
 	if err != nil {
 		log.Println("保存索引失败", err)
 		return err
 	}
 
 	// 保存建好的索引数
-	s.leveldb.Put(cmn.Uint64ToBytes(0), cmn.Uint64ToBytes(s.currentCount), nil)
+	s.leveldb.Put(cmn.Uint32ToBytes(0), cmn.Uint32ToBytes(s.currentCount), nil)
 	if err != nil {
 		log.Println("保存索引件数失败", err)
 		return err // 忽略事务问题，可下回重建
@@ -134,26 +134,26 @@ func (s *WordIndexStorage) Add(docId uint64) error {
 }
 
 // 按日志文档ID找索引位置(找不到返回0)
-func (s *WordIndexStorage) GetPosByDocId(id uint64) uint64 {
+func (s *WordIndexStorage) GetPosByDocId(id uint32) uint32 {
 	keyDocId := fmt.Sprintf("d%d", id)
 	idx, err := s.leveldb.Get(cmn.StringToBytes(keyDocId), nil)
 	if err != nil {
 		return 0
 	}
-	return cmn.BytesToUint64(idx)
+	return cmn.BytesToUint32(idx)
 }
 
 // 通过索引ID取日志ID（返回0表示有问题）
-func (s *WordIndexStorage) Get(id uint64) uint64 {
+func (s *WordIndexStorage) Get(id uint32) uint32 {
 	if s.closing {
 		return 0
 	}
 	s.lastTime = time.Now().Unix()
-	b, err := s.leveldb.Get(cmn.Uint64ToBytes(id), nil)
+	b, err := s.leveldb.Get(cmn.Uint32ToBytes(id), nil)
 	if err != nil {
 		return 0
 	}
-	return cmn.BytesToUint64(b)
+	return cmn.BytesToUint32(b)
 }
 
 // 关闭Storage
@@ -177,16 +177,16 @@ func (s *WordIndexStorage) Close() {
 	log.Println("关闭WordIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
-func (s *WordIndexStorage) loadTotalCount() uint64 {
-	bytes, err := s.leveldb.Get(cmn.Uint64ToBytes(0), nil)
+func (s *WordIndexStorage) loadTotalCount() uint32 {
+	bytes, err := s.leveldb.Get(cmn.Uint32ToBytes(0), nil)
 	if err != nil || bytes == nil {
 		return 0
 	}
-	return cmn.BytesToUint64(bytes)
+	return cmn.BytesToUint32(bytes)
 }
 
 // 总件数
-func (s *WordIndexStorage) TotalCount() uint64 {
+func (s *WordIndexStorage) TotalCount() uint32 {
 	return s.currentCount
 }
 

@@ -75,15 +75,15 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 // }
 
 // 取日志（文档）
-func (s *LogDataStorageHandle) GetLogDataDocument(id uint64) *LogDataDocument {
-	bytes, _ := s.storage.Get(cmn.Uint64ToBytes(id))
+func (s *LogDataStorageHandle) GetLogDataDocument(id uint32) *LogDataDocument {
+	bytes, _ := s.storage.Get(cmn.Uint32ToBytes(id))
 	doc := new(LogDataDocument)
 	doc.LoadBytes(bytes)
 	return doc
 }
 
 // 取日志（模型）
-func (s *LogDataStorageHandle) GetLogDataModel(id uint64) *LogDataModel {
+func (s *LogDataStorageHandle) GetLogDataModel(id uint32) *LogDataModel {
 	d := s.GetLogDataDocument(id)
 	m := new(LogDataModel)
 	m.LoadJson(d.Content)
@@ -91,6 +91,6 @@ func (s *LogDataStorageHandle) GetLogDataModel(id uint64) *LogDataModel {
 }
 
 // 总件数
-func (s *LogDataStorageHandle) TotalCount() uint64 {
+func (s *LogDataStorageHandle) TotalCount() uint32 {
 	return s.storage.TotalCount()
 }

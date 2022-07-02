@@ -17,7 +17,7 @@ type SearchResult struct {
 }
 
 // 多关键词浏览日志
-func Search(storeName string, kws []string, pageSize int, currentDocId uint64, forward bool) *SearchResult {
+func Search(storeName string, kws []string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 	var widxs []*storage.WordIndexStorage
 	for _, word := range kws {
@@ -27,12 +27,12 @@ func Search(storeName string, kws []string, pageSize int, currentDocId uint64, f
 }
 
 // 无关键词时走全量检索
-func SearchLogData(storeName string, pageSize int, currentDocId uint64, forward bool) *SearchResult {
+func SearchLogData(storeName string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 
 	var rs = new(SearchResult)                                 // 检索结果
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 	totalCount := storeLogData.TotalCount()                    // 总件数
-	rs.Total = cmn.Uint64ToString(totalCount, 10)              // 返回的总件数用10进制字符串形式以避免出现科学计数法
+	rs.Total = cmn.Uint32ToString(totalCount)                  // 返回的总件数用10进制字符串形式以避免出现科学计数法
 
 	if totalCount == 0 {
 		return rs
@@ -40,10 +40,10 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint64, forward 
 
 	if currentDocId == 0 {
 		// 第一页
-		var min, max uint64
+		var min, max uint32
 		max = totalCount
-		if max > uint64(pageSize) {
-			min = max - uint64(pageSize) + 1
+		if max > uint32(pageSize) {
+			min = max - uint32(pageSize) + 1
 		} else {
 			min = 1
 		}
@@ -54,14 +54,14 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint64, forward 
 	} else if forward {
 		// 后一页
 		if currentDocId > 1 {
-			var min, max uint64
+			var min, max uint32
 			if currentDocId > totalCount {
 				max = totalCount
 			} else {
 				max = currentDocId - 1
 			}
-			if max > uint64(pageSize) {
-				min = max - uint64(pageSize) + 1
+			if max > uint32(pageSize) {
+				min = max - uint32(pageSize) + 1
 			} else {
 				min = 1
 			}
@@ -73,9 +73,9 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint64, forward 
 	} else {
 		// 前一页
 		if totalCount > currentDocId {
-			var min, max uint64
+			var min, max uint32
 			min = currentDocId + 1
-			max = min + uint64(pageSize) - 1
+			max = min + uint32(pageSize) - 1
 			if max > totalCount {
 				max = totalCount
 			}
@@ -90,13 +90,13 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint64, forward 
 }
 
 // 有关键词时走索引检索
-func SearchWordIndex(storeName string, word string, pageSize int, currentDocId uint64, forward bool) *SearchResult {
+func SearchWordIndex(storeName string, word string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 
-	var rs = new(SearchResult)                                   // 检索结果
-	storeLogData := storage.NewLogDataStorageHandle(storeName)   // 数据
-	storeIndex := storage.NewWordIndexStorage(storeName, word)   // 索引
-	totalCount := storeIndex.TotalCount()                        // 总件数
-	rs.Total = cmn.Uint64ToString(storeLogData.TotalCount(), 10) // 返回的总件数用10进制字符串形式以避免出现科学计数法
+	var rs = new(SearchResult)                                 // 检索结果
+	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
+	storeIndex := storage.NewWordIndexStorage(storeName, word) // 索引
+	totalCount := storeIndex.TotalCount()                      // 总件数
+	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount())   // 返回的总件数用10进制字符串形式以避免出现科学计数法
 
 	if totalCount == 0 {
 		return rs
@@ -104,10 +104,10 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 
 	if currentDocId == 0 {
 		// 第一页
-		var min, max uint64
+		var min, max uint32
 		max = totalCount
-		if max > uint64(pageSize) {
-			min = max - uint64(pageSize) + 1
+		if max > uint32(pageSize) {
+			min = max - uint32(pageSize) + 1
 		} else {
 			min = 1
 		}
@@ -118,14 +118,14 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 	} else if forward {
 		// 后一页
 		if currentDocId > 1 {
-			var min, max uint64
+			var min, max uint32
 			if currentDocId > totalCount {
 				max = totalCount
 			} else {
 				max = currentDocId - 1
 			}
-			if max > uint64(pageSize) {
-				min = max - uint64(pageSize) + 1
+			if max > uint32(pageSize) {
+				min = max - uint32(pageSize) + 1
 			} else {
 				min = 1
 			}
@@ -137,9 +137,9 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 	} else {
 		// 前一页
 		if totalCount > currentDocId {
-			var min, max uint64
+			var min, max uint32
 			min = currentDocId + 1
-			max = min + uint64(pageSize) - 1
+			max = min + uint32(pageSize) - 1
 			if max > totalCount {
 				max = totalCount
 			}
