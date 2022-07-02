@@ -37,8 +37,8 @@ func Run() {
 		gweb.RegisterController(method.POST, contextPath+"/search", controller.LogSearchController)
 		gweb.RegisterController(method.POST, contextPath+"/add", controller.LogAddController)
 
+		// 默认引擎空转一下，触发未建索引继续建
+		go ldb.NewDefaultEngine().AddTextLog("", "", "")
 	})
 
-	// 默认引擎空转一下，触发未建索引继续建
-	ldb.NewDefaultEngine().AddTextLog("", "", "")
 }
