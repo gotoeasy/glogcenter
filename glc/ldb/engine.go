@@ -4,7 +4,7 @@ import (
 	"glc/cmn"
 	"glc/ldb/search"
 	"glc/ldb/storage"
-	"glc/ldb/sysmnt"
+	"glc/ldb/sysidx"
 	"glc/ldb/tokenizer"
 	"log"
 )
@@ -12,7 +12,7 @@ import (
 type Engine struct {
 	storeName  string
 	logStorage *storage.LogDataStorageHandle // 日志存储控制器
-	sysStorage *sysmnt.SysmntStorage         // 系统存储器
+	sysStorage *sysidx.SysidxStorage         // 系统存储器
 }
 
 func NewEngine(storeName string) *Engine {
@@ -20,7 +20,7 @@ func NewEngine(storeName string) *Engine {
 	return &Engine{
 		storeName:  storeName,
 		logStorage: storage.NewLogDataStorageHandle(storeName),
-		sysStorage: sysmnt.GetSysmntStorage(storeName),
+		sysStorage: sysidx.GetSysidxStorage(storeName),
 	}
 }
 
@@ -29,7 +29,7 @@ func NewDefaultEngine() *Engine {
 	return &Engine{
 		storeName:  storeName,
 		logStorage: storage.NewLogDataStorageHandle(storeName),
-		sysStorage: sysmnt.GetSysmntStorage(storeName),
+		sysStorage: sysidx.GetSysidxStorage(storeName),
 	}
 }
 

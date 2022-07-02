@@ -10,7 +10,7 @@ import (
 	"errors"
 	"glc/cmn"
 	"glc/ldb/conf"
-	"glc/ldb/sysmnt"
+	"glc/ldb/sysidx"
 	"glc/ldb/tokenizer"
 	"glc/onexit"
 	"log"
@@ -148,8 +148,8 @@ func createInvertedIndex(s *LogDataStorage) int {
 
 	// 索引信息和日志数量相互比较，判断是否继续创建索引
 	mntKey := "INDEX:" + s.StoreName()
-	mnt := sysmnt.GetSysmntStorage(s.StoreName())
-	sd := mnt.GetSysmntData(mntKey)
+	mnt := sysidx.GetSysidxStorage(s.StoreName())
+	sd := mnt.GetSysidxData(mntKey)
 	if s.TotalCount() == 0 || sd.Count >= s.TotalCount() {
 		return 0 // 没有新的日志需要建索引
 	}
@@ -177,7 +177,7 @@ func createInvertedIndex(s *LogDataStorage) int {
 
 	// 保存索引信息
 	mnt.AddKeyWords(kws)          // 关键词信息
-	mnt.SetSysmntData(mntKey, sd) // 索引生成进度信息
+	mnt.SetSysidxData(mntKey, sd) // 索引生成进度信息
 
 	return 1
 }

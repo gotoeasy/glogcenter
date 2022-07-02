@@ -3,7 +3,7 @@
  * 1）提供无序的KV形式读写功能，利用leveldb自动序列化存盘
  * 2）使用需自行控制避免发生Key的冲突问题
  */
-package sysmnt
+package sysidx
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ import (
 )
 
 // 存储结构体
-type SysmntStorage struct {
+type SysidxStorage struct {
 	storeName string      // 存储目录
 	subPath   string      // 存储目录下的相对路径（存放数据）
 	leveldb   *leveldb.DB // leveldb
@@ -27,30 +27,30 @@ type SysmntStorage struct {
 }
 
 var sdbMu sync.Mutex             // 锁
-var sysmntStorage *SysmntStorage // 缓存用存储器
+var sysidxStorage *SysidxStorage // 缓存用存储器
 
 func init() {
 	onexit.RegisterExitHandle(onExit) // 优雅退出
 }
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）
-func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档，自定义对象
+func GetSysidxStorage(storeName string) *SysidxStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
-	subPath := "sysmnt"
+	subPath := "sysidx"
 	cacheName := storeName + cmn.PathSeparator() + subPath
-	if sysmntStorage != nil && !sysmntStorage.IsClose() { // 尝试用缓存实例存储器
-		return sysmntStorage
+	if sysidxStorage != nil && !sysidxStorage.IsClose() { // 尝试用缓存实例存储器
+		return sysidxStorage
 	}
 
 	// 缓存无则锁后创建返回并存缓存
 	sdbMu.Lock()                                          // 上锁
 	defer sdbMu.Unlock()                                  // 解锁
-	if sysmntStorage != nil && !sysmntStorage.IsClose() { // 再次尝试用缓存实例存储器
-		return sysmntStorage
+	if sysidxStorage != nil && !sysidxStorage.IsClose() { // 再次尝试用缓存实例存储器
+		return sysidxStorage
 	}
 
-	store := new(SysmntStorage)
+	store := new(SysidxStorage)
 	store.storeName = storeName
 	store.subPath = subPath
 	store.closing = false
@@ -59,20 +59,20 @@ func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档�
 	dbPath := conf.GetStorageRoot() + cmn.PathSeparator() + cacheName
 	db, err := leveldb.OpenFile(dbPath, nil) // 打开（在指定子目录中存放数据）
 	if err != nil {
-		log.Println("打开SysmntStorage失败：", dbPath)
+		log.Println("打开SysidxStorage失败：", dbPath)
 		panic(err)
 	}
 	store.leveldb = db
-	sysmntStorage = store // 缓存起来
+	sysidxStorage = store // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
-	go autoCloseSysmntStorageWhenMaxIdle(store)
+	go autoCloseSysidxStorageWhenMaxIdle(store)
 
-	log.Println("打开SysmntStorage：", cacheName)
+	log.Println("打开SysidxStorage：", cacheName)
 	return store
 }
 
-func autoCloseSysmntStorageWhenMaxIdle(store *SysmntStorage) {
+func autoCloseSysidxStorageWhenMaxIdle(store *SysidxStorage) {
 	if conf.GetMaxIdleTime() > 0 {
 		ticker := time.NewTicker(time.Second)
 		for {
@@ -87,7 +87,7 @@ func autoCloseSysmntStorageWhenMaxIdle(store *SysmntStorage) {
 }
 
 // 关闭Storage
-func (s *SysmntStorage) Close() {
+func (s *SysidxStorage) Close() {
 	if s == nil || s.closing { // 优雅退出时可能会正好nil，判断一下优雅点
 		return
 	}
@@ -100,13 +100,13 @@ func (s *SysmntStorage) Close() {
 
 	s.closing = true
 	s.leveldb.Close()
-	sysmntStorage = nil
+	sysidxStorage = nil
 
-	log.Println("关闭SysmntStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
+	log.Println("关闭SysidxStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
 // 直接存入数据到leveldb
-func (s *SysmntStorage) Put(key []byte, value []byte) error {
+func (s *SysidxStorage) Put(key []byte, value []byte) error {
 	if s.closing {
 		return errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
 	}
@@ -115,7 +115,7 @@ func (s *SysmntStorage) Put(key []byte, value []byte) error {
 }
 
 // 直接从leveldb取数据
-func (s *SysmntStorage) Get(key []byte) ([]byte, error) {
+func (s *SysidxStorage) Get(key []byte) ([]byte, error) {
 	if s.closing {
 		return nil, errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
 	}
@@ -124,18 +124,18 @@ func (s *SysmntStorage) Get(key []byte) ([]byte, error) {
 }
 
 // 存储目录名
-func (s *SysmntStorage) StoreName() string {
+func (s *SysidxStorage) StoreName() string {
 	return s.storeName
 }
 
 // 是否关闭中状态
-func (s *SysmntStorage) IsClose() bool {
+func (s *SysidxStorage) IsClose() bool {
 	return s.closing
 }
 
 func onExit() {
-	if sysmntStorage != nil {
-		sysmntStorage.Close()
+	if sysidxStorage != nil {
+		sysidxStorage.Close()
 	}
-	log.Println("退出SysmntStorage")
+	log.Println("退出SysidxStorage")
 }
