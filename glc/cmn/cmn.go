@@ -126,9 +126,8 @@ func PathSeparator() string {
 }
 
 // 字符串哈希处理后取模(余数)，返回值最大不超过mod值
-func HashAndMod(str string, mod uint32, prefix string) string {
-	txt := prefix + "_" + str
-	return fmt.Sprint(crc32.ChecksumIEEE(StringToBytes(txt)) % mod)
+func HashAndMod(str string, mod uint32) string {
+	return fmt.Sprint(crc32.ChecksumIEEE(StringToBytes(str)) % mod)
 }
 
 func ToBytes(data any) []byte {
@@ -187,4 +186,8 @@ func SubStringRune(str string, start int, end int) string {
 		rs += string(srune[i])
 	}
 	return rs
+}
+
+func JoinBytes(bts ...[]byte) []byte {
+	return bytes.Join(bts, []byte(""))
 }

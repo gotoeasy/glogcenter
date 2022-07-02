@@ -4,13 +4,14 @@
  * 2）优先响应保存日志，闲时创建关键词反向索引
  * 3）获取存储对象线程安全，带缓存无则创建有则直取，空闲超时自动关闭leveldb，再次获取时自动打开
  */
-package storage
+package logdata
 
 import (
 	"errors"
 	"glc/cmn"
 	"glc/ldb/conf"
-	"glc/ldb/sysidx"
+	"glc/ldb/storage/indexword"
+	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"
 	"glc/onexit"
 	"log"
@@ -34,15 +35,15 @@ type LogDataStorage struct {
 }
 
 var ldbMu sync.Mutex
-var mapLogDataStorage map[string](*LogDataStorage)
+var mapStorage map[string](*LogDataStorage)
 
 func init() {
-	mapLogDataStorage = make(map[string](*LogDataStorage))
-	onexit.RegisterExitHandle(onExit4LogDataStorage) // 优雅退出
+	mapStorage = make(map[string](*LogDataStorage))
+	onexit.RegisterExitHandle(onExit) // 优雅退出
 }
 
 func getCacheStore(cacheName string) *LogDataStorage {
-	cacheStore := mapLogDataStorage[cacheName]
+	cacheStore := mapStorage[cacheName]
 	if cacheStore != nil && !cacheStore.IsClose() {
 		return cacheStore // 缓存中未关闭的存储对象
 	}
@@ -82,13 +83,13 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 	}
 	store.leveldb = db
 	store.currentCount = store.loadTotalCount() // 读取总件数
-	mapLogDataStorage[cacheName] = store        // 缓存起来
+	mapStorage[cacheName] = store               // 缓存起来
 
 	// 消费就绪
 	go readyGo(store)
 
 	// 逐秒判断，若闲置超时则自动关闭
-	go autoCloseLogDataStorageWhenMaxIdle(store)
+	go autoCloseWhenMaxIdle(store)
 
 	log.Println("打开LogDataStorage：", cacheName)
 	return store
@@ -148,41 +149,40 @@ func createInvertedIndex(s *LogDataStorage) int {
 
 	// 索引信息和日志数量相互比较，判断是否继续创建索引
 	mntKey := "INDEX:" + s.StoreName()
-	mnt := sysidx.GetSysidxStorage(s.StoreName())
-	sd := mnt.GetSysidxData(mntKey)
-	if s.TotalCount() == 0 || sd.Count >= s.TotalCount() {
+	sysStorage := sysmnt.GetSysmntStorage(s.StoreName())
+	sysmntData := sysStorage.GetSysmntData(mntKey)
+	if s.TotalCount() == 0 || sysmntData.Count >= s.TotalCount() {
 		return 0 // 没有新的日志需要建索引
 	}
 
-	sd.Count++                            // 下一条要建索引的日志id
-	m, err := s.GetLogDataModel(sd.Count) // 取出日志模型数据
+	sysmntData.Count++                               // 下一条要建索引的日志id
+	docm, err := s.GetLogDataModel(sysmntData.Count) // 取出日志模型数据
 	if err != nil {
-		log.Println("取日志模型数据失败：", sd.Count, err)
+		log.Println("取日志模型数据失败：", sysmntData.Count, err)
 		return 2
 	}
 
 	// 整理关键词
-	adds := m.Keywords
-	adds = append(adds, m.Tags...)
-	adds = append(adds, m.Client, m.Server, m.System, m.User)
-	kws := tokenizer.CutForSearchEx(m.Text, adds, m.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
-	//	log.Println("GetLogDataModel=", m.ToJson(), kws)
+	adds := docm.Keywords
+	adds = append(adds, docm.Tags...)
+	adds = append(adds, docm.Client, docm.Server, docm.System, docm.User)
+	kws := tokenizer.CutForSearchEx(docm.Text, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
+	//	log.Println("GetLogDataModel=", docm.ToJson(), kws)
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {
-		idx := NewWordIndexStorage(s.StoreName(), word)
-		idx.Add(cmn.StringToUint32(m.Id, 0)) // 日志ID加入索引
+		idxw := indexword.NewWordIndexStorage(s.StoreName(), word)
+		idxw.Add(word, cmn.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
-	log.Println("创建日志索引：", cmn.StringToUint32(m.Id, 0))
+	log.Println("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
 
-	// 保存索引信息
-	mnt.AddKeyWords(kws)          // 关键词信息
-	mnt.SetSysidxData(mntKey, sd) // 索引生成进度信息
+	// 保存当前创建了多少索引
+	sysStorage.SetSysmntData(mntKey, sysmntData)
 
 	return 1
 }
 
-func autoCloseLogDataStorageWhenMaxIdle(store *LogDataStorage) {
+func autoCloseWhenMaxIdle(store *LogDataStorage) {
 	if conf.GetMaxIdleTime() > 0 {
 		ticker := time.NewTicker(time.Second)
 		for {
@@ -257,11 +257,11 @@ func (s *LogDataStorage) Close() {
 	}
 
 	s.closing = true
-	s.wg.Wait()                          // 等待通道清空
-	s.wg.Add(1)                          // 通道消息计数
-	s.storeChan <- nil                   // 通道正在在阻塞等待接收，给个nil让它接收后关闭
-	s.leveldb.Close()                    // 走到这里时没有db操作了，可以关闭
-	mapLogDataStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
+	s.wg.Wait()                   // 等待通道清空
+	s.wg.Add(1)                   // 通道消息计数
+	s.storeChan <- nil            // 通道正在在阻塞等待接收，给个nil让它接收后关闭
+	s.leveldb.Close()             // 走到这里时没有db操作了，可以关闭
+	mapStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
 
 	log.Println("关闭LogDataStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
@@ -289,9 +289,9 @@ func (s *LogDataStorage) IsClose() bool {
 	return s.closing
 }
 
-func onExit4LogDataStorage() {
-	for k := range mapLogDataStorage {
-		mapLogDataStorage[k].Close()
+func onExit() {
+	for k := range mapStorage {
+		mapStorage[k].Close()
 	}
 	log.Println("退出LogDataStorage")
 }

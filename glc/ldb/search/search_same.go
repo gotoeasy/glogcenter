@@ -6,24 +6,28 @@ package search
 import (
 	"fmt"
 	"glc/ldb/storage"
+	"glc/ldb/storage/logdata"
 )
 
 // 参数widxs长度要求大于1，currentDocId不传就是查第一页
-func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *storage.LogDataStorageHandle, widxs ...*storage.WordIndexStorage) *SearchResult {
+func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *storage.LogDataStorageHandle, widxs ...*WidxStorage) *SearchResult {
 
 	var rs = new(SearchResult)
 
 	// 选个最短的索引
 	cnt := len(widxs)
 	minIdx := widxs[0]
+	minCount := minIdx.idxwordStorage.GetTotalCount(minIdx.word)
 	for i := 1; i < cnt; i++ {
-		if widxs[i].TotalCount() < minIdx.TotalCount() {
+		ctmp := widxs[i].idxwordStorage.GetTotalCount(widxs[i].word)
+		if ctmp < minCount {
+			minCount = ctmp
 			minIdx = widxs[i]
 		}
 	}
 
 	// 简单检查排除没结果的情景
-	totalCount := minIdx.TotalCount()
+	totalCount := minIdx.idxwordStorage.GetTotalCount(minIdx.word)
 	if totalCount == 0 || (totalCount == 1 && currentDocId > 0) {
 		return rs // 索引件数0、或只有1条又还要跳过，都是找不到
 	}
@@ -31,7 +35,7 @@ func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *sto
 	// 找匹配位置并排除没结果的情景
 	pos := totalCount // 默认检索最新第一页
 	if currentDocId > 0 {
-		pos = minIdx.GetPosByDocId(currentDocId) // 有相对文档ID时找相对位置
+		pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, currentDocId) // 有相对文档ID时找相对位置
 		if pos == 0 || (pos == 1 && forward) || (pos == totalCount && !forward) {
 			return rs // 找不到、或最后条还要向后、或最前条还要向前，都是找不到
 		}
@@ -48,14 +52,14 @@ func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *sto
 
 		for i := pos; i > 0; i-- {
 			// 取值
-			docId := minIdx.Get(i)
+			docId := minIdx.idxwordStorage.GetDocId(minIdx.word, i)
 			// 比较
 			flg = true
 			for i := 0; i < cnt; i++ {
 				if widxs[i] == minIdx {
 					continue // 跳过比较自己
 				}
-				if widxs[i].GetPosByDocId(docId) == 0 {
+				if widxs[i].idxdocStorage.GetWordDocSeq(widxs[i].word, docId) == 0 {
 					flg = false // 没找到
 					break
 				}
@@ -72,17 +76,17 @@ func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *sto
 	} else {
 		// 有相对文档ID且是前一页方向
 		pos++
-		var ary []*storage.LogDataModel
+		var ary []*logdata.LogDataModel
 		for i := pos; i <= totalCount; i++ {
 			// 取值
-			docId := minIdx.Get(pos)
+			docId := minIdx.idxwordStorage.GetDocId(minIdx.word, i)
 			// 比较
 			flg = true
 			for i := 0; i < cnt; i++ {
 				if widxs[i] == minIdx {
 					continue // 跳过比较自己
 				}
-				if widxs[i].GetPosByDocId(docId) == 0 {
+				if widxs[i].idxdocStorage.GetWordDocSeq(widxs[i].word, docId) == 0 {
 					flg = false // 没找到
 					break
 				}

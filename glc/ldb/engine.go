@@ -4,32 +4,32 @@ import (
 	"glc/cmn"
 	"glc/ldb/search"
 	"glc/ldb/storage"
-	"glc/ldb/sysidx"
+	"glc/ldb/storage/indexword"
 	"glc/ldb/tokenizer"
 	"log"
 )
 
 type Engine struct {
-	storeName  string
-	logStorage *storage.LogDataStorageHandle // 日志存储控制器
-	sysStorage *sysidx.SysidxStorage         // 系统存储器
+	storeName   string
+	logStorage  *storage.LogDataStorageHandle // 日志存储控制器
+	idxwStorage *indexword.WordIndexStorage   // 关键词反向索引存储器
 }
 
 func NewEngine(storeName string) *Engine {
 	storeName = cmn.GeyStoreNameByDate(storeName)
 	return &Engine{
-		storeName:  storeName,
-		logStorage: storage.NewLogDataStorageHandle(storeName),
-		sysStorage: sysidx.GetSysidxStorage(storeName),
+		storeName:   storeName,
+		logStorage:  storage.NewLogDataStorageHandle(storeName),
+		idxwStorage: indexword.NewWordIndexStorage(storeName, " "), // 特殊（空格做关键词参数传入）
 	}
 }
 
 func NewDefaultEngine() *Engine {
 	var storeName string = cmn.GeyStoreNameByDate("default")
 	return &Engine{
-		storeName:  storeName,
-		logStorage: storage.NewLogDataStorageHandle(storeName),
-		sysStorage: sysidx.GetSysidxStorage(storeName),
+		storeName:   storeName,
+		logStorage:  storage.NewLogDataStorageHandle(storeName),
+		idxwStorage: indexword.NewWordIndexStorage(storeName, " "), // 特殊（空格做关键词参数传入）
 	}
 }
 
@@ -57,10 +57,13 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 		log.Println("查询", searchKey, "，分词后检索", kws)
 	}
 
-	// 无数据判断，同布隆判断效果
-	if !e.sysStorage.ContainsKeyWord(kws) {
-		log.Println("检索条件布隆检查发现有不存在的关键词，直接返回空结果", kws)
-		return new(search.SearchResult)
+	// 简单检查，存在无索引数据的关键词时，直接返回
+	for _, word := range kws {
+		idxw := indexword.NewWordIndexStorage(e.storeName, word)
+		if idxw.GetTotalCount(word) < 1 {
+			log.Println("关键词", word, "没有索引数据，直接返回空结果")
+			return new(search.SearchResult)
+		}
 	}
 
 	if len(kws) == 0 {

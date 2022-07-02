@@ -9,19 +9,33 @@ package search
 import (
 	"glc/cmn"
 	"glc/ldb/storage"
+	"glc/ldb/storage/indexdoc"
+	"glc/ldb/storage/indexword"
+	"glc/ldb/storage/logdata"
 )
 
 type SearchResult struct {
 	Total string                  `json:"total,omitempty"` // 总件数（用10进制字符串形式以避免出现科学计数法）
-	Data  []*storage.LogDataModel `json:"data,omitempty"`  // 检索结果数据（日志文档数组）
+	Data  []*logdata.LogDataModel `json:"data,omitempty"`  // 检索结果数据（日志文档数组）
+}
+
+type WidxStorage struct {
+	word           string
+	idxdocStorage  *indexdoc.DocIndexStorage
+	idxwordStorage *indexword.WordIndexStorage
 }
 
 // 多关键词浏览日志
 func Search(storeName string, kws []string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
-	var widxs []*storage.WordIndexStorage
+	var widxs []*WidxStorage
 	for _, word := range kws {
-		widxs = append(widxs, storage.NewWordIndexStorage(storeName, word))
+		widxStorage := &WidxStorage{
+			word:           word,
+			idxdocStorage:  indexdoc.NewDocIndexStorage(storeName, word),
+			idxwordStorage: indexword.NewWordIndexStorage(storeName, word),
+		}
+		widxs = append(widxs, widxStorage)
 	}
 	return findSame(pageSize, currentDocId, forward, storeLogData, widxs...)
 }
@@ -92,11 +106,11 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint32, forward 
 // 有关键词时走索引检索
 func SearchWordIndex(storeName string, word string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 
-	var rs = new(SearchResult)                                 // 检索结果
-	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
-	storeIndex := storage.NewWordIndexStorage(storeName, word) // 索引
-	totalCount := storeIndex.TotalCount()                      // 总件数
-	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount())   // 返回的总件数用10进制字符串形式以避免出现科学计数法
+	var rs = new(SearchResult)                                   // 检索结果
+	storeLogData := storage.NewLogDataStorageHandle(storeName)   // 数据
+	storeIndex := indexword.NewWordIndexStorage(storeName, word) // 索引
+	totalCount := storeIndex.GetTotalCount(word)                 // 总件数
+	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount())     // 返回的总件数用10进制字符串形式以避免出现科学计数法
 
 	if totalCount == 0 {
 		return rs
@@ -113,7 +127,7 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 		}
 
 		for i := max; i >= min; i-- {
-			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)).ToLogDataModel()) // 经索引取日志文档ID
+			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.GetDocId(word, i)).ToLogDataModel()) // 经索引取日志文档ID
 		}
 	} else if forward {
 		// 后一页
@@ -131,7 +145,7 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)).ToLogDataModel())
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.GetDocId(word, i)).ToLogDataModel())
 			}
 		}
 	} else {
@@ -145,7 +159,7 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.Get(i)).ToLogDataModel())
+				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.GetDocId(word, i)).ToLogDataModel())
 			}
 		}
 	}

@@ -1,9 +1,9 @@
 /**
  * KV读写封装
  * 1）Key接口统一为string
- * 2）Value接口统一为SysidxData，并提供默认字段方便自行使用
+ * 2）Value接口统一为SysmntData，并提供默认字段方便自行使用
  */
-package sysidx
+package sysmnt
 
 import (
 	"bytes"
@@ -11,14 +11,14 @@ import (
 	"glc/cmn"
 )
 
-type SysidxData struct {
+type SysmntData struct {
 	Count   uint32
 	Value   uint32
 	Flag    bool
 	Content string
 }
 
-func (s *SysidxStorage) SetSysidxData(key string, value *SysidxData) {
+func (s *SysmntStorage) SetSysmntData(key string, value *SysmntData) {
 	k := cmn.StringToBytes(key)
 	buffer := new(bytes.Buffer)
 	encoder := gob.NewEncoder(buffer)
@@ -30,15 +30,15 @@ func (s *SysidxStorage) SetSysidxData(key string, value *SysidxData) {
 	s.Put(k, v)
 }
 
-func (s *SysidxStorage) GetSysidxData(key string) *SysidxData {
+func (s *SysmntStorage) GetSysmntData(key string) *SysmntData {
 	bs, err := s.Get(cmn.StringToBytes(key))
 	if err != nil {
-		return &SysidxData{
+		return &SysmntData{
 			Count: 0,
 		}
 	}
 
-	rs := new(SysidxData)
+	rs := new(SysmntData)
 	buffer := bytes.NewBuffer(bs)
 	decoder := gob.NewDecoder(buffer)
 	err = decoder.Decode(rs)

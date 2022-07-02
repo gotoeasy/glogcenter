@@ -6,7 +6,6 @@ package tokenizer
 import (
 	"glc/ldb/conf"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/wangbin/jiebago"
@@ -14,7 +13,7 @@ import (
 
 var seg jiebago.Segmenter // 参考 https://github.com/wangbin/jiebago
 var ignoreWords []string  // 默认忽略的单词
-var simpleCutMode bool    // 是否使用简单分词模式
+// var simpleCutMode bool    // 是否使用简单分词模式
 
 // 初始化装载字典
 func init() {
@@ -34,7 +33,7 @@ func init() {
 	}
 	//log.Println("默认忽略的单词: ", ignoreWords)
 
-	simpleCutMode = conf.GetenvBool("SIMPLE_CUT_MODE", true)
+	// simpleCutMode = conf.GetenvBool("SIMPLE_CUT_MODE", true)
 
 	seg.LoadDictionary(dictFile)
 }
@@ -64,20 +63,20 @@ func CutForSearchEx(text string, addWords []string, delWords []string) []string 
 		}
 	}
 
-	// 简单分词
-	if simpleCutMode {
-		// 针对日志再保留特殊字符（【.】用于包名，【/】用工于路径或日期，【_】常用于表名，【-】常用于日期或连词）
-		txt = replaceByRegex(txt, "[,/;\"'?？，。!！=@#\\[\\]【】\\\\:]", " ")
-		//log.Println(txt)
-		keys := strings.Split(txt, " ")
-		for _, word := range keys {
-			tmp = strings.TrimSpace(word)
-			tmp = strings.TrimRight(strings.Trim(tmp, "."), "-") // 去除两边点和右边减号
-			if tmp != "" {
-				mapStr[tmp] = ""
-			}
-		}
-	}
+	// // 简单分词
+	// if simpleCutMode {
+	// 	// 针对日志再保留特殊字符（【.】用于包名，【/】用工于路径或日期，【_】常用于表名，【-】常用于日期或连词）
+	// 	txt = replaceByRegex(txt, "[,/;\"'?？，。!！=@#\\[\\]【】\\\\:]", " ")
+	// 	//log.Println(txt)
+	// 	keys := strings.Split(txt, " ")
+	// 	for _, word := range keys {
+	// 		tmp = strings.TrimSpace(word)
+	// 		tmp = strings.TrimRight(strings.Trim(tmp, "."), "-") // 去除两边点和右边减号
+	// 		if tmp != "" {
+	// 			mapStr[tmp] = ""
+	// 		}
+	// 	}
+	// }
 
 	// 删除默认忽略的单词
 	for _, word := range ignoreWords {
@@ -106,14 +105,14 @@ func CutForSearchEx(text string, addWords []string, delWords []string) []string 
 	return rs
 }
 
-func replaceByRegex(str string, rule string, replace string) string {
-	reg, err := regexp.Compile(rule)
-	if reg == nil || err != nil {
-		panic("ssssssssssssssssssssssssssss")
-		// return ""
-	}
-	return reg.ReplaceAllString(str, replace)
-}
+// func replaceByRegex(str string, rule string, replace string) string {
+// 	reg, err := regexp.Compile(rule)
+// 	if reg == nil || err != nil {
+// 		panic("ssssssssssssssssssssssssssss")
+// 		// return ""
+// 	}
+// 	return reg.ReplaceAllString(str, replace)
+// }
 
 // // 检索用文字进行分词，以及针对检索特殊场景的优化
 // func GetSearchKey(searchKey string) string {

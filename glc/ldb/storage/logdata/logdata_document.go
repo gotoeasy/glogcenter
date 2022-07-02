@@ -2,7 +2,7 @@
  * 日志文档
  * 1）面向leveldb存储接口
  */
-package storage
+package logdata
 
 import (
 	"bytes"

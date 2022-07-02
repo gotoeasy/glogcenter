@@ -2,7 +2,7 @@
  * 日志模型
  * 1）面向日志接口，设定常用属性方便扩充
  */
-package storage
+package logdata
 
 import (
 	"encoding/json"

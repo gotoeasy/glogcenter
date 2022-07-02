@@ -8,25 +8,26 @@ package storage
 
 import (
 	"glc/cmn"
+	"glc/ldb/storage/logdata"
 	"log"
 	"strings"
 )
 
-var mapLogDataStorageHandle map[string](*LogDataStorageHandle)
+var mapStorageHandle map[string](*LogDataStorageHandle)
 
 // 日志存储结构体
 type LogDataStorageHandle struct {
-	storage *LogDataStorage // 存储器
+	storage *logdata.LogDataStorage // 存储器
 }
 
 func init() {
-	mapLogDataStorageHandle = make(map[string](*LogDataStorageHandle))
+	mapStorageHandle = make(map[string](*LogDataStorageHandle))
 }
 
 // 创建日志存储
 func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 
-	cacheStore := mapLogDataStorageHandle[storeName] // 缓存中的存储对象
+	cacheStore := mapStorageHandle[storeName] // 缓存中的存储对象
 	if cacheStore != nil {
 		if !cacheStore.storage.IsClose() {
 			return cacheStore
@@ -34,9 +35,9 @@ func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 	}
 
 	store := &LogDataStorageHandle{
-		storage: NewLogDataStorage(storeName, "data"),
+		storage: logdata.NewLogDataStorage(storeName, "data"),
 	}
-	mapLogDataStorageHandle[storeName] = store
+	mapStorageHandle[storeName] = store
 	return store
 }
 
@@ -48,7 +49,7 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 	}
 	ary := strings.Split(txt, "\n")
 
-	d := new(LogDataModel)
+	d := new(logdata.LogDataModel)
 	d.Text = strings.TrimSpace(ary[0])
 	if len(ary) > 1 {
 		d.Detail = txt
@@ -57,13 +58,13 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 	d.System = system
 
 	if s.storage.IsClose() {
-		s.storage = NewLogDataStorage(s.storage.storeName, "data")
+		s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
 	}
 	err := s.storage.Add(d)
 	if err != nil {
 		log.Println("竟然失败，再来一次", s.storage.IsClose(), err)
 		if s.storage.IsClose() {
-			s.storage = NewLogDataStorage(s.storage.storeName, "data")
+			s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
 		}
 		s.storage.Add(d)
 	}
@@ -75,17 +76,17 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 // }
 
 // 取日志（文档）
-func (s *LogDataStorageHandle) GetLogDataDocument(id uint32) *LogDataDocument {
+func (s *LogDataStorageHandle) GetLogDataDocument(id uint32) *logdata.LogDataDocument {
 	bytes, _ := s.storage.Get(cmn.Uint32ToBytes(id))
-	doc := new(LogDataDocument)
+	doc := new(logdata.LogDataDocument)
 	doc.LoadBytes(bytes)
 	return doc
 }
 
 // 取日志（模型）
-func (s *LogDataStorageHandle) GetLogDataModel(id uint32) *LogDataModel {
+func (s *LogDataStorageHandle) GetLogDataModel(id uint32) *logdata.LogDataModel {
 	d := s.GetLogDataDocument(id)
-	m := new(LogDataModel)
+	m := new(logdata.LogDataModel)
 	m.LoadJson(d.Content)
 	return m
 }
