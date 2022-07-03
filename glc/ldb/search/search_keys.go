@@ -49,6 +49,7 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint32, forward 
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 	totalCount := storeLogData.TotalCount()                    // 总件数
 	rs.Total = cmn.Uint32ToString(totalCount)                  // 返回的总件数用10进制字符串形式以避免出现科学计数法
+	rs.Count = cmn.Uint32ToString(totalCount)                  // 当前条件最多匹配件数
 
 	if totalCount == 0 {
 		return rs
