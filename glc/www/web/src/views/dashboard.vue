@@ -106,7 +106,7 @@ export default {
     searchMore() {
       if (this.data.length >= 5000) {
         if (this.info.indexOf('请考虑') < 0){
-          this.info += ` （不再自动加载更多数据，更精确查询请考虑修改检索条件）`
+          this.info += ` （数据太多不再自动加载，请考虑添加条件）`
         }
         return
       }
@@ -118,7 +118,7 @@ export default {
         let res = rs.data
         if (res.success && res.result.data.length) {
           this.data.push(...res.result.data)
-          this.info = `日志总量 ${res.result.total} 条，当前匹配展示前 ${this.data.length} 条`
+          this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
         }
       })
     },
@@ -133,7 +133,7 @@ export default {
          // console.info(res,"xxxxxxxxxxxxxxxxxxxxxxx")
           this.data = res.result.data;
           document.querySelector('.el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
-          this.info = `日志总量 ${res.result.total} 条，当前匹配展示前 ${this.data.length} 条`
+          this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
         }
 
       }).finally(() => {
