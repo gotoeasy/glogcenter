@@ -47,7 +47,8 @@ func getStorage(cacheName string) *DocIndexStorage {
 func NewDocIndexStorage(storeName string, word string) *DocIndexStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
-	subPath := "inverted" + cmn.PathSeparator() + "d_" + cmn.HashAndMod(word, 10)
+	subPath := "inverted" + cmn.PathSeparator() + "d"
+	// subPath := "inverted" + cmn.PathSeparator() + "d_" + cmn.HashAndMod(word, 10)
 	cacheName := storeName + cmn.PathSeparator() + subPath
 	cacheStore := getStorage(cacheName)
 	if cacheStore != nil {

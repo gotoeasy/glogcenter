@@ -50,7 +50,8 @@ func getStorage(cacheName string) *WordIndexStorage {
 func NewWordIndexStorage(storeName string, word string) *WordIndexStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
-	subPath := "inverted" + cmn.PathSeparator() + "k_" + cmn.HashAndMod(word, 10)
+	subPath := "inverted" + cmn.PathSeparator() + "k"
+	// subPath := "inverted" + cmn.PathSeparator() + "k_" + cmn.HashAndMod(word, 10)
 	cacheName := storeName + cmn.PathSeparator() + subPath
 	cacheStore := getStorage(cacheName)
 	if cacheStore != nil {
@@ -145,7 +146,7 @@ func (s *WordIndexStorage) Add(word string, docId uint32) error {
 		log.Println("保存关键词反向索引件数失败", err)
 		return err // 忽略事务问题，可下回重建
 	}
-	// log.Println("创建日志索引：", docId, "，关键词：", s.word)
+	// log.Println("创建日志索引：", docId, "，关键词：", word)
 	return nil
 }
 

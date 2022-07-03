@@ -29,6 +29,8 @@ type LogDataStorage struct {
 	leveldb           *leveldb.DB        // leveldb
 	currentCount      uint32             // 当前件数
 	savedCurrentCount uint32             // 已保存的当前件数
+	indexedCount      uint32             // 已创建的索引件数
+	savedIndexedCount uint32             // 已保存的索引件数
 	lastTime          int64              // 最后一次访问时间
 	closing           bool               // 是否关闭中状态
 	mu                sync.Mutex         // 锁
@@ -84,14 +86,14 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 		panic(err)
 	}
 	store.leveldb = db
-	store.currentCount = store.loadTotalCount() // 读取总件数
-	mapStorage[cacheName] = store               // 缓存起来
+	store.loadMetaData()          // 初始化件数等信息
+	mapStorage[cacheName] = store // 缓存起来
 
 	// 消费就绪
 	go store.readyGo()
 
 	// 定时判断保存总件数，避免每次保存以提高性能
-	go store.readySaveCurrentCount()
+	go store.readySaveMetaDate()
 
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()
@@ -101,7 +103,7 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 }
 
 // 等待接收日志，优先响应保存日志，空时再生成索引
-func (s *LogDataStorage) readySaveCurrentCount() {
+func (s *LogDataStorage) readySaveMetaDate() {
 	ticker := time.NewTicker(time.Second * 5)
 	for {
 		<-ticker.C
@@ -109,17 +111,8 @@ func (s *LogDataStorage) readySaveCurrentCount() {
 			ticker.Stop()
 			break
 		}
-		s.saveCurrentCount()
+		s.saveMetaData()
 	}
-}
-
-func (s *LogDataStorage) saveCurrentCount() {
-	if s.currentCount == s.savedCurrentCount {
-		return
-	}
-	s.savedCurrentCount = s.currentCount
-	s.leveldb.Put(zeroUint32Bytes, cmn.Uint32ToBytes(s.savedCurrentCount), nil) // 保存日志总件数
-	log.Println("保存LogDataStorage件数:", s.savedCurrentCount)
 }
 
 // 等待接收日志，优先响应保存日志，空时再生成索引
@@ -174,17 +167,15 @@ func (s *LogDataStorage) saveLogData(model *LogDataModel) {
 func (s *LogDataStorage) createInvertedIndex() int {
 
 	// 索引信息和日志数量相互比较，判断是否继续创建索引
-	mntKey := "INDEX:" + s.StoreName()
-	sysStorage := sysmnt.GetSysmntStorage(s.StoreName())
-	sysmntData := sysStorage.GetSysmntData(mntKey)
-	if s.TotalCount() == 0 || sysmntData.Count >= s.TotalCount() {
+
+	if s.TotalCount() == 0 || s.indexedCount >= s.TotalCount() {
 		return 0 // 没有新的日志需要建索引
 	}
 
-	sysmntData.Count++                               // 下一条要建索引的日志id
-	docm, err := s.GetLogDataModel(sysmntData.Count) // 取出日志模型数据
+	s.indexedCount++                               // 下一条要建索引的日志id
+	docm, err := s.GetLogDataModel(s.indexedCount) // 取出日志模型数据
 	if err != nil {
-		log.Println("取日志模型数据失败：", sysmntData.Count, err)
+		log.Println("取日志模型数据失败：", s.indexedCount, err)
 		return 2
 	}
 
@@ -201,9 +192,6 @@ func (s *LogDataStorage) createInvertedIndex() int {
 		idxw.Add(word, cmn.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
 	//log.Println("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
-
-	// 保存当前创建了多少索引
-	sysStorage.SetSysmntData(mntKey, sysmntData)
 
 	return 1
 }
@@ -284,7 +272,7 @@ func (s *LogDataStorage) Close() {
 
 	s.closing = true
 	s.wg.Wait()                   // 等待通道清空
-	s.saveCurrentCount()          // 判断保存总件数
+	s.saveMetaData()              // 保存件数等元信息
 	s.wg.Add(1)                   // 通道消息计数
 	s.storeChan <- nil            // 通道正在在阻塞等待接收，给个nil让它接收后关闭
 	s.leveldb.Close()             // 走到这里时没有db操作了，可以关闭
@@ -293,12 +281,42 @@ func (s *LogDataStorage) Close() {
 	log.Println("关闭LogDataStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
-func (s *LogDataStorage) loadTotalCount() uint32 {
+func (s *LogDataStorage) loadMetaData() {
+
+	// 初始化：当前索引件数
 	bytes, err := s.leveldb.Get(zeroUint32Bytes, nil)
 	if err != nil || bytes == nil {
-		return 0
+		s.currentCount = 0
+	} else {
+		s.currentCount = cmn.BytesToUint32(bytes)
+		s.savedCurrentCount = s.currentCount
 	}
-	return cmn.BytesToUint32(bytes)
+
+	// 初始化：已建索引件数
+	mntKey := "INDEX:" + s.StoreName()
+	sysStorage := sysmnt.GetSysmntStorage(s.StoreName())
+	sysmntData := sysStorage.GetSysmntData(mntKey)
+	s.indexedCount = sysmntData.Count
+	s.savedIndexedCount = s.indexedCount
+}
+
+func (s *LogDataStorage) saveMetaData() {
+
+	if s.savedCurrentCount < s.currentCount {
+		s.savedCurrentCount = s.currentCount
+		s.leveldb.Put(zeroUint32Bytes, cmn.Uint32ToBytes(s.savedCurrentCount), nil) // 保存日志总件数
+		log.Println("保存LogDataStorage件数:", s.savedCurrentCount)
+	}
+
+	if s.savedIndexedCount < s.indexedCount {
+		s.savedIndexedCount = s.indexedCount
+		mntKey := "INDEX:" + s.StoreName()
+		sysStorage := sysmnt.GetSysmntStorage(s.StoreName())
+		sysmntData := new(sysmnt.SysmntData)
+		sysmntData.Count = s.savedCurrentCount
+		sysStorage.SetSysmntData(mntKey, sysmntData)
+		log.Println("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
+	}
 }
 
 // 总件数
