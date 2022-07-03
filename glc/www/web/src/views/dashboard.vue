@@ -116,7 +116,7 @@ export default {
 
       api.search(params).then(rs => {
         let res = rs.data
-        if (res.success && res.result.data.length) {
+        if (res.success && res.result.data && res.result.data.length) {
           this.data.push(...res.result.data)
           this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
         }
@@ -131,7 +131,7 @@ export default {
         let res = rs.data
         if (res.success) {
          // console.info(res,"xxxxxxxxxxxxxxxxxxxxxxx")
-          this.data = res.result.data;
+          this.data = res.result.data || [];
           document.querySelector('.el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
           this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
         }

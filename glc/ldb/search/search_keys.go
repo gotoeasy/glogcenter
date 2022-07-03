@@ -27,7 +27,7 @@ type WidxStorage struct {
 	idxwordStorage *indexword.WordIndexStorage
 }
 
-// 多关键词浏览日志
+// 多关键词时计算关键词索引交集
 func Search(storeName string, kws []string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 	var widxs []*WidxStorage
@@ -106,7 +106,7 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint32, forward 
 	return rs
 }
 
-// 有关键词时走索引检索
+// 单关键词时走一个关键词索引检索
 func SearchWordIndex(storeName string, word string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 
 	var rs = new(SearchResult)                                       // 检索结果

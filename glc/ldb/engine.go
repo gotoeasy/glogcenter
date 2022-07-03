@@ -62,7 +62,10 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 		idxw := indexword.NewWordIndexStorage(e.storeName, word)
 		if idxw.GetTotalCount(word) < 1 {
 			log.Println("关键词", word, "没有索引数据，直接返回空结果")
-			return new(search.SearchResult)
+			rs := new(search.SearchResult)
+			rs.Total = cmn.Uint32ToString(e.logStorage.TotalCount())
+			rs.Count = cmn.Uint32ToString(0)
+			return rs
 		}
 	}
 
