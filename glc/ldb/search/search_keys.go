@@ -16,7 +16,8 @@ import (
 )
 
 type SearchResult struct {
-	Total string                  `json:"total,omitempty"` // 总件数（用10进制字符串形式以避免出现科学计数法）
+	Total string                  `json:"total,omitempty"` // 日志总量件数（用10进制字符串形式以避免出现科学计数法）
+	Count string                  `json:"count,omitempty"` // 当前条件最多匹配件数（用10进制字符串形式以避免出现科学计数法）
 	Data  []*logdata.LogDataModel `json:"data,omitempty"`  // 检索结果数据（日志文档数组）
 }
 
@@ -113,6 +114,7 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 	idxwordStorage := indexword.NewWordIndexStorage(storeName, word) // 关键词索引
 	totalCount := idxwordStorage.GetTotalCount(word)                 // 总件数
 	rs.Total = cmn.Uint32ToString(logDataStorage.TotalCount())       // 返回的总件数用10进制字符串形式以避免出现科学计数法
+	rs.Count = cmn.Uint32ToString(totalCount)                        // 当前条件最多匹配件数
 
 	if totalCount == 0 {
 		return rs

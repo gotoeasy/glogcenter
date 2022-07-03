@@ -5,6 +5,7 @@ package search
 
 import (
 	"fmt"
+	"glc/cmn"
 	"glc/ldb/storage"
 	"glc/ldb/storage/logdata"
 )
@@ -13,6 +14,7 @@ import (
 func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *storage.LogDataStorageHandle, widxs ...*WidxStorage) *SearchResult {
 
 	var rs = new(SearchResult)
+	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount()) // 日志总量件数
 
 	// 选个最短的索引
 	cnt := len(widxs)
@@ -25,6 +27,7 @@ func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *sto
 			minIdx = widxs[i]
 		}
 	}
+	rs.Count = cmn.Uint32ToString(minCount) // 当前条件最多匹配件数
 
 	// 简单检查排除没结果的情景
 	totalCount := minIdx.idxwordStorage.GetTotalCount(minIdx.word)
