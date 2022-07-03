@@ -12,6 +12,7 @@ import (
 	"glc/ldb/storage/indexdoc"
 	"glc/ldb/storage/indexword"
 	"glc/ldb/storage/logdata"
+	"log"
 )
 
 type SearchResult struct {
@@ -106,11 +107,12 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint32, forward 
 // 有关键词时走索引检索
 func SearchWordIndex(storeName string, word string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 
-	var rs = new(SearchResult)                                   // 检索结果
-	storeLogData := storage.NewLogDataStorageHandle(storeName)   // 数据
-	storeIndex := indexword.NewWordIndexStorage(storeName, word) // 索引
-	totalCount := storeIndex.GetTotalCount(word)                 // 总件数
-	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount())     // 返回的总件数用10进制字符串形式以避免出现科学计数法
+	var rs = new(SearchResult)                                       // 检索结果
+	logDataStorage := storage.NewLogDataStorageHandle(storeName)     // 数据
+	idxdocStorage := indexdoc.NewDocIndexStorage(storeName, word)    // 关键词文档索引
+	idxwordStorage := indexword.NewWordIndexStorage(storeName, word) // 关键词索引
+	totalCount := idxwordStorage.GetTotalCount(word)                 // 总件数
+	rs.Total = cmn.Uint32ToString(logDataStorage.TotalCount())       // 返回的总件数用10进制字符串形式以避免出现科学计数法
 
 	if totalCount == 0 {
 		return rs
@@ -127,39 +129,42 @@ func SearchWordIndex(storeName string, word string, pageSize int, currentDocId u
 		}
 
 		for i := max; i >= min; i-- {
-			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.GetDocId(word, i)).ToLogDataModel()) // 经索引取日志文档ID
+			rs.Data = append(rs.Data, logDataStorage.GetLogDataDocument(idxwordStorage.GetDocId(word, i)).ToLogDataModel()) // 经索引取日志文档ID
 		}
 	} else if forward {
 		// 后一页
 		if currentDocId > 1 {
-			var min, max uint32
-			if currentDocId > totalCount {
-				max = totalCount
-			} else {
-				max = currentDocId - 1
+			max := idxdocStorage.GetWordDocSeq(word, currentDocId)
+			if max == 0 {
+				log.Println("无效的currentDocId(不应该)", currentDocId)
+				return rs
 			}
+			max--
+			var min uint32 = 1
 			if max > uint32(pageSize) {
 				min = max - uint32(pageSize) + 1
-			} else {
-				min = 1
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.GetDocId(word, i)).ToLogDataModel())
+				rs.Data = append(rs.Data, logDataStorage.GetLogDataDocument(idxwordStorage.GetDocId(word, i)).ToLogDataModel())
 			}
 		}
 	} else {
 		// 前一页
-		if totalCount > currentDocId {
-			var min, max uint32
-			min = currentDocId + 1
-			max = min + uint32(pageSize) - 1
+		if currentDocId > 1 {
+			min := idxdocStorage.GetWordDocSeq(word, currentDocId)
+			if min == 0 {
+				log.Println("无效的currentDocId(不应该)", currentDocId)
+				return rs
+			}
+			min++
+			max := min + uint32(pageSize)
 			if max > totalCount {
 				max = totalCount
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(storeIndex.GetDocId(word, i)).ToLogDataModel())
+				rs.Data = append(rs.Data, logDataStorage.GetLogDataDocument(idxwordStorage.GetDocId(word, i)).ToLogDataModel())
 			}
 		}
 	}

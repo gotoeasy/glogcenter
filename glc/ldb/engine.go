@@ -52,9 +52,9 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 	kws := tokenizer.CutForSearch(searchKey) // TODO 检索用关键词处理
 
 	if searchKey == "" {
-		log.Println("无条件查询")
+		log.Println("无条件查询", "currentDocId=", currentDocId)
 	} else {
-		log.Println("查询", searchKey, "，分词后检索", kws)
+		log.Println("查询", searchKey, "，分词后检索", kws, "currentDocId=", currentDocId)
 	}
 
 	// 简单检查，存在无索引数据的关键词时，直接返回
