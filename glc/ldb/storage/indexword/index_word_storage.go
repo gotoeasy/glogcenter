@@ -83,19 +83,19 @@ func NewWordIndexStorage(storeName string, word string) *WordIndexStorage { // �
 	mapStorage[cacheName] = store // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
-	go autoCloseWhenMaxIdle(store)
+	go store.autoCloseWhenMaxIdle()
 
 	log.Println("打开WordIndexStorage：", cacheName)
 	return store
 }
 
-func autoCloseWhenMaxIdle(store *WordIndexStorage) {
+func (s *WordIndexStorage) autoCloseWhenMaxIdle() {
 	if conf.GetMaxIdleTime() > 0 {
 		ticker := time.NewTicker(time.Second)
 		for {
 			<-ticker.C
-			if time.Now().Unix()-store.lastTime > int64(conf.GetMaxIdleTime()) {
-				store.Close()
+			if time.Now().Unix()-s.lastTime > int64(conf.GetMaxIdleTime()) {
+				s.Close()
 				ticker.Stop()
 				break
 			}

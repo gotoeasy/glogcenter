@@ -66,19 +66,19 @@ func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档�
 	sysmntStorage = store // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
-	go autoCloseWhenMaxIdle(store)
+	go store.autoCloseWhenMaxIdle()
 
 	log.Println("打开SysmntStorage：", cacheName)
 	return store
 }
 
-func autoCloseWhenMaxIdle(store *SysmntStorage) {
+func (s *SysmntStorage) autoCloseWhenMaxIdle() {
 	if conf.GetMaxIdleTime() > 0 {
 		ticker := time.NewTicker(time.Second)
 		for {
 			<-ticker.C
-			if time.Now().Unix()-store.lastTime > int64(conf.GetMaxIdleTime()) {
-				store.Close()
+			if time.Now().Unix()-s.lastTime > int64(conf.GetMaxIdleTime()) {
+				s.Close()
 				ticker.Stop()
 				break
 			}
