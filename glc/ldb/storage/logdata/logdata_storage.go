@@ -30,7 +30,7 @@ type LogDataStorage struct {
 	currentCount      uint32             // 当前件数
 	savedCurrentCount uint32             // 已保存的当前件数
 	indexedCount      uint32             // 已创建的索引件数
-	savedIndexedCount uint32             // 已保存的索引件数
+	savedIndexedCount uint32             // 已保存的索引件数(定时保存indexedCount，存起来以便下次启动继续建索引)
 	lastTime          int64              // 最后一次访问时间
 	closing           bool               // 是否关闭中状态
 	mu                sync.Mutex         // 锁
@@ -102,7 +102,7 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 	return store
 }
 
-// 等待接收日志，优先响应保存日志，空时再生成索引
+// 定时调用保存件数信息，避免每次都存levledb
 func (s *LogDataStorage) readySaveMetaDate() {
 	ticker := time.NewTicker(time.Second * 5)
 	for {
@@ -312,7 +312,7 @@ func (s *LogDataStorage) saveMetaData() {
 		mntKey := "INDEX:" + s.StoreName()
 		sysStorage := sysmnt.GetSysmntStorage(s.StoreName())
 		sysmntData := new(sysmnt.SysmntData)
-		sysmntData.Count = s.savedCurrentCount
+		sysmntData.Count = s.savedIndexedCount
 		sysStorage.SetSysmntData(mntKey, sysmntData)
 		log.Println("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
 	}
