@@ -116,9 +116,17 @@ export default {
 
       api.search(params).then(rs => {
         let res = rs.data
-        if (res.success && res.result.data && res.result.data.length) {
-          this.data.push(...res.result.data)
-          this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
+        if (res.success) {
+          if (res.result.data) {
+            this.data.push(...res.result.data)
+            if (res.result.data.length < params.pageSize) {
+              this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${this.data.length} 条，正展示前 ${this.data.length} 条`
+            }else{
+              this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
+            }
+          }else{
+            this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${this.data.length} 条，正展示前 ${this.data.length} 条`
+          }
         }
       })
     },
