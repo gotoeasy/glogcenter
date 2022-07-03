@@ -23,17 +23,19 @@ import (
 
 // 存储结构体
 type LogDataStorage struct {
-	storeName    string             // 存储目录
-	subPath      string             // 存储目录下的相对路径（存放数据）
-	storeChan    chan *LogDataModel // 存储通道
-	leveldb      *leveldb.DB        // leveldb
-	currentCount uint32             // 当前件数
-	lastTime     int64              // 最后一次访问时间
-	closing      bool               // 是否关闭中状态
-	mu           sync.Mutex         // 锁
-	wg           sync.WaitGroup     // 计数
+	storeName         string             // 存储目录
+	subPath           string             // 存储目录下的相对路径（存放数据）
+	storeChan         chan *LogDataModel // 存储通道
+	leveldb           *leveldb.DB        // leveldb
+	currentCount      uint32             // 当前件数
+	savedCurrentCount uint32             // 已保存的当前件数
+	lastTime          int64              // 最后一次访问时间
+	closing           bool               // 是否关闭中状态
+	mu                sync.Mutex         // 锁
+	wg                sync.WaitGroup     // 计数
 }
 
+var zeroUint32Bytes []byte = cmn.Uint32ToBytes(0)
 var ldbMu sync.Mutex
 var mapStorage map[string](*LogDataStorage)
 
@@ -86,66 +88,90 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 	mapStorage[cacheName] = store               // 缓存起来
 
 	// 消费就绪
-	go readyGo(store)
+	go store.readyGo()
+
+	// 定时判断保存总件数，避免每次保存以提高性能
+	go store.readySaveCurrentCount()
 
 	// 逐秒判断，若闲置超时则自动关闭
-	go autoCloseWhenMaxIdle(store)
+	go store.autoCloseWhenMaxIdle()
 
 	log.Println("打开LogDataStorage：", cacheName)
 	return store
 }
 
 // 等待接收日志，优先响应保存日志，空时再生成索引
-func readyGo(store *LogDataStorage) {
+func (s *LogDataStorage) readySaveCurrentCount() {
+	ticker := time.NewTicker(time.Second * 5)
+	for {
+		<-ticker.C
+		if s.IsClose() {
+			ticker.Stop()
+			break
+		}
+		s.saveCurrentCount()
+	}
+}
+
+func (s *LogDataStorage) saveCurrentCount() {
+	if s.currentCount == s.savedCurrentCount {
+		return
+	}
+	s.savedCurrentCount = s.currentCount
+	s.leveldb.Put(zeroUint32Bytes, cmn.Uint32ToBytes(s.savedCurrentCount), nil) // 保存日志总件数
+	log.Println("保存LogDataStorage件数:", s.savedCurrentCount)
+}
+
+// 等待接收日志，优先响应保存日志，空时再生成索引
+func (s *LogDataStorage) readyGo() {
 	for {
 		select {
-		case data := <-store.storeChan:
-			store.wg.Done()
+		case data := <-s.storeChan:
+			s.wg.Done()
 			// 优先响应保存日志
 			if data == nil {
-				if !store.IsClose() {
-					close(store.storeChan) // 关闭通道
+				if !s.IsClose() {
+					close(s.storeChan) // 关闭通道
 				}
 				break
 			}
-			saveLogData(store, data) // 保存日志数据
+			s.saveLogData(data) // 保存日志数据
 		default:
 			// 空时再生成索引，一次一条日志，有空则生成直到全部完成
-			n := createInvertedIndex(store) // 生成反向索引
+			n := s.createInvertedIndex() // 生成反向索引
 
 			// 索引生成完成后，等待接收保存日志
 			if n < 1 {
 				log.Println("空闲等待接收日志")
-				data := <-store.storeChan // 没有索引可生成时，等待storeChan
-				store.wg.Done()
+				data := <-s.storeChan // 没有索引可生成时，等待storeChan
+				s.wg.Done()
 				if data == nil {
-					if !store.IsClose() {
-						close(store.storeChan) // 关闭通道
+					if !s.IsClose() {
+						close(s.storeChan) // 关闭通道
 					}
 					break
 				}
-				saveLogData(store, data) // 保存日志数据
+				s.saveLogData(data) // 保存日志数据
 			}
 		}
 	}
 }
 
-func saveLogData(store *LogDataStorage, model *LogDataModel) {
+func (s *LogDataStorage) saveLogData(model *LogDataModel) {
 	//store.wg.Done()
-	store.currentCount++                              // ID递增
-	doc := new(LogDataDocument)                       // 文档
-	doc.Id = store.currentCount                       // 已递增好的值
-	model.Id = cmn.Uint32ToString(store.currentCount) // 模型数据要转Json存，也得更新ID,ID用36进制字符串形式表示
-	doc.Content = model.ToJson()                      // 转json作为内容(含Id)
+	s.currentCount++                              // ID递增
+	doc := new(LogDataDocument)                   // 文档
+	doc.Id = s.currentCount                       // 已递增好的值
+	model.Id = cmn.Uint32ToString(s.currentCount) // 模型数据要转Json存，也得更新ID,ID用36进制字符串形式表示
+	doc.Content = model.ToJson()                  // 转json作为内容(含Id)
 
 	// 保存
-	store.put(cmn.Uint32ToBytes(doc.Id), doc.ToBytes())                                 // 日志数据
-	store.leveldb.Put(cmn.Uint32ToBytes(0), cmn.Uint32ToBytes(store.currentCount), nil) // 保存日志总件数
-	log.Println("保存日志数据 ", doc.Id)
+	s.put(cmn.Uint32ToBytes(doc.Id), doc.ToBytes()) // 日志数据
+	//log.Println("保存日志数据 ", doc.Id)
 }
 
 // 创建日志索引（一次建一条日志的索引）,没有可建索引时返回false
-func createInvertedIndex(s *LogDataStorage) int {
+func (s *LogDataStorage) createInvertedIndex() int {
 
 	// 索引信息和日志数量相互比较，判断是否继续创建索引
 	mntKey := "INDEX:" + s.StoreName()
@@ -174,7 +200,7 @@ func createInvertedIndex(s *LogDataStorage) int {
 		idxw := indexword.NewWordIndexStorage(s.StoreName(), word)
 		idxw.Add(word, cmn.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
-	log.Println("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
+	//log.Println("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
 
 	// 保存当前创建了多少索引
 	sysStorage.SetSysmntData(mntKey, sysmntData)
@@ -182,13 +208,13 @@ func createInvertedIndex(s *LogDataStorage) int {
 	return 1
 }
 
-func autoCloseWhenMaxIdle(store *LogDataStorage) {
+func (s *LogDataStorage) autoCloseWhenMaxIdle() {
 	if conf.GetMaxIdleTime() > 0 {
 		ticker := time.NewTicker(time.Second)
 		for {
 			<-ticker.C
-			if time.Now().Unix()-store.lastTime > int64(conf.GetMaxIdleTime()) {
-				store.Close()
+			if time.Now().Unix()-s.lastTime > int64(conf.GetMaxIdleTime()) {
+				s.Close()
 				ticker.Stop()
 				break
 			}
@@ -258,6 +284,7 @@ func (s *LogDataStorage) Close() {
 
 	s.closing = true
 	s.wg.Wait()                   // 等待通道清空
+	s.saveCurrentCount()          // 判断保存总件数
 	s.wg.Add(1)                   // 通道消息计数
 	s.storeChan <- nil            // 通道正在在阻塞等待接收，给个nil让它接收后关闭
 	s.leveldb.Close()             // 走到这里时没有db操作了，可以关闭
@@ -267,7 +294,7 @@ func (s *LogDataStorage) Close() {
 }
 
 func (s *LogDataStorage) loadTotalCount() uint32 {
-	bytes, err := s.leveldb.Get(cmn.Uint32ToBytes(0), nil)
+	bytes, err := s.leveldb.Get(zeroUint32Bytes, nil)
 	if err != nil || bytes == nil {
 		return 0
 	}
