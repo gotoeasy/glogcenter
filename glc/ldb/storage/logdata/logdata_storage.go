@@ -167,7 +167,6 @@ func (s *LogDataStorage) saveLogData(model *LogDataModel) {
 func (s *LogDataStorage) createInvertedIndex() int {
 
 	// 索引信息和日志数量相互比较，判断是否继续创建索引
-
 	if s.TotalCount() == 0 || s.indexedCount >= s.TotalCount() {
 		return 0 // 没有新的日志需要建索引
 	}
