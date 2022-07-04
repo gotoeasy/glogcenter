@@ -83,3 +83,7 @@ func (r *HttpRequest) RequestURI() string {
 func (r *HttpRequest) RequestUrlPath() string {
 	return r.ginCtx.Request.URL.Path
 }
+
+func (r *HttpRequest) BindJSON(obj any) error {
+	return r.ginCtx.BindJSON(obj)
+}

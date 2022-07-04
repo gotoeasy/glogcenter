@@ -27,7 +27,7 @@ export default {
     for(let k in params){
       formData.append(k, params[k]);
     }
-    return post(`${BASE_URL}/glc/search`, formData)
+    return post(`${BASE_URL}/glc/v1/log/search`, formData)
   },
   // remove(db, id) {
   //   return request(`/remove?database=${db}`, 'post', { id })

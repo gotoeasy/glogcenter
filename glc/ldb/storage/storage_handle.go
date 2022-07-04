@@ -70,10 +70,26 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 	}
 }
 
-// // 添加日志（参数是LogDataModel形式的json字符串）
-// func (s *LogDataStorage) AddJsonLog(logJson string) {
-// 	s.storage.Add(logJson)
-// }
+// 添加日志（参数LogDataModel）
+func (s *LogDataStorageHandle) AddLogDataModel(data *logdata.LogDataModel) {
+	ary := strings.Split(data.Text, "\n")
+	data.Text = strings.TrimSpace(ary[0])
+	if len(ary) > 1 {
+		data.Detail = data.Text
+	}
+
+	if s.storage.IsClose() {
+		s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
+	}
+	err := s.storage.Add(data)
+	if err != nil {
+		log.Println("竟然失败，再来一次", s.storage.IsClose(), err)
+		if s.storage.IsClose() {
+			s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
+		}
+		s.storage.Add(data)
+	}
+}
 
 // 取日志（文档）
 func (s *LogDataStorageHandle) GetLogDataDocument(id uint32) *logdata.LogDataDocument {
