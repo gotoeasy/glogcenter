@@ -52,9 +52,9 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 	kws := tokenizer.CutForSearch(searchKey) // TODO 检索用关键词处理
 
 	if searchKey == "" {
-		log.Println("无条件查询", "currentDocId=", currentDocId)
+		log.Println("无条件查询", "currentDocId =", currentDocId)
 	} else {
-		log.Println("查询", searchKey, "，分词后检索", kws, "currentDocId=", currentDocId)
+		log.Println("查询", searchKey, "，分词后检索", kws, "currentDocId =", currentDocId)
 	}
 
 	// 简单检查，存在无索引数据的关键词时，直接返回
@@ -72,12 +72,8 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 	if len(kws) == 0 {
 		// 无条件浏览模式
 		return search.SearchLogData(e.storeName, pageSize, currentDocId, forward)
-	} else if len(kws) == 1 {
-		// 单关键词查询模式
-		return search.SearchWordIndex(e.storeName, kws[0], pageSize, currentDocId, forward)
-	} else {
-		// 多关键词查询模式
-		return search.Search(e.storeName, kws, pageSize, currentDocId, forward)
 	}
 
+	// 多关键词查询模式
+	return search.SearchWordIndex(e.storeName, kws, pageSize, currentDocId, forward)
 }

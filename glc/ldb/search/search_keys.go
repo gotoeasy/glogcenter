@@ -7,12 +7,12 @@
 package search
 
 import (
+	"fmt"
 	"glc/cmn"
 	"glc/ldb/storage"
 	"glc/ldb/storage/indexdoc"
 	"glc/ldb/storage/indexword"
 	"glc/ldb/storage/logdata"
-	"log"
 )
 
 type SearchResult struct {
@@ -28,7 +28,7 @@ type WidxStorage struct {
 }
 
 // 多关键词时计算关键词索引交集
-func Search(storeName string, kws []string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
+func SearchWordIndex(storeName string, kws []string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 	var widxs []*WidxStorage
 	for _, word := range kws {
@@ -106,71 +106,106 @@ func SearchLogData(storeName string, pageSize int, currentDocId uint32, forward 
 	return rs
 }
 
-// 单关键词时走一个关键词索引检索
-func SearchWordIndex(storeName string, word string, pageSize int, currentDocId uint32, forward bool) *SearchResult {
+// 参数widxs长度要求大于1，currentDocId不传就是查第一页
+func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *storage.LogDataStorageHandle, widxs ...*WidxStorage) *SearchResult {
 
-	var rs = new(SearchResult)                                       // 检索结果
-	logDataStorage := storage.NewLogDataStorageHandle(storeName)     // 数据
-	idxdocStorage := indexdoc.NewDocIndexStorage(storeName, word)    // 关键词文档索引
-	idxwordStorage := indexword.NewWordIndexStorage(storeName, word) // 关键词索引
-	totalCount := idxwordStorage.GetTotalCount(word)                 // 总件数
-	rs.Total = cmn.Uint32ToString(logDataStorage.TotalCount())       // 返回的总件数用10进制字符串形式以避免出现科学计数法
-	rs.Count = cmn.Uint32ToString(totalCount)                        // 当前条件最多匹配件数
+	var rs = new(SearchResult)
+	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount()) // 日志总量件数
 
-	if totalCount == 0 {
-		return rs
+	// 选个最短的索引
+	cnt := len(widxs)
+	minIdx := widxs[0]
+	minCount := minIdx.idxwordStorage.GetTotalCount(minIdx.word)
+	for i := 1; i < cnt; i++ {
+		ctmp := widxs[i].idxwordStorage.GetTotalCount(widxs[i].word)
+		if ctmp < minCount {
+			minCount = ctmp
+			minIdx = widxs[i]
+		}
+	}
+	rs.Count = cmn.Uint32ToString(minCount) // 当前条件最多匹配件数
+
+	// 简单检查排除没结果的情景
+	totalCount := minIdx.idxwordStorage.GetTotalCount(minIdx.word)
+	if totalCount == 0 || (totalCount == 1 && currentDocId > 0) {
+		return rs // 索引件数0、或只有1条又还要跳过，都是找不到
 	}
 
-	if currentDocId == 0 {
-		// 第一页
-		var min, max uint32
-		max = totalCount
-		if max > uint32(pageSize) {
-			min = max - uint32(pageSize) + 1
-		} else {
-			min = 1
+	// 找匹配位置并排除没结果的情景
+	pos := totalCount // 默认检索最新第一页
+	if currentDocId > 0 {
+		pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, currentDocId) // 有相对文档ID时找相对位置
+		if pos == 0 || (pos == 1 && forward) || (pos == totalCount && !forward) {
+			return rs // 找不到、或最后条还要向后、或最前条还要向前，都是找不到
+		}
+	}
+
+	// 位置就绪
+	var rsCnt int = 0
+	var flg bool
+	if currentDocId == 0 || currentDocId > 0 && forward {
+		// 无相对文档ID、或有且是后一页方向
+		if currentDocId > 0 {
+			pos-- //  相对文档ID有的话才顺移
 		}
 
-		for i := max; i >= min; i-- {
-			rs.Data = append(rs.Data, logDataStorage.GetLogDataDocument(idxwordStorage.GetDocId(word, i)).ToLogDataModel()) // 经索引取日志文档ID
-		}
-	} else if forward {
-		// 后一页
-		if currentDocId > 1 {
-			max := idxdocStorage.GetWordDocSeq(word, currentDocId)
-			if max == 0 {
-				log.Println("无效的currentDocId(不应该)", currentDocId)
-				return rs
+		for i := pos; i > 0; i-- {
+			// 取值
+			docId := minIdx.idxwordStorage.GetDocId(minIdx.word, i)
+			// 比较
+			flg = true
+			for i := 0; i < cnt; i++ {
+				if widxs[i] == minIdx {
+					continue // 跳过比较自己
+				}
+				if widxs[i].idxdocStorage.GetWordDocSeq(widxs[i].word, docId) == 0 {
+					flg = false // 没找到
+					break
+				}
 			}
-			max--
-			var min uint32 = 1
-			if max > uint32(pageSize) {
-				min = max - uint32(pageSize) + 1
-			}
-
-			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, logDataStorage.GetLogDataDocument(idxwordStorage.GetDocId(word, i)).ToLogDataModel())
+			// 找到则加入结果
+			if flg {
+				rsCnt++
+				rs.Data = append(rs.Data, storeLogData.GetLogDataModel(docId))
+				if rsCnt >= pageSize {
+					break // 最多找一页
+				}
 			}
 		}
 	} else {
-		// 前一页
-		if currentDocId > 1 {
-			min := idxdocStorage.GetWordDocSeq(word, currentDocId)
-			if min == 0 {
-				log.Println("无效的currentDocId(不应该)", currentDocId)
-				return rs
+		// 有相对文档ID且是前一页方向
+		pos++
+		var ary []*logdata.LogDataModel
+		for i := pos; i <= totalCount; i++ {
+			// 取值
+			docId := minIdx.idxwordStorage.GetDocId(minIdx.word, i)
+			// 比较
+			flg = true
+			for i := 0; i < cnt; i++ {
+				if widxs[i] == minIdx {
+					continue // 跳过比较自己
+				}
+				if widxs[i].idxdocStorage.GetWordDocSeq(widxs[i].word, docId) == 0 {
+					flg = false // 没找到
+					break
+				}
 			}
-			min++
-			max := min + uint32(pageSize)
-			if max > totalCount {
-				max = totalCount
+			// 找到则加入结果
+			if flg {
+				rsCnt++
+				ary = append(ary, storeLogData.GetLogDataModel(docId))
+				if rsCnt >= pageSize {
+					break // 最多找一页
+				}
 			}
+		}
 
-			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, logDataStorage.GetLogDataDocument(idxwordStorage.GetDocId(word, i)).ToLogDataModel())
-			}
+		// 倒序放入结果
+		for i := len(ary) - 1; i >= 0; i-- {
+			rs.Data = append(rs.Data, ary[i])
 		}
 	}
 
+	rs.Total = fmt.Sprintf("%d", storeLogData.TotalCount())
 	return rs
 }
