@@ -29,5 +29,6 @@ require (
 	github.com/gin-contrib/gzip v0.0.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect
+	github.com/streadway/amqp v1.0.0
 	github.com/wangbin/jiebago v0.3.2
 )

@@ -8,7 +8,7 @@ package sysmnt
 import (
 	"errors"
 	"glc/cmn"
-	"glc/ldb/conf"
+	"glc/conf"
 	"glc/onexit"
 	"log"
 	"sync"

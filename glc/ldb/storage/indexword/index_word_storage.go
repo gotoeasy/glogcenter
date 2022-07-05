@@ -7,7 +7,7 @@ package indexword
 
 import (
 	"glc/cmn"
-	"glc/ldb/conf"
+	"glc/conf"
 	"glc/ldb/storage/indexdoc"
 	"glc/onexit"
 	"log"

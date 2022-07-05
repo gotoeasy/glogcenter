@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"glc/cmn"
-	"glc/ldb/conf"
+	"glc/conf"
 	"glc/onexit"
 	"log"
 	"net/http"

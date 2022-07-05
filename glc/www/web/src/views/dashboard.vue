@@ -118,8 +118,8 @@ export default {
         let res = rs.data
         if (res.success) {
           if (res.result.data) {
-            this.data.push(...res.result.data)
-            if (res.result.data.length < params.pageSize) {
+            this.data.push(...res.result.data) 
+            if (res.result.data.length < this.params.pageSize) {
               this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${this.data.length} 条，正展示前 ${this.data.length} 条`
             }else{
               this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
@@ -141,7 +141,7 @@ export default {
          // console.info(res,"xxxxxxxxxxxxxxxxxxxxxxx")
           this.data = res.result.data || [];
           document.querySelector('.el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
-          if (res.result.data.length < params.pageSize) {
+          if (this.data.length < this.params.pageSize) {
             this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${this.data.length} 条，正展示前 ${this.data.length} 条`
           }else{
             this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`

@@ -4,7 +4,7 @@
 package tokenizer
 
 import (
-	"glc/ldb/conf"
+	"glc/conf"
 	"os"
 	"strings"
 

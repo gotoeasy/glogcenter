@@ -9,7 +9,7 @@ package logdata
 import (
 	"errors"
 	"glc/cmn"
-	"glc/ldb/conf"
+	"glc/conf"
 	"glc/ldb/storage/indexword"
 	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"

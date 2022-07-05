@@ -21,7 +21,10 @@ var contextPath string
 var enableSecurityKey bool
 var securityKey string
 var headerSecurityKey string
+var enableAmqpConsume bool
 var enableWebGzip bool
+var amqpAddr string
+var amqpQueueName string
 
 func init() {
 	UpdateConfigByEnv()
@@ -39,6 +42,24 @@ func UpdateConfigByEnv() {
 	headerSecurityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")      // web服务API秘钥的header键名
 	securityKey = Getenv("GLC_SECURITY_KEY", "glogcenter")                   // web服务API秘钥
 	enableWebGzip = GetenvBool("GLC_ENABLE_WEB_GZIP", true)                  // web服务是否开启Gzip
+	enableAmqpConsume = GetenvBool("GLC_ENABLE_AMQP_CONSUME", false)         // 是否开启rabbitMq消费者接收日志
+	amqpAddr = Getenv("GLC_AMQP_ADDR", "")                                   // rabbitMq连接地址，例："amqp://user:password@ip:port/"
+	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")           // rabbitMq队列名
+}
+
+// 取配置： rabbitMq连接地址，可通过环境变量“GLC_AMQP_ADDR”设定，默认值“”
+func GetAmqpQueueName() string {
+	return amqpQueueName
+}
+
+// 取配置： rabbitMq连接地址，可通过环境变量“GLC_AMQP_ADDR”设定，默认值“”
+func GetAmqpAddr() string {
+	return amqpAddr
+}
+
+// 取配置： 是否开启rabbitMq消费者接收日志，可通过环境变量“GLC_ENABLE_AMQP_CONSUME”设定，默认值“false”
+func IsEnableAmqpConsume() bool {
+	return enableAmqpConsume
 }
 
 // 取配置： web服务API秘钥的header键名，可通过环境变量“GLC_HEADER_SECURITY_KEY”设定，默认值“X-GLC-AUTH”

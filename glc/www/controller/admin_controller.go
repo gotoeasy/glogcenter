@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"glc/conf"
 	"glc/gweb"
-	"glc/ldb/conf"
 )
 
 // 前端检索页面

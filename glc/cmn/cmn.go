@@ -5,7 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/gob"
 	"fmt"
-	"glc/ldb/conf"
+	"glc/conf"
 	"hash/crc32"
 	"os"
 	"strconv"

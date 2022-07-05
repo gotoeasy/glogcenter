@@ -1,9 +1,9 @@
 package controller
 
 import (
+	"glc/conf"
 	"glc/gweb"
 	"glc/ldb"
-	"glc/ldb/conf"
 	"glc/ldb/storage/logdata"
 	"log"
 )

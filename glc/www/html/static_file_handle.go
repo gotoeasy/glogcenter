@@ -2,8 +2,8 @@ package html
 
 import (
 	"glc/cmn"
+	"glc/conf"
 	"glc/gweb"
-	"glc/ldb/conf"
 	"glc/www"
 	"log"
 	"os"
