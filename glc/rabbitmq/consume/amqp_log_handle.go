@@ -4,6 +4,7 @@
 package consume
 
 import (
+	"glc/conf"
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
 	"glc/onexit"
@@ -61,7 +62,11 @@ func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 	log.Println("接收到rabbitmq的日志", jsonLog)
 
 	md := &logdata.LogDataModel{}
-	md.LoadJson(jsonLog)
+	if conf.IsAmqpJsonFormat() {
+		md.LoadJson(jsonLog)
+	} else {
+		md.Text = jsonLog
+	}
 
 	engine := ldb.NewDefaultEngine()
 	engine.AddTextLog(md.Date, md.Text, md.System)
