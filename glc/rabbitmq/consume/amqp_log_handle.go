@@ -1,3 +1,6 @@
+/**
+ * RabbitMQ日志接收封装
+ */
 package consume
 
 import (
@@ -28,6 +31,10 @@ func StartRabbitMQConsume() error {
 
 	rabbitMQConsume.mu.Lock()
 	defer rabbitMQConsume.mu.Unlock()
+
+	if rabbitMQConsume.rabbitMQ != nil && !rabbitMQConsume.rabbitMQ.closing {
+		return nil
+	}
 
 	mq, err := NewSimpleRabbitMQ()
 	if err != nil {

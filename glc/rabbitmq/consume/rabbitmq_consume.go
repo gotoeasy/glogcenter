@@ -1,3 +1,6 @@
+/**
+ * RabbitMQ简单模式消费者封装
+ */
 package consume
 
 import (
@@ -107,7 +110,6 @@ func (r *RabbitMQ) StartConsume(fnJsonLogHandle func(string, error) bool) {
 		return
 	}
 
-	// channelWait := make(chan bool)
 	go func() {
 		for msg := range mqDelivery {
 			// TODO 是否要考虑失败?
@@ -117,5 +119,4 @@ func (r *RabbitMQ) StartConsume(fnJsonLogHandle func(string, error) bool) {
 			}
 		}
 	}()
-	// <-channelWait
 }

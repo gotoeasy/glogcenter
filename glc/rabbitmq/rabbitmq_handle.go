@@ -1,3 +1,6 @@
+/**
+ * RabbitMQ日志接收的启停
+ */
 package rabbitmq
 
 import (
