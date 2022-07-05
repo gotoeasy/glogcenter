@@ -25,6 +25,7 @@ var enableAmqpConsume bool
 var enableWebGzip bool
 var amqpAddr string
 var amqpQueueName string
+var amqpJsonFormat bool
 
 func init() {
 	UpdateConfigByEnv()
@@ -45,6 +46,12 @@ func UpdateConfigByEnv() {
 	enableAmqpConsume = GetenvBool("GLC_ENABLE_AMQP_CONSUME", false)         // 是否开启rabbitMq消费者接收日志
 	amqpAddr = Getenv("GLC_AMQP_ADDR", "")                                   // rabbitMq连接地址，例："amqp://user:password@ip:port/"
 	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")           // rabbitMq队列名
+	amqpJsonFormat = GetenvBool("GLC_AMQP_JSON_FORMAT", true)                // rabbitMq消息文本是否为json格式，默认true
+}
+
+// 取配置： rabbitMq消息文本是否为json格式，可通过环境变量“GLC_AMQP_JSON_FORMAT”设定，默认值“true”
+func IsAmqpJsonFormat() bool {
+	return amqpJsonFormat
 }
 
 // 取配置： rabbitMq连接地址，可通过环境变量“GLC_AMQP_ADDR”设定，默认值“”
@@ -142,5 +149,8 @@ func GetenvBool(name string, defaultValue bool) bool {
 	if strings.ToLower(s) == "true" {
 		return true
 	}
-	return false
+	if strings.ToLower(s) == "false" {
+		return false
+	}
+	return defaultValue
 }
