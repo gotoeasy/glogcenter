@@ -63,7 +63,9 @@ func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 
 	md := &logdata.LogDataModel{}
 	if conf.IsAmqpJsonFormat() {
-		md.LoadJson(jsonLog)
+		if md.LoadJson(jsonLog) != nil {
+			md.Text = jsonLog // 错误的json字符串？当文本吃掉
+		}
 	} else {
 		md.Text = jsonLog
 	}

@@ -32,6 +32,6 @@ func (d *LogDataModel) ToJson() string {
 	return cmn.BytesToString(bt)
 }
 
-func (d *LogDataModel) LoadJson(jsonstr string) {
-	json.Unmarshal(cmn.StringToBytes(jsonstr), d)
+func (d *LogDataModel) LoadJson(jsonstr string) error {
+	return json.Unmarshal(cmn.StringToBytes(jsonstr), d)
 }
