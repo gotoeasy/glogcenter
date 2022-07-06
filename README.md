@@ -6,8 +6,8 @@
 # 缘起
 
 日志中心，一直是用传统三件套，打开速度不理想，资源占用太厉害，常闹脾气，替代品总是找不到。终于忍不住用`go`试写一个`logcenter`，结果确实是惊艳到自己了，故起名`glogcenter`，简称`GLC`，开仓建库
-
 <br>
+
 [![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
 <br>
 
