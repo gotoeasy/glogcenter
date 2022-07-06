@@ -14,12 +14,12 @@
 - [x] 借助`goleveldb`做数据保存，结合日志写多读少特点稍加设计，真是快
 - [x] 日志量虽大，却是真心节省内存资源
 - [x] 常用的无条件查询最新日志，快到麻木无感
-- [x] 关键词全文检索，支持中文分词，反向索引以空间换时间，快到麻木无感
+- [x] 关键词全文检索，支持中文分词，毫秒级查询响应，快到麻木无感
 - [x] 日志吞食量每秒近万条，建索引速度每秒数千条，闲时建索引充分利用资源
 - [x] 提供`docker`镜像支持容器化部署，方便之极
 - [x] 提供`java`项目日志收集包，日志都发来发来发来
 - [x] 支持从`RabbitMQ`收取日志信息
-- [x] 提供简洁的日志查询界面
+- [x] 内置提供简洁的日志查询界面
 
 <div align=center>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
@@ -38,8 +38,8 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 
 ## 服务接口
-- [x] `/glc/add`日志添加，表单提交方式，字段`text`是日志内容，更多参数斟酌中
-- [x] `/glc/search`日志查询，表单提交方式，检索条件字段`searchKey`，更多参数斟酌中
+- [x] `/glc/v1/log/add`日志添加，提交`json`数据方式，字段`system`是分类，`date`是日期时间，`text`是日志内容
+- [x] `/glc/v1/log/search`日志查询，检索条件字段`searchKey`
 
 
 
@@ -49,20 +49,33 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
 ```xml
-<!-- logback-spring.xml配置例子 -->
-<appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpAppender">
-    <glcApiUrl>http://127.0.0.1:8080/glc/add</glcApiUrl>
-    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>
-    <system>Demo</glcApiKey>
+<!-- logback配置例子1，发送至 glogcenter -->
+<appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
+    <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
+    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!-- 可通过环境变量 GLC_API_KEY 设定 -->
+    <system>Demo</glcApiKey>                                    <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
         <pattern><![CDATA[%p %m %n]]></pattern>
     </layout>
 </appender>
+
+<!-- logback配置例子2，发送至 rabbitmq -->
+<appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcAmqpAppender">
+    <amqpHost>127.0.0.1</amqpHost>                <!-- 可通过环境变量 GLC_AMQP_HOST 设定 -->
+    <amqpPort>5672</amqpPort>                     <!-- 可通过环境变量 GLC_AMQP_PORT 设定 -->
+    <amqpUser>rabbitmqUsername</amqpUser>         <!-- 可通过环境变量 GLC_AMQP_USER 设定 -->
+    <amqpPassword>rabbitmqPassword</amqpPassword> <!-- 可通过环境变量 GLC_AMQP_PASSWORD 设定 -->
+    <system>Demo</glcApiKey>                      <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
+    <layout>
+        <pattern><![CDATA[%p %m %n]]></pattern>
+    </layout>
+</appender>
+
 ```
 
 
@@ -76,7 +89,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 ### 进行中的开发版本`latest`
 
-- [ ] 添加相应版本的`maven`公共仓库包，`java`项目日志可推至`RabbitMQ`
+- [x] 添加相应版本的`maven`公共仓库包，`java`项目日志可推至`RabbitMQ`
 - [x] 添加`RabbitMQ`简单模式消费者，开启后能从`RabbitMQ`获取日志
 - [x] 添加服务接口`/glc/v1/log/add`，接收`JSON`格式日志以便后续扩展
 
