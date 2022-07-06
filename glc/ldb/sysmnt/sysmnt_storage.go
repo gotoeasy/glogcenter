@@ -37,8 +37,8 @@ func init() {
 func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
-	subPath := "sysmnt"
-	cacheName := storeName + cmn.PathSeparator() + subPath
+	subPath := ".sysmnt"
+	cacheName := subPath
 	if sysmntStorage != nil && !sysmntStorage.IsClose() { // 尝试用缓存实例存储器
 		return sysmntStorage
 	}
@@ -102,7 +102,7 @@ func (s *SysmntStorage) Close() {
 	s.leveldb.Close()
 	sysmntStorage = nil
 
-	log.Println("关闭SysmntStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
+	log.Println("关闭SysmntStorage：", s.subPath)
 }
 
 // 直接存入数据到leveldb

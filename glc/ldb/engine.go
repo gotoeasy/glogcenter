@@ -20,7 +20,7 @@ func NewEngine(storeName string) *Engine {
 	return &Engine{
 		storeName:   storeName,
 		logStorage:  storage.NewLogDataStorageHandle(storeName),
-		idxwStorage: indexword.NewWordIndexStorage(storeName, " "), // 特殊（空格做关键词参数传入）
+		idxwStorage: indexword.NewWordIndexStorage(storeName),
 	}
 }
 
@@ -29,7 +29,7 @@ func NewDefaultEngine() *Engine {
 	return &Engine{
 		storeName:   storeName,
 		logStorage:  storage.NewLogDataStorageHandle(storeName),
-		idxwStorage: indexword.NewWordIndexStorage(storeName, " "), // 特殊（空格做关键词参数传入）
+		idxwStorage: indexword.NewWordIndexStorage(storeName),
 	}
 }
 
@@ -59,7 +59,7 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 
 	// 简单检查，存在无索引数据的关键词时，直接返回
 	for _, word := range kws {
-		idxw := indexword.NewWordIndexStorage(e.storeName, word)
+		idxw := indexword.NewWordIndexStorage(e.storeName)
 		if idxw.GetTotalCount(word) < 1 {
 			log.Println("关键词", word, "没有索引数据，直接返回空结果")
 			rs := new(search.SearchResult)

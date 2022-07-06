@@ -11,7 +11,6 @@ import (
 	"glc/cmn"
 	"glc/conf"
 	"glc/ldb/storage/indexword"
-	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"
 	"glc/onexit"
 	"log"
@@ -187,7 +186,7 @@ func (s *LogDataStorage) createInvertedIndex() int {
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {
-		idxw := indexword.NewWordIndexStorage(s.StoreName(), word)
+		idxw := indexword.NewWordIndexStorage(s.StoreName())
 		idxw.Add(word, cmn.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
 	//log.Println("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
@@ -282,7 +281,7 @@ func (s *LogDataStorage) Close() {
 
 func (s *LogDataStorage) loadMetaData() {
 
-	// 初始化：当前索引件数
+	// 初始化：当前日志件数
 	bytes, err := s.leveldb.Get(zeroUint32Bytes, nil)
 	if err != nil || bytes == nil {
 		s.currentCount = 0
@@ -292,10 +291,8 @@ func (s *LogDataStorage) loadMetaData() {
 	}
 
 	// 初始化：已建索引件数
-	mntKey := "INDEX:" + s.StoreName()
-	sysStorage := sysmnt.GetSysmntStorage(s.StoreName())
-	sysmntData := sysStorage.GetSysmntData(mntKey)
-	s.indexedCount = sysmntData.Count
+	idxw := indexword.NewWordIndexStorage(s.StoreName())
+	s.indexedCount = idxw.GetIndexedCount()
 	s.savedIndexedCount = s.indexedCount
 }
 
@@ -309,11 +306,8 @@ func (s *LogDataStorage) saveMetaData() {
 
 	if s.savedIndexedCount < s.indexedCount {
 		s.savedIndexedCount = s.indexedCount
-		mntKey := "INDEX:" + s.StoreName()
-		sysStorage := sysmnt.GetSysmntStorage(s.StoreName())
-		sysmntData := new(sysmnt.SysmntData)
-		sysmntData.Count = s.savedIndexedCount
-		sysStorage.SetSysmntData(mntKey, sysmntData)
+		idxw := indexword.NewWordIndexStorage(s.StoreName())
+		idxw.SavetIndexedCount(s.savedIndexedCount)
 		log.Println("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
 	}
 }

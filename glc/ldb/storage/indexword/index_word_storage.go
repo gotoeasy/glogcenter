@@ -20,15 +20,17 @@ import (
 )
 
 type WordIndexStorage struct {
-	storeName string      // 存储目录
-	subPath   string      // 存储目录下的相对路径（存放数据）
-	leveldb   *leveldb.DB // leveldb
-	lastTime  int64       // 最后一次访问时间
-	closing   bool        // 是否关闭中状态
-	mu        sync.Mutex  // 锁
+	storeName    string      // 存储目录
+	subPath      string      // 存储目录下的相对路径（存放数据）
+	leveldb      *leveldb.DB // leveldb
+	lastTime     int64       // 最后一次访问时间
+	indexedCount uint32      // 已建索引件数
+	closing      bool        // 是否关闭中状态
+	mu           sync.Mutex  // 锁
 }
 
 var zeroUint32Bytes []byte = cmn.Uint32ToBytes(0)
+var zeroUint16Bytes []byte = cmn.Uint16ToBytes(0) // 索引件数的key
 
 var idxMu sync.Mutex
 var mapStorage map[string](*WordIndexStorage)
@@ -47,7 +49,7 @@ func getStorage(cacheName string) *WordIndexStorage {
 }
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）
-func NewWordIndexStorage(storeName string, word string) *WordIndexStorage { // 存储器，文档，自定义对象
+func NewWordIndexStorage(storeName string) *WordIndexStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
 	subPath := "inverted" + cmn.PathSeparator() + "k"
@@ -81,6 +83,7 @@ func NewWordIndexStorage(storeName string, word string) *WordIndexStorage { // �
 		panic(err)
 	}
 	store.leveldb = db
+	store.loadIndexedCount()      // 加载已建索引件数
 	mapStorage[cacheName] = store // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
@@ -102,6 +105,24 @@ func (s *WordIndexStorage) autoCloseWhenMaxIdle() {
 			}
 		}
 	}
+}
+
+// 取已建索引件数
+func (s *WordIndexStorage) GetIndexedCount() uint32 {
+	return s.indexedCount
+}
+
+// 初期加载已建索引件数
+func (s *WordIndexStorage) loadIndexedCount() {
+	bt, err := s.leveldb.Get(zeroUint16Bytes, nil)
+	if err == nil {
+		s.indexedCount = cmn.BytesToUint32(bt)
+	}
+}
+
+// 保存已建索引件数
+func (s *WordIndexStorage) SavetIndexedCount(count uint32) error {
+	return s.leveldb.Put(zeroUint16Bytes, cmn.Uint32ToBytes(count), nil)
 }
 
 // 取关键词索引当前的文档数
@@ -133,7 +154,7 @@ func (s *WordIndexStorage) Add(word string, docId uint32) error {
 	}
 
 	// 添加文档反向索引
-	diStorage := indexdoc.NewDocIndexStorage(s.storeName, word)
+	diStorage := indexdoc.NewDocIndexStorage(s.storeName)
 	err = diStorage.AddWordDocSeq(word, docId, seq)
 	if err != nil {
 		log.Println("保存日志反向索引失败", err)

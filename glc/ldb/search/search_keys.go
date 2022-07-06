@@ -34,8 +34,8 @@ func SearchWordIndex(storeName string, kws []string, pageSize int, currentDocId 
 	for _, word := range kws {
 		widxStorage := &WidxStorage{
 			word:           word,
-			idxdocStorage:  indexdoc.NewDocIndexStorage(storeName, word),
-			idxwordStorage: indexword.NewWordIndexStorage(storeName, word),
+			idxdocStorage:  indexdoc.NewDocIndexStorage(storeName),
+			idxwordStorage: indexword.NewWordIndexStorage(storeName),
 		}
 		widxs = append(widxs, widxStorage)
 	}

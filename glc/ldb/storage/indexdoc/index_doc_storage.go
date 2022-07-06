@@ -44,7 +44,7 @@ func getStorage(cacheName string) *DocIndexStorage {
 }
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）
-func NewDocIndexStorage(storeName string, word string) *DocIndexStorage { // 存储器，文档，自定义对象
+func NewDocIndexStorage(storeName string) *DocIndexStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
 	subPath := "inverted" + cmn.PathSeparator() + "d"

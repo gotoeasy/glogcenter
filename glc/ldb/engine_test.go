@@ -2,10 +2,21 @@ package ldb
 
 import (
 	"fmt"
+	"glc/ldb/sysmnt"
 	"log"
 	"testing"
 	"time"
 )
+
+func Test_GetSubDirs(t *testing.T) {
+	s := sysmnt.GetSysmntStorage("default")
+	rs := s.GetStorageData()
+
+	for i := 0; i < len(rs); i++ {
+		log.Println(rs[i])
+	}
+
+}
 
 func Test_all(t *testing.T) {
 

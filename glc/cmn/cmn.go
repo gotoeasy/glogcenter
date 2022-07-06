@@ -7,7 +7,11 @@ import (
 	"fmt"
 	"glc/conf"
 	"hash/crc32"
+	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -89,7 +93,13 @@ func Uint32ToBytes(num uint32) []byte {
 }
 
 func BytesToUint32(bytes []byte) uint32 {
-	return uint32(binary.BigEndian.Uint32(bytes))
+	return binary.BigEndian.Uint32(bytes)
+}
+
+func Uint16ToBytes(num uint16) []byte {
+	bkey := make([]byte, 2)
+	binary.BigEndian.PutUint16(bkey, num)
+	return bkey
 }
 
 // func Uint64ToBytes(num uint64) []byte {
@@ -190,4 +200,47 @@ func SubStringRune(str string, start int, end int) string {
 
 func JoinBytes(bts ...[]byte) []byte {
 	return bytes.Join(bts, []byte(""))
+}
+
+func GetStorageNames(path string, excludes ...string) []string {
+	fileinf, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Println("读取目录失败", err)
+		return []string{}
+	}
+
+	mapDir := make(map[string]string)
+	for _, v := range fileinf {
+		if v.IsDir() {
+			mapDir[v.Name()] = ""
+		}
+	}
+	for i := 0; i < len(excludes); i++ {
+		delete(mapDir, excludes[i])
+	}
+
+	var rs []string
+	for k := range mapDir {
+		rs = append(rs, k)
+	}
+
+	// 倒序
+	sort.Slice(rs, func(i, j int) bool {
+		return rs[i] > rs[j]
+	})
+
+	return rs
+}
+
+func GetDirInfo(path string) (uint32, int64, error) {
+	var count uint32
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			size += info.Size()
+			count++
+		}
+		return err
+	})
+	return count, size, err
 }
