@@ -83,9 +83,9 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 
 ## TODO
-- [ ] 日志分仓，可维护
-- [ ] 查询界面优化
-- [ ] 国际化多语言
+- [ ] 界面优化
+- [ ] 多语言
+- [ ] 登录支持
 
 
 ## 更新履历
@@ -95,6 +95,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] 添加相应版本的`maven`公共仓库包，`java`项目日志可推至`RabbitMQ`
 - [x] 添加`RabbitMQ`简单模式消费者，开启后能从`RabbitMQ`获取日志
 - [x] 添加服务接口`/glc/v1/log/add`，接收`JSON`格式日志以便后续扩展
+- [x] 日志可分仓，可查看、删除
 
 ### 版本`0.3.0`
 
