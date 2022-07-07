@@ -8,14 +8,14 @@ import (
 
 // 日志检索（表单提交方式）
 func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
-	storeNmae := req.GetFormParameter("name")
+	storeName := req.GetFormParameter("storeName")
 	//searchKey := tokenizer.GetSearchKey(req.GetFormParameter("searchKey"))
 	searchKey := req.GetFormParameter("searchKey")
 	pageSize := cmn.StringToInt(req.GetFormParameter("pageSize"), 20)
 	currentId := cmn.StringToUint32(req.GetFormParameter("currentId"), 0)
 	forward := cmn.StringToBool(req.GetFormParameter("forward"), true)
 
-	eng := ldb.NewEngine(storeNmae)
+	eng := ldb.NewEngine(storeName)
 	rs := eng.Search(searchKey, pageSize, currentId, forward)
 	return gweb.Result(rs)
 }

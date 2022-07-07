@@ -9,6 +9,16 @@
             <div class="header">
               <div style="display:flex;justify-content:space-between;">
                 <div>
+
+                  <el-select v-if="storageOptions.length > 1" v-model="storage" filterable placeholder="请选择日志仓" style="width:260px">
+                    <el-option
+                      v-for="item in storageOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+
                   <el-input @keyup.enter="search()" v-model="params.searchKey" placeholder="请输入关键词检索" style="width:600px">
                     <template #append>
                       <el-button type="primary" @click="search()" class="x-search">全文检索</el-button>
@@ -60,6 +70,7 @@
 <script>
 import api from '../api'
 //import jsonViewer from 'vue-json-viewer'
+import { ref } from 'vue'
 
 const FixHeight = 215  // 177
 
@@ -79,7 +90,20 @@ export default {
       },
       data: [],
       info: '',
+      storage: ref(''),
+      storageOptions: [],
     }
+  },
+  created(){
+      api.searchStorages(this.params).then(rs => {
+        let res = rs.data
+        if (res.success) {
+          let datas = res.result.data || [];
+          for (let i = 0; i < datas.length; i++) {
+            this.storageOptions.push({value: datas[i].name, label: '日志仓：' + datas[i].name})
+          }
+        }
+      });
   },
   mounted(){
 
@@ -111,6 +135,7 @@ export default {
         return
       }
       let params = Object.assign({}, this.params);
+      params.storeName = this.storage
       params.forward = true
       params.currentId = this.data[this.data.length-1].id; // 相对最后条id，继续找后面的日志
 
@@ -133,8 +158,9 @@ export default {
     search() {
       this.loading = true
 
-      //console.info("----------this.params",this.params)
+      this.params.storeName = this.storage
       this.params.currentId = ''
+     // console.info("----------this.params",this.params)
       api.search(this.params).then(rs => {
         let res = rs.data
         if (res.success) {

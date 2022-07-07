@@ -39,6 +39,8 @@ func Run() {
 
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/add", controller.JsonLogAddController)
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/search", controller.LogSearchController)
+		gweb.RegisterController(method.POST, contextPath+"/v1/store/list", controller.StorageListController)
+		gweb.RegisterController(method.POST, contextPath+"/v1/store/delete", controller.StorageDeleteController)
 
 		// 默认引擎空转一下，触发未建索引继续建
 		go ldb.NewDefaultEngine().AddTextLog("", "", "")

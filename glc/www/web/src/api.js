@@ -29,6 +29,13 @@ export default {
     }
     return post(`${BASE_URL}/glc/v1/log/search`, formData)
   },
+  searchStorages(params={}) {
+    let formData = new FormData();
+    for(let k in params){
+      formData.append(k, params[k]);
+    }
+    return post(`${BASE_URL}/glc/v1/store/list`, formData)
+  },
   // remove(db, id) {
   //   return request(`/remove?database=${db}`, 'post', { id })
   // },
