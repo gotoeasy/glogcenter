@@ -307,7 +307,7 @@ func (s *LogDataStorage) saveMetaData() {
 	if s.savedIndexedCount < s.indexedCount {
 		s.savedIndexedCount = s.indexedCount
 		idxw := indexword.NewWordIndexStorage(s.StoreName())
-		idxw.SavetIndexedCount(s.savedIndexedCount)
+		idxw.SaveIndexedCount(s.savedIndexedCount)
 		log.Println("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
 	}
 }

@@ -121,7 +121,8 @@ func (s *WordIndexStorage) loadIndexedCount() {
 }
 
 // 保存已建索引件数
-func (s *WordIndexStorage) SavetIndexedCount(count uint32) error {
+func (s *WordIndexStorage) SaveIndexedCount(count uint32) error {
+	s.indexedCount = count
 	return s.leveldb.Put(zeroUint16Bytes, cmn.Uint32ToBytes(count), nil)
 }
 
