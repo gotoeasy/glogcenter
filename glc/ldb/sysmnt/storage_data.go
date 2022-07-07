@@ -59,5 +59,12 @@ func GetStorageList() *StorageResult {
 
 // 删除指定日志仓目录
 func DeleteStorage(name string) error {
-	return os.RemoveAll(conf.GetStorageRoot() + cmn.PathSeparator() + name)
+	// 先尝试目录改名，改成功后再删除
+	oldPath := conf.GetStorageRoot() + cmn.PathSeparator() + name
+	newPath := conf.GetStorageRoot() + cmn.PathSeparator() + "_x_" + name
+	err := os.Rename(oldPath, newPath)
+	if err != nil {
+		return err
+	}
+	return os.RemoveAll(newPath)
 }

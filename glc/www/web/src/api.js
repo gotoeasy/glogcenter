@@ -36,6 +36,11 @@ export default {
     }
     return post(`${BASE_URL}/glc/v1/store/list`, formData)
   },
+  deleteStorage(name) {
+    let formData = new FormData();
+    formData.append("storeName", name);
+    return post(`${BASE_URL}/glc/v1/store/delete`, formData)
+  },
   // remove(db, id) {
   //   return request(`/remove?database=${db}`, 'post', { id })
   // },

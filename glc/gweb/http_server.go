@@ -34,7 +34,7 @@ func Run() {
 		for _, fnFilter := range filters {
 			rs := fnFilter(req)
 			if rs != nil {
-				c.JSON(rs.Code, rs) // 过滤器返回有内容时直接返回处理结果，结束
+				c.JSON(200, rs) // 过滤器返回有内容时直接返回处理结果，结束
 				return
 			}
 		}
@@ -63,7 +63,7 @@ func Run() {
 
 		rs := handle.Controller(req)
 		if rs != nil {
-			c.JSON(rs.Code, rs)
+			c.JSON(200, rs)
 		}
 	})
 

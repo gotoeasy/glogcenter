@@ -14,11 +14,12 @@ func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // 删除指定日志仓
 func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
-	name := req.GetFormParameter("name")
+	name := req.GetFormParameter("storeName")
 	err := sysmnt.DeleteStorage(name)
 	if err != nil {
-		log.Println("日志仓", name, "删除失败", err)
-		return gweb.Error500("删除失败")
+		msg := err.Error()
+		log.Println("日志仓", name, "删除失败", msg)
+		return gweb.Error500("日志仓 " + name + " 正在使用中，无法删除")
 	}
 	return gweb.Ok()
 }

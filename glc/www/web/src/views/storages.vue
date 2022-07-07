@@ -25,11 +25,11 @@
             <el-table-column prop="indexCount" label="已建索引数量" />
             <el-table-column prop="fileCount" label="文件数量" />
             <el-table-column prop="totalSize" label="空间占用" />
-            <!-- <el-table-column fixed="right" prop="operation" label="操作" width="100">
+            <el-table-column fixed="right" label="操作" width="100">
               <template #default="scope">
-                <el-link @click="deleteRow(scope.row)" type="danger">删除</el-link>
+                <el-link @click="remove(scope.row)" type="danger">删除</el-link>
               </template>
-            </el-table-column> -->
+            </el-table-column>
 
           </el-table>
 
@@ -79,13 +79,36 @@ export default {
 
   },
   methods: {
+    remove(row) {
+
+      this.$confirm('确定删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        this.loading = true
+        api.deleteStorage(row.name).then(rs => {
+          let res = rs.data
+          if (res.success) {
+            this.$message({type: 'info', message: "已删除 " + row.name});
+            this.search();
+          }else{
+            this.$message({type: 'error', message: res.message});
+          }
+        }).finally(() => {
+          this.loading = false
+        })
+      }).catch(() => {
+        // ignore
+      })
+
+    },
     search() {
       this.loading = true
 
       api.searchStorages(this.params).then(rs => {
         let res = rs.data
         if (res.success) {
-          console.error(res)
           this.data = res.result.data || [];
           // document.querySelector('.el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
         }
