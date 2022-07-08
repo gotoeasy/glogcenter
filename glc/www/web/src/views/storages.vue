@@ -81,7 +81,7 @@ export default {
   methods: {
     remove(row) {
 
-      this.$confirm('确定删除 ' + row.name + ' 吗？', '提示', {
+      this.$confirm('确定删除日志仓 ' + row.name + ' 吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -90,7 +90,7 @@ export default {
         api.deleteStorage(row.name).then(rs => {
           let res = rs.data
           if (res.success) {
-            this.$message({type: 'info', message: "已删除 " + row.name});
+            this.$message({type: 'info', message: "已删除日志仓 " + row.name});
             this.search();
           }else{
             this.$message({type: 'error', message: res.message});
