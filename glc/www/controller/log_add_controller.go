@@ -19,12 +19,11 @@ func LogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 		}
 	}
 
-	storeNmae := req.GetFormParameter("name")
 	text := req.GetFormParameter("text")
 	date := req.GetFormParameter("date")
 	system := req.GetFormParameter("system")
 
-	engine := ldb.NewEngine(storeNmae)
+	engine := ldb.NewDefaultEngine()
 	engine.AddTextLog(date, text, system)
 	return gweb.Ok()
 }
