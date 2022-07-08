@@ -8,6 +8,7 @@ package indexword
 import (
 	"glc/cmn"
 	"glc/conf"
+	"glc/ldb/status"
 	"glc/ldb/storage/indexdoc"
 	"glc/onexit"
 	"log"
@@ -83,8 +84,9 @@ func NewWordIndexStorage(storeName string) *WordIndexStorage { // 存储器，�
 		panic(err)
 	}
 	store.leveldb = db
-	store.loadIndexedCount()      // 加载已建索引件数
-	mapStorage[cacheName] = store // 缓存起来
+	store.loadIndexedCount()                    // 加载已建索引件数
+	status.UpdateStorageStatus(storeName, true) // 更新状态：当前日志仓打开
+	mapStorage[cacheName] = store               // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()

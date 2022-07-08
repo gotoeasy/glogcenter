@@ -2,6 +2,7 @@ package controller
 
 import (
 	"glc/gweb"
+	"glc/ldb/status"
 	"glc/ldb/sysmnt"
 	"log"
 )
@@ -15,11 +16,15 @@ func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
 // 删除指定日志仓
 func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 	name := req.GetFormParameter("storeName")
+	if status.IsStorageOpening(name) {
+		return gweb.Error500("日志仓 " + name + " 正在使用，不能删除")
+	}
+
 	err := sysmnt.DeleteStorage(name)
 	if err != nil {
 		msg := err.Error()
 		log.Println("日志仓", name, "删除失败", msg)
-		return gweb.Error500("日志仓 " + name + " 正在使用中，无法删除")
+		return gweb.Error500("日志仓 " + name + " 正在使用，不能删除")
 	}
 	return gweb.Ok()
 }

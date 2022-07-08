@@ -10,6 +10,7 @@ import (
 	"errors"
 	"glc/cmn"
 	"glc/conf"
+	"glc/ldb/status"
 	"glc/ldb/storage/indexword"
 	"glc/ldb/tokenizer"
 	"glc/onexit"
@@ -85,8 +86,9 @@ func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // �
 		panic(err)
 	}
 	store.leveldb = db
-	store.loadMetaData()          // 初始化件数等信息
-	mapStorage[cacheName] = store // 缓存起来
+	store.loadMetaData()                        // 初始化件数等信息
+	status.UpdateStorageStatus(storeName, true) // 更新状态：当前日志仓打开
+	mapStorage[cacheName] = store               // 缓存起来
 
 	// 消费就绪
 	go store.readyGo()
@@ -269,12 +271,13 @@ func (s *LogDataStorage) Close() {
 	}
 
 	s.closing = true
-	s.wg.Wait()                   // 等待通道清空
-	s.saveMetaData()              // 保存件数等元信息
-	s.wg.Add(1)                   // 通道消息计数
-	s.storeChan <- nil            // 通道正在在阻塞等待接收，给个nil让它接收后关闭
-	s.leveldb.Close()             // 走到这里时没有db操作了，可以关闭
-	mapStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
+	s.wg.Wait()                                    // 等待通道清空
+	s.saveMetaData()                               // 保存件数等元信息
+	s.wg.Add(1)                                    // 通道消息计数
+	s.storeChan <- nil                             // 通道正在在阻塞等待接收，给个nil让它接收后关闭
+	s.leveldb.Close()                              // 走到这里时没有db操作了，可以关闭
+	mapStorage[s.storeName] = nil                  // 设空，下回GetStorage时自动再创建
+	status.UpdateStorageStatus(s.storeName, false) // 更新状态：当前日志仓关闭
 
 	log.Println("关闭LogDataStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }

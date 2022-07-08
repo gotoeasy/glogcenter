@@ -8,6 +8,7 @@ package indexdoc
 import (
 	"glc/cmn"
 	"glc/conf"
+	"glc/ldb/status"
 	"glc/onexit"
 	"log"
 	"sync"
@@ -78,7 +79,8 @@ func NewDocIndexStorage(storeName string) *DocIndexStorage { // 存储器，文�
 		panic(err)
 	}
 	store.leveldb = db
-	mapStorage[cacheName] = store // 缓存起来
+	status.UpdateStorageStatus(storeName, true) // 更新状态：当前日志仓打开
+	mapStorage[cacheName] = store               // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()
