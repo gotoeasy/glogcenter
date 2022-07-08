@@ -67,7 +67,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 ```
 
