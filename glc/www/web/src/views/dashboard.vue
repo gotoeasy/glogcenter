@@ -95,12 +95,13 @@ export default {
     }
   },
   created(){
-      api.searchStorages(this.params).then(rs => {
+      api.searchStorageNames().then(rs => {
         let res = rs.data
+        console.info(res)
         if (res.success) {
-          let datas = res.result.data || [];
-          for (let i = 0; i < datas.length; i++) {
-            this.storageOptions.push({value: datas[i].name, label: '日志仓：' + datas[i].name})
+          let names = res.result || [];
+          for (let i = 0; i < names.length; i++) {
+            this.storageOptions.push({value: names[i], label: '日志仓：' + names[i]})
           }
         }
       });

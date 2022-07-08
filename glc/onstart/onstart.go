@@ -39,6 +39,7 @@ func Run() {
 
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/add", controller.JsonLogAddController)
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/search", controller.LogSearchController)
+		gweb.RegisterController(method.POST, contextPath+"/v1/store/names", controller.StorageNamesController)
 		gweb.RegisterController(method.POST, contextPath+"/v1/store/list", controller.StorageListController)
 		gweb.RegisterController(method.POST, contextPath+"/v1/store/delete", controller.StorageDeleteController)
 

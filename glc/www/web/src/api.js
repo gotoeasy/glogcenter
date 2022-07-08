@@ -29,6 +29,9 @@ export default {
     }
     return post(`${BASE_URL}/glc/v1/log/search`, formData)
   },
+  searchStorageNames() {
+    return post(`${BASE_URL}/glc/v1/store/names`, new FormData())
+  },
   searchStorages(params={}) {
     let formData = new FormData();
     for(let k in params){

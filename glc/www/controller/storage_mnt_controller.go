@@ -1,13 +1,21 @@
 package controller
 
 import (
+	"glc/cmn"
+	"glc/conf"
 	"glc/gweb"
 	"glc/ldb/status"
 	"glc/ldb/sysmnt"
 	"log"
 )
 
-// 查询日志仓列表
+// 查询日志仓名称列表
+func StorageNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
+	rs := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
+	return gweb.Result(rs)
+}
+
+// 查询日志仓信息列表
 func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
 	rs := sysmnt.GetStorageList()
 	return gweb.Result(rs)

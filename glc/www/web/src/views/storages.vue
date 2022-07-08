@@ -81,7 +81,7 @@ export default {
   methods: {
     remove(row) {
 
-      this.$confirm('确定删除日志仓 ' + row.name + ' 吗？', '提示', {
+      this.$confirm('确定删除日志仓 ' + row.name + ' 吗？', '确认', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
