@@ -50,8 +50,8 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
 - [x] `GLC_ENABLE_WEB_GZIP`WEB服务是否开启`Gzip`压缩，默认`true`
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
-- [x] `GLC_AMQP_ADDR``rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认``
-- [x] `GLC_AMQP_JSON_FORMAT``rabbitMq`消息文本是否为`json`格式，默认`true`
+- [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
+- [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
 
 
 
