@@ -152,7 +152,7 @@ func ToBytes(data any) []byte {
 
 func GeyStoreNameByDate(name string) string {
 	if name == "" {
-		name = "default"
+		name = "logdata"
 	}
 	if conf.IsStoreNameAutoAddDate() {
 		return fmt.Sprint(name, "-", time.Now().Format("20060102")) // name-yyyymmdd
