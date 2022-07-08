@@ -41,6 +41,20 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
 
+## `docker`启动环境变量
+- [x] `GLC_STORE_ROOT`存储根目录，默认`/glogcenter`
+- [x] `GLC_MAX_IDLE_TIME`最大闲置时间（秒），超过闲置时间将自动关闭日志仓（再次使用会自动开启），`0`时表示不关闭，默认`180`秒
+- [x] `GLC_STORE_NAME_AUTO_ADD_DATE`日志仓是否自动按日存储，默认`false`
+- [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
+- [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
+- [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
+- [x] `GLC_ENABLE_WEB_GZIP`WEB服务是否开启`Gzip`压缩，默认`true`
+- [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
+- [x] `GLC_AMQP_ADDR``rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认``
+- [x] `GLC_AMQP_JSON_FORMAT``rabbitMq`消息文本是否为`json`格式，默认`true`
+
+
+
 ## 服务接口
 - [x] `/glc/v1/log/add`日志添加，提交`json`数据方式，字段`system`是分类，`date`是日期时间，`text`是日志内容
 - [x] `/glc/v1/log/search`日志查询，检索条件字段`searchKey`
@@ -102,7 +116,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] 添加相应版本的`maven`公共仓库包，`java`项目日志可推至`RabbitMQ`
 - [x] 添加`RabbitMQ`简单模式消费者，开启后能从`RabbitMQ`获取日志
 - [x] 添加服务接口`/glc/v1/log/add`，接收`JSON`格式日志以便后续扩展
-- [x] 页面添加日志仓管理功能，支持查看、删除等操作
+- [x] 添加日志仓管理功能，页面支持查看、删除等操作
 
 ### 版本`0.3.0`
 
