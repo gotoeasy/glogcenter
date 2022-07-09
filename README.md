@@ -42,9 +42,9 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 
 ## `docker`启动环境变量
+- [x] `GLC_STORE_NAME_AUTO_ADD_DATE`日志仓是否自动按日存储，默认`true`
 - [x] `GLC_STORE_ROOT`存储根目录，默认`/glogcenter`
-- [x] `GLC_MAX_IDLE_TIME`最大闲置时间（秒），超过闲置时间将自动关闭日志仓（再次使用会自动开启），`0`时表示不关闭，默认`180`秒
-- [x] `GLC_STORE_NAME_AUTO_ADD_DATE`日志仓是否自动按日存储，默认`false`
+- [x] `GLC_MAX_IDLE_TIME`最大闲置时间（秒），超过闲置时间将自动关闭日志仓，`0`时不关闭，默认`180`秒
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
 - [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
 - [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
@@ -67,7 +67,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 </dependency>
 ```
 
