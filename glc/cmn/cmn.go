@@ -156,6 +156,7 @@ func GeyStoreNameByDate(name string) string {
 	}
 	if conf.IsStoreNameAutoAddDate() {
 		return fmt.Sprint(name, "-", time.Now().Format("20060102")) // name-yyyymmdd
+		// return fmt.Sprint(name, "-", time.Now().Format("200601021504")) // name-yyyymmddHHMM
 	}
 	return name
 }

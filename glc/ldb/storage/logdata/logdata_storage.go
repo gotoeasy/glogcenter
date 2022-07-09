@@ -12,6 +12,7 @@ import (
 	"glc/conf"
 	"glc/ldb/status"
 	"glc/ldb/storage/indexword"
+	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"
 	"glc/onexit"
 	"log"
@@ -55,8 +56,9 @@ func getCacheStore(cacheName string) *LogDataStorage {
 }
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）
-func NewLogDataStorage(storeName string, subPath string) *LogDataStorage { // 存储器，文档，自定义对象
+func NewLogDataStorage(storeName string) *LogDataStorage { // 存储器，文档，自定义对象
 
+	subPath := "data"
 	// 缓存有则取用
 	cacheName := storeName + cmn.PathSeparator() + subPath
 	cacheStore := getCacheStore(cacheName)
@@ -304,13 +306,17 @@ func (s *LogDataStorage) saveMetaData() {
 	if s.savedCurrentCount < s.currentCount {
 		s.savedCurrentCount = s.currentCount
 		s.leveldb.Put(zeroUint32Bytes, cmn.Uint32ToBytes(s.savedCurrentCount), nil) // 保存日志总件数
+		sysmntStore := sysmnt.NewSysmntStorage()                                    // 系统管理存储器
+		sysmntStore.SetStorageDataCount(s.storeName, s.savedCurrentCount)           // 保存日志总件数
 		log.Println("保存LogDataStorage件数:", s.savedCurrentCount)
 	}
 
 	if s.savedIndexedCount < s.indexedCount {
 		s.savedIndexedCount = s.indexedCount
 		idxw := indexword.NewWordIndexStorage(s.StoreName())
-		idxw.SaveIndexedCount(s.savedIndexedCount)
+		idxw.SaveIndexedCount(s.savedIndexedCount)                         // 保存索引总件数
+		sysmntStore := sysmnt.NewSysmntStorage()                           // 系统管理存储器
+		sysmntStore.SetStorageIndexCount(s.storeName, s.savedCurrentCount) // 保存索引总件数
 		log.Println("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
 	}
 }

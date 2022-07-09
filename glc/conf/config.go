@@ -33,20 +33,20 @@ func init() {
 
 func UpdateConfigByEnv() {
 	// 读取环境变量初始化配置，各配置都有默认值
-	storeRoot = Getenv("GLC_STORE_ROOT", "/glogcenter")                      // 存储根目录
-	storeChanLength = GetenvInt("GLC_STORE_CHAN_LENGTH", 64)                 // 存储通道长度
-	maxIdleTime = GetenvInt("GLC_MAX_IDLE_TIME", 180)                        // 最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
-	storeNameAutoAddDate = GetenvBool("GLC_STORE_NAME_AUTO_ADD_DATE", false) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
-	serverPort = GetenvInt("GLC_SERVER_PORT", 8080)                          // web服务端口
-	contextPath = Getenv("GLC_CONTEXT_PATH", "/glc")                         // web服务contextPath
-	enableSecurityKey = GetenvBool("GLC_ENABLE_SECURITY_KEY", false)         // web服务是否开启API秘钥校验，默认false
-	headerSecurityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")      // web服务API秘钥的header键名
-	securityKey = Getenv("GLC_SECURITY_KEY", "glogcenter")                   // web服务API秘钥
-	enableWebGzip = GetenvBool("GLC_ENABLE_WEB_GZIP", true)                  // web服务是否开启Gzip
-	enableAmqpConsume = GetenvBool("GLC_ENABLE_AMQP_CONSUME", false)         // 是否开启rabbitMq消费者接收日志
-	amqpAddr = Getenv("GLC_AMQP_ADDR", "")                                   // rabbitMq连接地址，例："amqp://user:password@ip:port/"
-	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")           // rabbitMq队列名
-	amqpJsonFormat = GetenvBool("GLC_AMQP_JSON_FORMAT", true)                // rabbitMq消息文本是否为json格式，默认true
+	storeRoot = Getenv("GLC_STORE_ROOT", "/glogcenter")                     // 存储根目录
+	storeChanLength = GetenvInt("GLC_STORE_CHAN_LENGTH", 64)                // 存储通道长度
+	maxIdleTime = GetenvInt("GLC_MAX_IDLE_TIME", 180)                       // 最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
+	storeNameAutoAddDate = GetenvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
+	serverPort = GetenvInt("GLC_SERVER_PORT", 8080)                         // web服务端口
+	contextPath = Getenv("GLC_CONTEXT_PATH", "/glc")                        // web服务contextPath
+	enableSecurityKey = GetenvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
+	headerSecurityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")     // web服务API秘钥的header键名
+	securityKey = Getenv("GLC_SECURITY_KEY", "glogcenter")                  // web服务API秘钥
+	enableWebGzip = GetenvBool("GLC_ENABLE_WEB_GZIP", true)                 // web服务是否开启Gzip
+	enableAmqpConsume = GetenvBool("GLC_ENABLE_AMQP_CONSUME", false)        // 是否开启rabbitMq消费者接收日志
+	amqpAddr = Getenv("GLC_AMQP_ADDR", "")                                  // rabbitMq连接地址，例："amqp://user:password@ip:port/"
+	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")          // rabbitMq队列名
+	amqpJsonFormat = GetenvBool("GLC_AMQP_JSON_FORMAT", true)               // rabbitMq消息文本是否为json格式，默认true
 }
 
 // 取配置： rabbitMq消息文本是否为json格式，可通过环境变量“GLC_AMQP_JSON_FORMAT”设定，默认值“true”

@@ -19,11 +19,10 @@ import (
 
 // 存储结构体
 type SysmntStorage struct {
-	storeName string      // 存储目录
-	subPath   string      // 存储目录下的相对路径（存放数据）
-	leveldb   *leveldb.DB // leveldb
-	lastTime  int64       // 最后一次访问时间
-	closing   bool        // 是否关闭中状态
+	subPath  string      // 存储目录下的相对路径（存放数据）
+	leveldb  *leveldb.DB // leveldb
+	lastTime int64       // 最后一次访问时间
+	closing  bool        // 是否关闭中状态
 }
 
 var sdbMu sync.Mutex             // 锁
@@ -34,7 +33,7 @@ func init() {
 }
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）
-func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档，自定义对象
+func NewSysmntStorage() *SysmntStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
 	subPath := ".sysmnt"
@@ -51,7 +50,6 @@ func GetSysmntStorage(storeName string) *SysmntStorage { // 存储器，文档�
 	}
 
 	store := new(SysmntStorage)
-	store.storeName = storeName
 	store.subPath = subPath
 	store.closing = false
 	store.lastTime = time.Now().Unix()
@@ -105,6 +103,42 @@ func (s *SysmntStorage) Close() {
 	log.Println("关闭SysmntStorage：", s.subPath)
 }
 
+func (s *SysmntStorage) GetStorageDataCount(storeName string) uint32 {
+	bt, err := s.Get(cmn.StringToBytes("data:" + storeName))
+	if err != nil {
+		return 0
+	}
+	return cmn.BytesToUint32(bt)
+}
+
+func (s *SysmntStorage) SetStorageDataCount(storeName string, count uint32) {
+	s.Put(cmn.StringToBytes("data:"+storeName), cmn.Uint32ToBytes(count))
+}
+
+func (s *SysmntStorage) GetStorageIndexCount(storeName string) uint32 {
+	bt, err := s.Get(cmn.StringToBytes("index:" + storeName))
+	if err != nil {
+		return 0
+	}
+	return cmn.BytesToUint32(bt)
+}
+
+func (s *SysmntStorage) SetStorageIndexCount(storeName string, count uint32) {
+	s.Put(cmn.StringToBytes("index:"+storeName), cmn.Uint32ToBytes(count))
+}
+
+func (s *SysmntStorage) DeleteStorageInfo(storeName string) error {
+	err := s.leveldb.Delete(cmn.StringToBytes("data:"+storeName), nil)
+	if err != nil {
+		return err
+	}
+	err = s.leveldb.Delete(cmn.StringToBytes("index:"+storeName), nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // 直接存入数据到leveldb
 func (s *SysmntStorage) Put(key []byte, value []byte) error {
 	if s.closing {
@@ -121,11 +155,6 @@ func (s *SysmntStorage) Get(key []byte) ([]byte, error) {
 	}
 	s.lastTime = time.Now().Unix()
 	return s.leveldb.Get(key, nil)
-}
-
-// 存储目录名
-func (s *SysmntStorage) StoreName() string {
-	return s.storeName
 }
 
 // 是否关闭中状态

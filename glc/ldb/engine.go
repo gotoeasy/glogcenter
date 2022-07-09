@@ -17,7 +17,7 @@ type Engine struct {
 
 func NewEngine(storeName string) *Engine {
 	if storeName == "" {
-		storeName = cmn.GeyStoreNameByDate("logdata")
+		storeName = cmn.GeyStoreNameByDate("")
 	}
 
 	return &Engine{
@@ -28,7 +28,7 @@ func NewEngine(storeName string) *Engine {
 }
 
 func NewDefaultEngine() *Engine {
-	var storeName string = cmn.GeyStoreNameByDate("logdata")
+	var storeName string = cmn.GeyStoreNameByDate("")
 	return &Engine{
 		storeName:   storeName,
 		logStorage:  storage.NewLogDataStorageHandle(storeName),

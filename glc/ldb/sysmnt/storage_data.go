@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"glc/cmn"
 	"glc/conf"
-	"glc/ldb/storage"
-	"glc/ldb/storage/indexword"
 	"os"
 )
 
@@ -42,10 +40,9 @@ func GetStorageList() *StorageResult {
 			d.LogCount = 0
 			d.IndexCount = 0
 		} else {
-			store := storage.NewLogDataStorageHandle(name)
-			d.LogCount = store.TotalCount()
-			widx := indexword.NewWordIndexStorage(name)
-			d.IndexCount = widx.GetIndexedCount()
+			sysmntStore := NewSysmntStorage()
+			d.LogCount = sysmntStore.GetStorageDataCount(name)
+			d.IndexCount = sysmntStore.GetStorageIndexCount(name)
 		}
 
 		datas = append(datas, d)
@@ -66,5 +63,9 @@ func DeleteStorage(name string) error {
 	if err != nil {
 		return err
 	}
-	return os.RemoveAll(newPath)
+	err = os.RemoveAll(newPath)
+	if err != nil {
+		return err
+	}
+	return NewSysmntStorage().DeleteStorageInfo(name)
 }

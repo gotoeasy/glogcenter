@@ -35,7 +35,7 @@ func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 	}
 
 	store := &LogDataStorageHandle{
-		storage: logdata.NewLogDataStorage(storeName, "data"),
+		storage: logdata.NewLogDataStorage(storeName),
 	}
 	mapStorageHandle[storeName] = store
 	return store
@@ -58,13 +58,13 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 	d.System = system
 
 	if s.storage.IsClose() {
-		s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
+		s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 	}
 	err := s.storage.Add(d)
 	if err != nil {
 		log.Println("竟然失败，再来一次", s.storage.IsClose(), err)
 		if s.storage.IsClose() {
-			s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
+			s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 		}
 		s.storage.Add(d)
 	}
@@ -79,13 +79,13 @@ func (s *LogDataStorageHandle) AddLogDataModel(data *logdata.LogDataModel) {
 	}
 
 	if s.storage.IsClose() {
-		s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
+		s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 	}
 	err := s.storage.Add(data)
 	if err != nil {
 		log.Println("竟然失败，再来一次", s.storage.IsClose(), err)
 		if s.storage.IsClose() {
-			s.storage = logdata.NewLogDataStorage(s.storage.StoreName(), "data")
+			s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 		}
 		s.storage.Add(data)
 	}
