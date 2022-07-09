@@ -108,7 +108,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ### 开发版`latest`
 
 - [ ] TODO
-- [ ] TODO
+- [ ] 界面显示当前版本
 - [ ] 日志按日分仓存储时，默认保存最多180天
 
 ### 版本`0.4.0`
