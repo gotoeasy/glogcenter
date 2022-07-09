@@ -76,7 +76,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
     <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
     <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!-- 可通过环境变量 GLC_API_KEY 设定 -->
-    <system>Demo</glcApiKey>                                    <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
+    <system>Demo</system>                                       <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
         <pattern><![CDATA[%p %m %n]]></pattern>
     </layout>
@@ -88,7 +88,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
     <amqpPort>5672</amqpPort>                     <!-- 可通过环境变量 GLC_AMQP_PORT 设定 -->
     <amqpUser>rabbitmqUsername</amqpUser>         <!-- 可通过环境变量 GLC_AMQP_USER 设定 -->
     <amqpPassword>rabbitmqPassword</amqpPassword> <!-- 可通过环境变量 GLC_AMQP_PASSWORD 设定 -->
-    <system>Demo</glcApiKey>                      <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
+    <system>Demo</system>                         <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
         <pattern><![CDATA[%p %m %n]]></pattern>
     </layout>
