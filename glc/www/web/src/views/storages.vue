@@ -27,7 +27,7 @@
             <el-table-column prop="totalSize" label="空间占用" />
             <el-table-column fixed="right" label="操作" width="100">
               <template #default="scope">
-                <el-button type="warning" @click="remove(scope.row)">删除</el-button>
+                <el-button size="small" type="warning" @click="remove(scope.row)">删除</el-button>
               </template>
             </el-table-column>
 
