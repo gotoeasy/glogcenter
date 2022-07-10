@@ -97,7 +97,7 @@ export default {
   created(){
       api.searchStorageNames().then(rs => {
         let res = rs.data
-        console.info(res)
+       // console.info(res)
         if (res.success) {
           let names = res.result || [];
           for (let i = 0; i < names.length; i++) {
