@@ -44,6 +44,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ## `docker`启动环境变量
 - [x] `GLC_STORE_NAME_AUTO_ADD_DATE`日志仓是否自动按日存储，默认`true`
 - [x] `GLC_SAVE_DAYS`日志仓按日存储自动维护时的保留天数(`0~180`)，`0`表示不自动删除，默认`180`天
+- [x] `GLC_ENABLE_LOGIN`是否开启用户密码登录功能，默认`false`
 - [x] `GLC_USERNAME`查询界面登录用的用户名，默认`glc`
 - [x] `GLC_PASSWORD`查询界面登录用的密码，默认`glogcenter`
 - [x] `GLC_STORE_ROOT`存储根目录，默认`/glogcenter`
@@ -58,9 +59,11 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 
 
-## 服务接口
-- [x] `/glc/v1/log/add`日志添加，提交`json`数据方式，字段`system`是分类，`date`是日期时间，`text`是日志内容
-- [x] `/glc/v1/log/search`日志查询，检索条件字段`searchKey`
+## 接口
+- [x] `/glc/v1/log/add`日志添加，`POST`，`application/json` <br>
+      字段`system`： 对应页面的`分类` <br>
+      字段`date`： 对应页面的`日期时间` <br>
+      字段`text`： 对应页面的`日志内容` <br>
 
 
 
@@ -109,7 +112,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 ### 开发版`latest`
 
-- [x] 增加用户密码登录功能
+- [x] 增加用户密码登录功能，可设定是否开启用户密码登录
 - [x] 日志按日分仓存储时，默认自动维护保存最多180天，自动维护时不能手动删除日志仓
 - [x] 改善日志仓管理页面的展示
 
