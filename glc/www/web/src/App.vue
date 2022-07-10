@@ -71,6 +71,7 @@ export default {
     },
     logout() {
       sessionStorage.clear();
+      this.isLogin = false;
       location.reload();
     },
   }

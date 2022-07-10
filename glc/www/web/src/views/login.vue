@@ -31,7 +31,7 @@ export default {
       this.loading = true
       api.login(this.username,this.password).then(rs => {
         let res = rs.data
-        console.info('-------------------------------', res)
+        // console.info('-------------------------------', res)
         if (res.success) {
           sessionStorage.setItem("glctoken", res.result)
           location.reload()
