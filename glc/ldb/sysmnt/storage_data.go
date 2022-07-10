@@ -8,12 +8,13 @@ import (
 	"glc/cmn"
 	"glc/conf"
 	"os"
+
+	"github.com/shirou/gopsutil/disk"
 )
 
 type StorageResult struct {
-	Total string          `json:"total,omitempty"` // 名称
-	Free  uint32          `json:"free,omitempty"`  // 日志量
-	Data  []*StorageModel `json:"data,omitempty"`  // 占用空间
+	Info string          `json:"info,omitempty"`
+	Data []*StorageModel `json:"data,omitempty"` // 占用空间
 }
 type StorageModel struct {
 	Name       string `json:"name"`       // 名称
@@ -26,6 +27,7 @@ type StorageModel struct {
 func GetStorageList() *StorageResult {
 
 	var datas []*StorageModel
+	var sum int64
 	names := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	for _, name := range names {
 		d := &StorageModel{
@@ -33,8 +35,10 @@ func GetStorageList() *StorageResult {
 		}
 
 		cnt, size, _ := cmn.GetDirInfo(conf.GetStorageRoot() + cmn.PathSeparator() + name)
-		d.TotalSize = fmt.Sprintf("%.0fM", float64(size)/1024/1024)
+		d.TotalSize = cmn.GetSizeInfo(uint64(size))
 		d.FileCount = cnt
+
+		sum += size
 
 		if cnt == 0 {
 			d.LogCount = 0
@@ -48,7 +52,10 @@ func GetStorageList() *StorageResult {
 		datas = append(datas, d)
 	}
 
+	stat, _ := disk.Usage(conf.GetStorageRoot())
+
 	rs := &StorageResult{
+		Info: fmt.Sprintf("合计占用空间 " + cmn.GetSizeInfo(uint64(sum)) + "，剩余空间 " + cmn.GetSizeInfo(stat.Free)),
 		Data: datas,
 	}
 	return rs

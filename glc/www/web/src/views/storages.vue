@@ -9,7 +9,7 @@
             <div class="header">
               <div style="display:flex;justify-content:space-between;">
                 <div>
-                  日志仓信息列表
+                  日志仓信息列表 <el-button type="info" @click="search">刷新</el-button>
                 </div>
               </div>
             </div>
@@ -27,7 +27,7 @@
             <el-table-column prop="totalSize" label="空间占用" />
             <el-table-column fixed="right" label="操作" width="100">
               <template #default="scope">
-                <el-link @click="remove(scope.row)" type="danger">删除</el-link>
+                <el-button type="warning" @click="remove(scope.row)">删除</el-button>
               </template>
             </el-table-column>
 
@@ -110,6 +110,7 @@ export default {
         let res = rs.data
         if (res.success) {
           this.data = res.result.data || [];
+          this.info =  res.result.info;
           // document.querySelector('.el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
         }
       }).finally(() => {
