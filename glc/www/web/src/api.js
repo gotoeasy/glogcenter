@@ -20,7 +20,15 @@ function post(url, formData) {
   })
 }
 
+let app = null;
+
 export default {
+  initApp(a) {
+    app = a;
+  },
+  logout() {
+    app.logout();
+  },
   search(params={}) {
 
     let formData = new FormData();

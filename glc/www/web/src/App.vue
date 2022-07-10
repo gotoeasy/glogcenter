@@ -29,7 +29,18 @@
         <router-view></router-view> 
       </el-main>
 
-      <Login v-if="enableLogin && !isLogin"></Login>
+      <el-dialog v-if="enableLogin && !isLogin" title="登录" class="x-login" v-model="dialogVisible" width="420px"
+        :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+
+        <el-input placeholder="请输入用户名" v-model="username" maxlength="100"></el-input><p/>
+        <el-input placeholder="请输入密码" type="password" v-model="password" maxlength="100"></el-input>
+        
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button type="primary" @click="login" style="width:100%;">确 定</el-button>
+          </span>
+        </template>
+      </el-dialog>
 
     </el-container>
   </el-container>
@@ -38,23 +49,25 @@
 <script>
 import Menu from './components/Menu.vue'
 import { Expand, Fold } from '@element-plus/icons-vue'
-import Login from './views/login.vue'
 import api from './api'
 
 export default {
   components: {
     Fold,
     Expand,
-    Menu,
-    Login
+    Menu
   },
   data() {
     return {
       enableLogin: true,
       isLogin: false,
+      dialogVisible: true,
+      username: "",
+      password: "",
     }
   },
   created() {
+    api.initApp(this);
     api.enableLogin().then(rs => {
       let res = rs.data
       if (res.success) {
@@ -69,10 +82,30 @@ export default {
     clickLogo() {
       location.href = "https://github.com/gotoeasy/glogcenter"
     },
+    login(){
+      this.loading = true
+      api.login(this.username,this.password).then(rs => {
+        let res = rs.data
+        if (res.success) {
+          sessionStorage.setItem("glctoken", res.result);
+          this.dialogVisible = false;
+          this.isLogin = true;
+          this.username = '';
+          this.password = '';
+          this.$router.push({name:'dashboard'})
+        }else{
+          this.$message({type: 'error', message: res.message});
+        }
+      }).finally(() => {
+        this.loading = false
+      })
+    },
     logout() {
       sessionStorage.clear();
       this.isLogin = false;
-      location.reload();
+      this.dialogVisible = true;
+      this.username = '';
+      this.password = '';
     },
   }
 }
