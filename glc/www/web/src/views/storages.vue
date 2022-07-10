@@ -9,7 +9,7 @@
             <div class="header">
               <div style="display:flex;justify-content:space-between;">
                 <div>
-                  日志仓信息列表 <el-button type="info" @click="search">刷新</el-button>
+                  日志仓信息列表 <el-button type="primary" @click="search">刷新</el-button>
                 </div>
               </div>
             </div>
