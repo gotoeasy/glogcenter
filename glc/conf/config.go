@@ -26,6 +26,7 @@ var enableWebGzip bool
 var amqpAddr string
 var amqpQueueName string
 var amqpJsonFormat bool
+var saveDays int
 
 func init() {
 	UpdateConfigByEnv()
@@ -47,6 +48,12 @@ func UpdateConfigByEnv() {
 	amqpAddr = Getenv("GLC_AMQP_ADDR", "")                                  // rabbitMq连接地址，例："amqp://user:password@ip:port/"
 	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")          // rabbitMq队列名
 	amqpJsonFormat = GetenvBool("GLC_AMQP_JSON_FORMAT", true)               // rabbitMq消息文本是否为json格式，默认true
+	saveDays = GetenvInt("GLC_SAVE_DAYS", 180)                              // 日志分仓时的保留天数(0~180)，0表示不自动删除，默认180天
+}
+
+// 取配置： 日志分仓时的保留天数(0~180)，0表示不自动删除，可通过环境变量“GLC_SAVE_DAYS”设定，默认180天
+func GetSaveDays() int {
+	return saveDays
 }
 
 // 取配置： rabbitMq消息文本是否为json格式，可通过环境变量“GLC_AMQP_JSON_FORMAT”设定，默认值“true”

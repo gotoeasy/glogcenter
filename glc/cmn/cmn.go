@@ -131,6 +131,22 @@ func LeftRune(str string, length int) string {
 	return rs
 }
 
+func RightRune(str string, length int) string {
+	lenr := LenRune(str)
+	if lenr <= length {
+		return str
+	}
+
+	var rs string
+	start := lenr - length
+	for i, s := range str {
+		if i >= start {
+			rs = rs + string(s)
+		}
+	}
+	return rs
+}
+
 func PathSeparator() string {
 	return string(os.PathSeparator)
 }
@@ -159,6 +175,29 @@ func GeyStoreNameByDate(name string) string {
 		// return fmt.Sprint(name, "-", time.Now().Format("200601021504")) // name-yyyymmddHHMM
 	}
 	return name
+}
+
+func StartwithsRune(str string, startstr string) bool {
+
+	if startstr == "" || str == startstr {
+		return true
+	}
+
+	strs := []rune(str)
+	tmps := []rune(startstr)
+	lens := len(strs)
+	lentmp := len([]rune(tmps))
+	if lens < lentmp {
+		return false
+	}
+
+	for i := 0; i < lentmp; i++ {
+		if tmps[i] != strs[i] {
+			return false
+		}
+	}
+
+	return true
 }
 
 func EndwithsRune(str string, endstr string) bool {
@@ -252,4 +291,9 @@ func GetSizeInfo(size uint64) string {
 		return fmt.Sprintf("%.1fG", float64(size)/1024/1024/1024)
 	}
 	return fmt.Sprintf("%.1fM", float64(size)/1024/1024)
+}
+
+// 当前日期加减天数后的yyyymmdd格式
+func GetYyyymmdd(days int) string {
+	return time.Now().AddDate(0, 0, days).Format("20060102")
 }

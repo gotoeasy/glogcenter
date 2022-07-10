@@ -43,6 +43,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 ## `docker`启动环境变量
 - [x] `GLC_STORE_NAME_AUTO_ADD_DATE`日志仓是否自动按日存储，默认`true`
+- [x] `GLC_SAVE_DAYS`日志仓按日存储自动维护时的保留天数(`0~180`)，`0`表示不自动删除，默认`180`天
 - [x] `GLC_STORE_ROOT`存储根目录，默认`/glogcenter`
 - [x] `GLC_MAX_IDLE_TIME`最大闲置时间（秒），超过闲置时间将自动关闭日志仓，`0`时不关闭，默认`180`秒
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
@@ -108,8 +109,8 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ### 开发版`latest`
 
 - [ ] TODO
-- [ ] 界面显示当前版本
-- [ ] 日志按日分仓存储时，默认保存最多180天
+- [x] 日志按日分仓存储时，默认自动维护保存最多180天，自动维护时不能手动删除日志仓
+- [x] 改善日志仓管理页面的展示
 
 ### 版本`0.4.0`
 

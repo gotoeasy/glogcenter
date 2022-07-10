@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"glc/cmn"
 	"glc/conf"
+	"log"
 	"os"
+	"time"
 
 	"github.com/shirou/gopsutil/disk"
 )
@@ -22,6 +24,19 @@ type StorageModel struct {
 	IndexCount uint32 `json:"indexCount"` // 已建索引数量
 	FileCount  uint32 `json:"fileCount"`  // 文件数量
 	TotalSize  string `json:"totalSize"`  // 占用空间
+}
+
+func init() {
+	go func() {
+		if conf.IsStoreNameAutoAddDate() && conf.GetSaveDays() > 0 {
+			removeStorageByDays()
+			ticker := time.NewTicker(time.Hour) // 一小时检查一次是否有待删除的日志仓
+			for {
+				<-ticker.C
+				removeStorageByDays()
+			}
+		}
+	}()
 }
 
 func GetStorageList() *StorageResult {
@@ -75,4 +90,25 @@ func DeleteStorage(name string) error {
 		return err
 	}
 	return NewSysmntStorage().DeleteStorageInfo(name)
+}
+
+func removeStorageByDays() {
+	// 日志按日期分仓存储时，按保存天数自动删除
+	minYmd := cmn.GetYyyymmdd(-1 * conf.GetSaveDays())
+	dirs := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
+	for _, dir := range dirs {
+		ymd := cmn.RightRune(dir, 8)
+		if !cmn.StartwithsRune(ymd, "20") {
+			continue
+		}
+
+		if ymd < minYmd {
+			err := DeleteStorage(dir)
+			if err != nil {
+				log.Println("日志仓最多保存", conf.GetSaveDays(), "天，", "删除", dir, "失败", err)
+			} else {
+				log.Println("日志仓最多保存", conf.GetSaveDays(), "天，", "已删除", dir)
+			}
+		}
+	}
 }

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"glc/cmn"
 	"glc/conf"
 	"glc/gweb"
@@ -24,6 +25,12 @@ func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
 // 删除指定日志仓
 func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 	name := req.GetFormParameter("storeName")
+
+	if conf.IsStoreNameAutoAddDate() && conf.GetSaveDays() > 0 {
+		msg := fmt.Sprintf("当前是日志仓自动维护模式，最多保存 %d 天，不能手动删除", conf.GetSaveDays())
+		return gweb.Error500(msg)
+	}
+
 	if status.IsStorageOpening(name) {
 		return gweb.Error500("日志仓 " + name + " 正在使用，不能删除")
 	}
