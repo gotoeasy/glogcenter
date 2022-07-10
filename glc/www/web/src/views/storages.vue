@@ -92,6 +92,9 @@ export default {
           if (res.success) {
             this.$message({type: 'info', message: "已删除日志仓 " + row.name});
             this.search();
+          }else if (res.code == 403){
+            sessionStorage.clear();
+            location.reload();
           }else{
             this.$message({type: 'error', message: res.message});
           }
@@ -112,6 +115,9 @@ export default {
           this.data = res.result.data || [];
           this.info =  res.result.info;
           // document.querySelector('.el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
+        }else if (res.code == 403){
+          sessionStorage.clear();
+          location.reload();
         }
       }).finally(() => {
         this.loading = false

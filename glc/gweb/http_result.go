@@ -28,6 +28,14 @@ func Error500(msg string) *HttpResult {
 	}
 }
 
+func Error403() *HttpResult {
+	return &HttpResult{
+		Code:    403,
+		Message: "forbidden",
+		Success: false,
+	}
+}
+
 func Error404() *HttpResult {
 	return &HttpResult{
 		Code:    404,

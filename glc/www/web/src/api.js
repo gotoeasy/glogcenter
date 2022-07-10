@@ -12,11 +12,11 @@ function request(url, method = 'get', data) {
 }
 
 function post(url, formData) {
+  formData.append('token', sessionStorage.getItem("glctoken"));
   return axios.post(url,formData,{
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-    //  'X-GLC-AUTH': 'glogcenter',
-      }
+    }
   })
 }
 
@@ -44,22 +44,10 @@ export default {
     formData.append("storeName", name);
     return post(`${BASE_URL}/glc/v1/store/delete`, formData)
   },
-  // remove(db, id) {
-  //   return request(`/remove?database=${db}`, 'post', { id })
-  // },
-  // gc() {
-  //   return request('/gc')
-  // },
-  // getStatus() {
-  //   return request('/status')
-  // },
-  // addIndex(db, index) {
-  //   return request(`/index?database=${db}`, 'post', index )
-  // },
-  // drop(db){
-  //   return request(`/db/drop?database=${db}`)
-  // },
-  // create(db){
-  //   return request(`/db/create?database=${db}`)
-  // }
+  login(user,pass) {
+    let formData = new FormData();
+    formData.append("username", user);
+    formData.append("password", pass);
+    return post(`${BASE_URL}/glc/v1/user/login`, formData)
+  },
 }

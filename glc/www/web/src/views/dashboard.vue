@@ -103,6 +103,9 @@ export default {
           for (let i = 0; i < names.length; i++) {
             this.storageOptions.push({value: names[i], label: '日志仓：' + names[i]})
           }
+        }else if (res.code == 403){
+          sessionStorage.clear();
+          location.reload();
         }
       });
   },
@@ -153,6 +156,9 @@ export default {
           }else{
             this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${this.data.length} 条，正展示前 ${this.data.length} 条`
           }
+        }else if (res.code == 403){
+          sessionStorage.clear();
+          location.reload();
         }
       })
     },
@@ -173,6 +179,9 @@ export default {
           }else{
             this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
           }
+        }else if (res.code == 403){
+          sessionStorage.clear();
+          location.reload();
         }
 
       }).finally(() => {

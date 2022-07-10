@@ -27,6 +27,8 @@ var amqpAddr string
 var amqpQueueName string
 var amqpJsonFormat bool
 var saveDays int
+var username string
+var password string
 
 func init() {
 	UpdateConfigByEnv()
@@ -49,6 +51,18 @@ func UpdateConfigByEnv() {
 	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")          // rabbitMq队列名
 	amqpJsonFormat = GetenvBool("GLC_AMQP_JSON_FORMAT", true)               // rabbitMq消息文本是否为json格式，默认true
 	saveDays = GetenvInt("GLC_SAVE_DAYS", 180)                              // 日志分仓时的保留天数(0~180)，0表示不自动删除，默认180天
+	username = Getenv("GLC_USERNAME", "glc")                                // 登录用户名，默认“glc”
+	password = Getenv("GLC_PASSWORD", "glogcenter")                         // 登录密码，默认“glogcenter”
+}
+
+// 取配置： 登录用户名，可通过环境变量“GLC_USERNAME”设定，默认“glc”
+func GetUsername() string {
+	return username
+}
+
+// 取配置： 登录用户名，可通过环境变量“GLC_PASSWORD”设定，默认“glogcenter”
+func GetPassword() string {
+	return password
 }
 
 // 取配置： 日志分仓时的保留天数(0~180)，0表示不自动删除，可通过环境变量“GLC_SAVE_DAYS”设定，默认180天

@@ -8,6 +8,11 @@ import (
 
 // 日志检索（表单提交方式）
 func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
+
+	if req.GetFormParameter("token") != GetSessionid() {
+		return gweb.Error403() // 登录检查
+	}
+
 	storeName := req.GetFormParameter("storeName")
 	//searchKey := tokenizer.GetSearchKey(req.GetFormParameter("searchKey"))
 	searchKey := req.GetFormParameter("searchKey")

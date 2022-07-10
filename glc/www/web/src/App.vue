@@ -14,15 +14,23 @@
         </div> 
 
       </div>
+
+      <el-link v-if="isLogin" @click="logout">
+        <el-icon :size="26"><expand/></el-icon>
+      </el-link>
+
       </el-header>
 
-    <el-aside class="menubar x-menubar" style="width:48px">
-      <Menu :isCollapsed="true"></Menu>
-    </el-aside>
+      <el-aside v-if="isLogin" class="menubar x-menubar" style="width:48px">
+        <Menu :isCollapsed="true"></Menu>
+      </el-aside>
 
-      <el-main class="main x-main" >
+      <el-main v-if="isLogin" class="main x-main" >
         <router-view></router-view> 
       </el-main>
+
+      <Login v-if="!isLogin"></Login>
+
 
     </el-container>
   </el-container>
@@ -31,18 +39,27 @@
 <script>
 import Menu from './components/Menu.vue'
 import { Expand, Fold } from '@element-plus/icons-vue'
+import Login from './views/login.vue'
 
 export default {
   components: {
     Fold,
     Expand,
     Menu,
-  },
+    Login
+},
   data() {
+    return {
+      isLogin: !!sessionStorage.getItem('glctoken')
+    }
   },
   methods: {
     clickLogo() {
       location.href = "https://github.com/gotoeasy/glogcenter"
+    },
+    logout() {
+      sessionStorage.clear();
+      location.reload();
     },
   }
 }

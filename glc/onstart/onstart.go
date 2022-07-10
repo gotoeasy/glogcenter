@@ -34,14 +34,15 @@ func Run() {
 		gweb.RegisterController(method.GET, "/**/*.png", html.StaticFileController)
 
 		// 控制器
-		gweb.RegisterController(method.POST, contextPath+"/search", controller.LogSearchController) // Deprecated
-		gweb.RegisterController(method.POST, contextPath+"/add", controller.LogAddController)       // Deprecated
+		gweb.RegisterController(method.POST, contextPath+"/search", controller.LogSearchController) // 查询日志 Deprecated
+		gweb.RegisterController(method.POST, contextPath+"/add", controller.LogAddController)       // 添加日志 Deprecated
 
-		gweb.RegisterController(method.POST, contextPath+"/v1/log/add", controller.JsonLogAddController)
-		gweb.RegisterController(method.POST, contextPath+"/v1/log/search", controller.LogSearchController)
-		gweb.RegisterController(method.POST, contextPath+"/v1/store/names", controller.StorageNamesController)
-		gweb.RegisterController(method.POST, contextPath+"/v1/store/list", controller.StorageListController)
-		gweb.RegisterController(method.POST, contextPath+"/v1/store/delete", controller.StorageDeleteController)
+		gweb.RegisterController(method.POST, contextPath+"/v1/log/add", controller.JsonLogAddController)         // 添加日志
+		gweb.RegisterController(method.POST, contextPath+"/v1/log/search", controller.LogSearchController)       // 查询日志
+		gweb.RegisterController(method.POST, contextPath+"/v1/store/names", controller.StorageNamesController)   // 查询日志仓名称列表
+		gweb.RegisterController(method.POST, contextPath+"/v1/store/list", controller.StorageListController)     // 查询日志仓信息列表
+		gweb.RegisterController(method.POST, contextPath+"/v1/store/delete", controller.StorageDeleteController) // 删除日志仓
+		gweb.RegisterController(method.POST, contextPath+"/v1/user/login", controller.LoginController)           // Login
 
 		// 默认引擎空转一下，触发未建索引继续建
 		go ldb.NewDefaultEngine().AddTextLog("", "", "")
