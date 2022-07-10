@@ -15,22 +15,21 @@
 
       </div>
 
-      <el-link v-if="isLogin" @click="logout">
+      <el-link v-if="enableLogin && isLogin" @click="logout">
         <el-icon :size="26"><expand/></el-icon>
       </el-link>
 
       </el-header>
 
-      <el-aside v-if="isLogin" class="menubar x-menubar" style="width:48px">
+      <el-aside v-if="!enableLogin || isLogin" class="menubar x-menubar" style="width:48px">
         <Menu :isCollapsed="true"></Menu>
       </el-aside>
 
-      <el-main v-if="isLogin" class="main x-main" >
+      <el-main v-if="!enableLogin || isLogin" class="main x-main" >
         <router-view></router-view> 
       </el-main>
 
-      <Login v-if="!isLogin"></Login>
-
+      <Login v-if="enableLogin && !isLogin"></Login>
 
     </el-container>
   </el-container>
@@ -40,6 +39,7 @@
 import Menu from './components/Menu.vue'
 import { Expand, Fold } from '@element-plus/icons-vue'
 import Login from './views/login.vue'
+import api from './api'
 
 export default {
   components: {
@@ -47,11 +47,23 @@ export default {
     Expand,
     Menu,
     Login
-},
+  },
   data() {
     return {
-      isLogin: !!sessionStorage.getItem('glctoken')
+      enableLogin: true,
+      isLogin: false,
     }
+  },
+  created() {
+    api.enableLogin().then(rs => {
+      let res = rs.data
+      if (res.success) {
+        this.enableLogin = res.result;
+        if (res.result) {
+          this.isLogin = !!sessionStorage.getItem('glctoken');
+        }
+      }
+    });
   },
   methods: {
     clickLogo() {

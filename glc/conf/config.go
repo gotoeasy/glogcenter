@@ -27,6 +27,7 @@ var amqpAddr string
 var amqpQueueName string
 var amqpJsonFormat bool
 var saveDays int
+var enableLogin bool
 var username string
 var password string
 
@@ -51,8 +52,14 @@ func UpdateConfigByEnv() {
 	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")          // rabbitMq队列名
 	amqpJsonFormat = GetenvBool("GLC_AMQP_JSON_FORMAT", true)               // rabbitMq消息文本是否为json格式，默认true
 	saveDays = GetenvInt("GLC_SAVE_DAYS", 180)                              // 日志分仓时的保留天数(0~180)，0表示不自动删除，默认180天
+	enableLogin = GetenvBool("GLC_ENABLE_LOGIN", false)                     // 是否开启用户密码登录，默认“false”
 	username = Getenv("GLC_USERNAME", "glc")                                // 登录用户名，默认“glc”
 	password = Getenv("GLC_PASSWORD", "glogcenter")                         // 登录密码，默认“glogcenter”
+}
+
+// 取配置： 是否开启用户密码登录，可通过环境变量“GLC_ENABLE_LOGIN”设定，默认“false”
+func IsEnableLogin() bool {
+	return enableLogin
 }
 
 // 取配置： 登录用户名，可通过环境变量“GLC_USERNAME”设定，默认“glc”

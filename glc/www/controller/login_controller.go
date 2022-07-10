@@ -12,14 +12,16 @@ import (
 var sessionid string
 
 func init() {
-	sessionid = createSessionid()
-	go func() {
-		ticker := time.NewTicker(time.Hour) // 一小时更新一次
-		for {
-			<-ticker.C
-			sessionid = createSessionid()
-		}
-	}()
+	if conf.IsEnableLogin() {
+		sessionid = createSessionid()
+		go func() {
+			ticker := time.NewTicker(time.Hour) // 一小时更新一次
+			for {
+				<-ticker.C
+				sessionid = createSessionid()
+			}
+		}()
+	}
 }
 
 func LoginController(req *gweb.HttpRequest) *gweb.HttpResult {
@@ -30,6 +32,10 @@ func LoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 	}
 
 	return gweb.Result(sessionid)
+}
+
+func IsEnableLoginController(req *gweb.HttpRequest) *gweb.HttpResult {
+	return gweb.Result(conf.IsEnableLogin())
 }
 
 func createSessionid() string {

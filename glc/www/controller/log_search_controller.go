@@ -2,6 +2,7 @@ package controller
 
 import (
 	"glc/cmn"
+	"glc/conf"
 	"glc/gweb"
 	"glc/ldb"
 )
@@ -9,7 +10,7 @@ import (
 // 日志检索（表单提交方式）
 func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 
-	if req.GetFormParameter("token") != GetSessionid() {
+	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
 		return gweb.Error403() // 登录检查
 	}
 

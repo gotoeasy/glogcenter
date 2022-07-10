@@ -12,7 +12,7 @@ import (
 
 // 查询日志仓名称列表
 func StorageNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
-	if req.GetFormParameter("token") != GetSessionid() {
+	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
 		return gweb.Error403() // 登录检查
 	}
 
@@ -22,7 +22,7 @@ func StorageNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // 查询日志仓信息列表
 func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
-	if req.GetFormParameter("token") != GetSessionid() {
+	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
 		return gweb.Error403() // 登录检查
 	}
 
@@ -32,7 +32,7 @@ func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // 删除指定日志仓
 func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
-	if req.GetFormParameter("token") != GetSessionid() {
+	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
 		return gweb.Error403() // 登录检查
 	}
 

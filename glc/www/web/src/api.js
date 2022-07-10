@@ -50,4 +50,8 @@ export default {
     formData.append("password", pass);
     return post(`${BASE_URL}/glc/v1/user/login`, formData)
   },
+  enableLogin() {
+    let formData = new FormData();
+    return post(`${BASE_URL}/glc/v1/user/enableLogin`, formData)
+  },
 }
