@@ -70,7 +70,7 @@ func GetStorageList() *StorageResult {
 	stat, _ := disk.Usage(conf.GetStorageRoot())
 
 	rs := &StorageResult{
-		Info: fmt.Sprintf("合计占用空间 " + cmn.GetSizeInfo(uint64(sum)) + "，剩余空间 " + cmn.GetSizeInfo(stat.Free)),
+		Info: fmt.Sprintf("共占用空间 " + cmn.GetSizeInfo(uint64(sum)) + "，剩余空间 " + cmn.GetSizeInfo(stat.Free)),
 		Data: datas,
 	}
 	return rs
