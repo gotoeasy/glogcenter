@@ -5,7 +5,8 @@
 
 # 缘起
 
-日志中心，一直是用传统三件套，打开速度不理想，资源占用太厉害，常闹脾气，替代品总是找不到。终于忍不住用`go`试写一个`logcenter`，结果确实是惊艳到自己了，故起名`glogcenter`，简称`GLC`，开仓建库
+日志中心，一直是用传统的三件套`ELK`，但终究还是不理想（定制安装并非简单、页面打开初始化太慢，界面操作不习惯，最主要的是资源占用太厉害，甚至隔断时间就会崩溃），替代品总是找不到<br>
+终于，在又一次的挂掉之后，忍不住用`go`试写一个`logcenter`，结果各种优异表现确实是惊艳到了自己，故起名`glogcenter`，简称`GLC`，开仓建库，目标是逐步替换线上的`ELK`
 <br>
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
@@ -14,16 +15,14 @@
 
 
 ## 特点
-- [x] 使用`golang`实现，就是快
+- [x] 使用`golang`实现，具备`go`的各种特性优势，关键是省资源、性能高
 - [x] 借助`goleveldb`做数据保存，结合日志写多读少特点稍加设计，真是快
-- [x] 日志量虽大，却是真心节省内存资源
-- [x] 常用的无条件查询最新日志，快到麻木无感
-- [x] 关键词全文检索，支持中文分词，毫秒级查询响应，快到麻木无感
+- [x] 关键词全文检索，支持中文分词（使用`jiebago`进行分词），毫秒级响应，自然流畅
 - [x] 日志吞食量每秒近万条，建索引速度每秒数千条，闲时建索引充分利用资源
-- [x] 提供`docker`镜像支持容器化部署，方便之极
+- [x] 提供`docker`镜像，支持容器化部署，方便之极
 - [x] 提供`java`项目日志收集包，日志都发来发来发来
 - [x] 支持从`RabbitMQ`收取日志信息
-- [x] 内置提供简洁的日志查询界面
+- [x] 内置提供简洁的日志查询管理界面
 
 <div align=center>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
@@ -47,12 +46,9 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] `GLC_ENABLE_LOGIN`是否开启用户密码登录功能，默认`false`
 - [x] `GLC_USERNAME`查询界面登录用的用户名，默认`glc`
 - [x] `GLC_PASSWORD`查询界面登录用的密码，默认`glogcenter`
-- [x] `GLC_STORE_ROOT`存储根目录，默认`/glogcenter`
-- [x] `GLC_MAX_IDLE_TIME`最大闲置时间（秒），超过闲置时间将自动关闭日志仓，`0`时不关闭，默认`180`秒
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
 - [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
 - [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
-- [x] `GLC_ENABLE_WEB_GZIP`WEB服务是否开启`Gzip`压缩，默认`true`
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
@@ -61,9 +57,9 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 ## 接口
 - [x] `/glc/v1/log/add`日志添加，`POST`，`application/json` <br>
-      字段`system`： 对应页面的`分类` <br>
-      字段`date`： 对应页面的`日期时间` <br>
-      字段`text`： 对应页面的`日志内容` <br>
+      字段`system`： 字符串，对应页面的`分类` <br>
+      字段`date`： 字符串，对应页面的`日期时间` <br>
+      字段`text`： 字符串，对应页面的`日志内容` <br>
 
 
 
@@ -73,7 +69,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -103,18 +99,21 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
 
-## TODO
-- [ ] 界面优化
-- [ ] 多语言
-
-
 ## 更新履历
 
 ### 开发版`latest`
 
+- [ ] 界面优化
+- [ ] 多语言
+- [ ] 分词优化
+
+### 版本`0.5.0`
+
 - [x] 增加用户密码登录功能，可设定是否开启用户密码登录
 - [x] 日志按日分仓存储时，默认自动维护保存最多180天，自动维护时不能手动删除日志仓
 - [x] 改善日志仓管理页面的展示
+- [x] 删除旧版接口`/glc/add`、`/glc/search`，`maven`公共仓库包同步修改并更新版本
+- [x] `Docker`镜像设定默认时区`Asia/Shanghai`
 
 ### 版本`0.4.0`
 
@@ -137,7 +136,6 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] 接口`/glc/add`添加`system`参数
 - [x] 提供简洁的日志查询界面
 - [x] 当前版设计为接收多个项目的日志，界面栏目为`分类`
-
 
 ### 初版`0.1.0`
 
