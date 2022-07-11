@@ -22,7 +22,7 @@
 - [x] 提供`docker`镜像，支持容器化部署，方便之极
 - [x] 提供`java`项目日志收集包，`java`项目闭环支持
 - [x] 支持从`RabbitMQ`收取日志信息，满足更多闭环需求
-- [x] 内置提供简洁的日志查询管理界面
+- [x] 内置提供简洁的`VUE`实现的日志查询管理界面
 
 <div align=center>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
