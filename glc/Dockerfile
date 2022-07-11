@@ -33,10 +33,11 @@ MAINTAINER gotoeasy <gotoeasy@163.com>
 
 COPY --from=gobuilder /goproject/glc /usr/local/bin/
 
-# 安装bash
+# 安装bash、设定默认时区
 RUN alpine_version=`cat /etc/issue | head -1 | awk '{print $5}'` \
     && echo "https://mirrors.aliyun.com/alpine/v${alpine_version}/main/" > /etc/apk/repositories \
-    && apk update && apk upgrade && apk add --no-cache bash bash-doc bash-completion \
+    && apk update && apk upgrade && apk add --no-cache bash bash-doc bash-completion tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone \
     && rm -rf /var/cache/apk/*
 
 EXPOSE 8080
