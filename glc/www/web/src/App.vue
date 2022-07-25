@@ -15,21 +15,21 @@
 
       </div>
 
-      <el-link v-if="enableLogin && isLogin" @click="logout">
+      <el-link v-if="inited && (enableLogin && isLogin)" @click="logout">
         <el-icon :size="26"><expand/></el-icon>
       </el-link>
 
       </el-header>
 
-      <el-aside v-if="!enableLogin || isLogin" class="menubar x-menubar" style="width:48px">
+      <el-aside v-if="inited && (!enableLogin || isLogin)" class="menubar x-menubar" style="width:48px">
         <Menu :isCollapsed="true"></Menu>
       </el-aside>
 
-      <el-main v-if="!enableLogin || isLogin" class="main x-main" >
+      <el-main v-if="inited && (!enableLogin || isLogin)" class="main x-main" >
         <router-view></router-view> 
       </el-main>
 
-      <el-dialog v-if="enableLogin && !isLogin" title="登录" class="x-login" v-model="dialogVisible" width="420px"
+      <el-dialog v-if="inited && enableLogin && !isLogin" title="登录" class="x-login" v-model="dialogVisible" width="420px"
         :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
 
         <el-input placeholder="请输入用户名" v-model="username" maxlength="100"></el-input><p/>
@@ -59,6 +59,7 @@ export default {
   },
   data() {
     return {
+      inited: false,
       enableLogin: true,
       isLogin: false,
       dialogVisible: true,
@@ -71,6 +72,7 @@ export default {
     api.enableLogin().then(rs => {
       let res = rs.data
       if (res.success) {
+        this.inited = true;
         this.enableLogin = res.result;
         if (res.result) {
           this.isLogin = !!sessionStorage.getItem('glctoken');
