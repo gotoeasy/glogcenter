@@ -110,6 +110,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [ ] 界面优化
 - [ ] 多语言
 - [ ] 分词优化
+- [x] 升级使用Go1.19
 
 ### 版本`0.5.0`
 
