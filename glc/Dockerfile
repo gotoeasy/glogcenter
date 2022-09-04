@@ -14,7 +14,7 @@ RUN cd www/web && \
 # ----------------------------
 # 编译Go
 # ----------------------------
-FROM golang:alpine AS gobuilder
+FROM golang:1.19-alpine AS gobuilder
 
 WORKDIR /goproject
 COPY . /goproject
