@@ -40,7 +40,7 @@ func NewSimpleRabbitMQ() (*RabbitMQ, error) {
 
 // 关闭连接
 func (r *RabbitMQ) Close() {
-	if r.closing {
+	if r == nil || r.closing {
 		return
 	}
 

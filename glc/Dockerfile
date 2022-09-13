@@ -40,5 +40,5 @@ RUN alpine_version=`cat /etc/issue | head -1 | awk '{print $5}'` \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone \
     && rm -rf /var/cache/apk/*
 
-EXPOSE 8080
+EXPOSE 18080
 ENTRYPOINT ["glc"]

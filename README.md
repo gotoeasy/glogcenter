@@ -55,6 +55,8 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
 
+## 命令行启动参数
+- [x] 支持命令行参数`-d`以后台方式启动
 
 
 ## 接口
@@ -111,6 +113,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [ ] 多语言
 - [ ] 分词优化
 - [x] 升级使用Go1.19
+- [x] 支持命令行参数使用`-d`以后台方式启动
 
 ### 版本`0.5.0`
 
