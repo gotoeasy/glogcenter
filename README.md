@@ -56,7 +56,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
 
 ## 命令行启动参数
-- [x] 支持命令行参数`-d`以后台方式启动
+- [x] 在Linux系统下支持命令行参数`-d`以后台方式启动
 
 
 ## 接口
