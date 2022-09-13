@@ -35,10 +35,10 @@
 ## `docker`运行
 ```
 // 简单示例
-docker run -d -p 8080:8080 gotoeasy/glc
+docker run -d -p 18080:18080 gotoeasy/glc
 
 // 外挂数据目录
-docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
+docker run -d -p 18080:18080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
 
@@ -81,9 +81,9 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 <!-- logback配置例子1，发送至 glogcenter -->
 <!-- 0.5.1及以上版本，可通过设定环境变量 GLC_ENABLE=false 关闭发送功能 -->
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
-    <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
-    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!-- 可通过环境变量 GLC_API_KEY 设定 -->
-    <system>Demo</system>                                       <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
+    <glcApiUrl>http://127.0.0.1:18080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
+    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                 <!-- 可通过环境变量 GLC_API_KEY 设定 -->
+    <system>Demo</system>                                        <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
         <pattern><![CDATA[%p %m %n]]></pattern>
     </layout>
