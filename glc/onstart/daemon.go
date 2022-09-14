@@ -1,12 +1,13 @@
 package onstart
 
 import (
-	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
+	"os/user"
+	"path/filepath"
 	"runtime"
+	"time"
 )
 
 func init() {
@@ -16,11 +17,20 @@ func init() {
 		return
 	}
 
-	pidfile := "~/.gologcenter/glc.pid"
+	// pid 目录、文件
+	pidpath := "."
+	pidfile := "glc.pid"
+	u, err := user.Current()
+	if err == nil {
+		pidpath = filepath.Join(u.HomeDir, ".glogcenter")
+		os.MkdirAll(pidpath, 0766)
+	}
+	pidpathfile := filepath.Join(pidpath, pidfile)
 
 	// 操作系统是linux时，支持以命令行参数【-d】后台方式启动，【stop】停止
 	daemon := false
 	stop := false
+	restart := false
 	for index, arg := range os.Args {
 		if index == 0 {
 			continue
@@ -31,61 +41,62 @@ func init() {
 		if arg == "stop" {
 			stop = true
 		}
+		if arg == "restart" {
+			restart = true
+		}
 	}
 
-	// 停止
-	if stop {
-		tmpPid := readPid(pidfile)
-		if tmpPid != "" {
-			exec.Command("sh", "-c", "kill "+tmpPid)
+	rs := checkPidFile(pidpathfile)
+	if rs != nil {
+		if stop {
+			// 退出
+			cmd := exec.Command("sh", "-c", "kill "+rs.Pid)
+			cmd.Start()
+		} else if restart {
+			// 重启
+			cmd := exec.Command("sh", "-c", "kill "+rs.Pid)
+			cmd.Start()
+			//
+			time.Sleep(time.Duration(2) * time.Second)
+		} else {
+			// 禁止重复启动
+			fmt.Printf("%s\n", rs.Pid)
+			os.Exit(0)
 		}
+	}
+
+	if stop {
 		os.Exit(0)
 	}
 
-	// 启动守护进程
 	if daemon {
+		// cmd := exec.Command(os.Args[0], flag.Args()...)
+		cmd := exec.Command(os.Args[0]) // 不再需要启动参数了
 
-		// 已启动时忽略
-		chk := checkPidFile(pidfile)
-		if chk != nil {
-			log.Println(chk.Pid)
-			os.Exit(0) // 进程已存在，不重复启动
+		err := cmd.Start()
+		for i := 0; i < 60; i++ {
+			if err != nil {
+				time.Sleep(time.Duration(1) * time.Second) // 原进程没退出的话会导致启动失败，等待1秒后再试
+			} else {
+				break
+			}
 		}
-
-		// 启动失败则退出
-		cmd := exec.Command(os.Args[0], flag.Args()...)
-		if err := cmd.Start(); err != nil {
+		if err != nil {
+			// 最多等1分钟，仍旧启动失败就放弃
 			fmt.Printf("start %s failed, error: %v\n", os.Args[0], err)
 			os.Exit(1)
 		}
 
-		// 启动成功则保存pid
-		daemonPid := fmt.Sprintf("%d", cmd.Process.Pid)
-		err := savePid(pidfile, daemonPid)
-		if err != nil {
-			// 保存pid失败则退出
-			exec.Command("sh", "-c", "kill "+daemonPid)
-			os.Exit(1) // 创建或保存pid文件失败
-		}
-
-		log.Println(daemonPid)
+		fmt.Printf("%d\n", cmd.Process.Pid)
 		os.Exit(0)
-	}
-
-	// 普通启动
-	// 已启动时忽略
-	chk := checkPidFile(pidfile)
-	if chk != nil {
-		log.Println(chk.Pid)
-		os.Exit(0) // 进程已存在，不重复启动
-	}
-
-	// 保存pid失败则退出
-	pid := fmt.Sprintf("%d", os.Getpid())
-	err := savePid(pidfile, pid)
-	if err != nil {
-		exec.Command("sh", "-c", "kill "+pid)
-		os.Exit(1) // 创建或保存pid文件失败
+	} else {
+		npid := fmt.Sprintf("%d", os.Getpid())
+		nerr := savePid(pidpathfile, npid)
+		if nerr != nil {
+			cmd := exec.Command("sh", "-c", "kill "+npid)
+			cmd.Start()
+			os.Exit(1)
+		}
 	}
 
 }

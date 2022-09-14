@@ -14,33 +14,6 @@ type PidFile struct {
 	Err   error  // error
 }
 
-// 指定路径下生成pid文件，文件内容为pid，已存在时检查pid有效性
-func NewPid(pathfile string, pid string) *PidFile {
-
-	// 运行中时直接返回
-	if opid := checkPidFile(pathfile); opid != nil {
-		return opid
-	}
-
-	// 保存PID
-	if err := savePid(pathfile, pid); err != nil {
-		log.Println("save pid file failed", pathfile)
-		return &PidFile{
-			Path: pathfile,
-			Err:  err,
-		}
-	}
-
-	// 成功创建后返回
-	return &PidFile{
-		Path:  pathfile,
-		Pid:   pid,
-		IsNew: false,
-		Err:   nil,
-	}
-
-}
-
 func checkPidFile(path string) *PidFile {
 	pid := readPid(path)
 	if pid == "" {
@@ -64,7 +37,6 @@ func readPid(path string) string {
 }
 
 func savePid(path string, pid string) error {
-
 	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0755)); err != nil {
 		log.Println("create pid file failed", path)
 		return err
@@ -74,5 +46,6 @@ func savePid(path string, pid string) error {
 		log.Println("save pid file failed", path)
 		return err
 	}
+
 	return nil
 }
