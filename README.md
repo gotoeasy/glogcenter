@@ -57,6 +57,8 @@ docker run -d -p 18080:18080 -v /glc:/glogcenter gotoeasy/glc
 
 ## 命令行启动参数
 - [x] 在Linux系统下支持命令行参数`-d`以后台方式启动
+- [x] 在Linux系统下支持命令行参数`stop`关闭程序
+- [x] 在Linux系统下支持命令行参数`restart`重启程序
 
 
 ## 接口
@@ -114,6 +116,8 @@ docker run -d -p 18080:18080 -v /glc:/glogcenter gotoeasy/glc
 - [ ] 分词优化
 - [x] 升级使用Go1.19
 - [x] 支持命令行参数使用`-d`以后台方式启动
+- [x] 支持命令行参数使用`stop`停止程序
+- [x] 支持命令行参数使用`restart`重启程序
 
 ### 版本`0.5.0`
 
