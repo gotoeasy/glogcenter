@@ -48,16 +48,10 @@ func init() {
 
 	rs := checkPidFile(pidpathfile)
 	if rs != nil {
-		if stop {
-			// 退出
+		if stop || restart {
+			// 退出/重启
 			cmd := exec.Command("sh", "-c", "kill "+rs.Pid)
 			cmd.Start()
-		} else if restart {
-			// 重启
-			cmd := exec.Command("sh", "-c", "kill "+rs.Pid)
-			cmd.Start()
-			//
-			time.Sleep(time.Duration(2) * time.Second)
 		} else {
 			// 禁止重复启动
 			fmt.Printf("%s\n", rs.Pid)
