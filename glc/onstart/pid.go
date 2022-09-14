@@ -1,7 +1,6 @@
 package onstart
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,25 +15,15 @@ type PidFile struct {
 }
 
 // 指定路径下生成pid文件，文件内容为pid，已存在时检查pid有效性
-func NewPid(pathfile string) *PidFile {
+func NewPid(pathfile string, pid string) *PidFile {
 
 	// 运行中时直接返回
 	if opid := checkPidFile(pathfile); opid != nil {
 		return opid
 	}
 
-	// 创建文件
-	if err := os.MkdirAll(filepath.Dir(pathfile), os.FileMode(0755)); err != nil {
-		log.Println("create pid file failed", pathfile)
-		return &PidFile{
-			Path: pathfile,
-			Err:  err,
-		}
-	}
-
 	// 保存PID
-	pid := fmt.Sprintf("%d", os.Getpid())
-	if err := os.WriteFile(pathfile, []byte(pid), 0644); err != nil {
+	if err := savePid(pathfile, pid); err != nil {
 		log.Println("save pid file failed", pathfile)
 		return &PidFile{
 			Path: pathfile,
@@ -53,15 +42,37 @@ func NewPid(pathfile string) *PidFile {
 }
 
 func checkPidFile(path string) *PidFile {
-	if pidByte, err := os.ReadFile(path); err == nil {
-		pid := strings.TrimSpace(string(pidByte))
-		if _, err := os.Stat(filepath.Join("/proc", pid)); err == nil {
-			return &PidFile{
-				Path:  path,
-				Pid:   pid,
-				IsNew: false,
-			}
+	pid := readPid(path)
+	if pid == "" {
+		return nil
+	}
+	if _, err := os.Stat(filepath.Join("/proc", pid)); err == nil {
+		return &PidFile{
+			Path:  path,
+			Pid:   pid,
+			IsNew: false,
 		}
+	}
+	return nil
+}
+
+func readPid(path string) string {
+	if pidByte, err := os.ReadFile(path); err == nil {
+		return strings.TrimSpace(string(pidByte))
+	}
+	return ""
+}
+
+func savePid(path string, pid string) error {
+
+	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0755)); err != nil {
+		log.Println("create pid file failed", path)
+		return err
+	}
+
+	if err := os.WriteFile(path, []byte(pid), 0644); err != nil {
+		log.Println("save pid file failed", path)
+		return err
 	}
 	return nil
 }
