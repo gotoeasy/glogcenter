@@ -54,7 +54,7 @@ func init() {
 			cmd.Start()
 		} else {
 			// 禁止重复启动
-			fmt.Printf("%s\n", rs.Pid)
+			fmt.Printf("[PID] %s\n", rs.Pid)
 			os.Exit(0)
 		}
 	}
@@ -81,7 +81,7 @@ func init() {
 			os.Exit(1)
 		}
 
-		fmt.Printf("%d\n", cmd.Process.Pid)
+		fmt.Printf("[PID] %d\n", cmd.Process.Pid)
 		os.Exit(0)
 	} else {
 		npid := fmt.Sprintf("%d", os.Getpid())
