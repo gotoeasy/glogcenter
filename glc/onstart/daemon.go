@@ -12,25 +12,11 @@ import (
 
 func init() {
 
-	// 仅支持linux
-	if runtime.GOOS != "linux" {
-		return
-	}
-
-	// pid 目录、文件
-	pidpath := "."
-	pidfile := "glc.pid"
-	u, err := user.Current()
-	if err == nil {
-		pidpath = filepath.Join(u.HomeDir, ".glogcenter")
-		os.MkdirAll(pidpath, 0766)
-	}
-	pidpathfile := filepath.Join(pidpath, pidfile)
-
-	// 操作系统是linux时，支持以命令行参数【-d】后台方式启动，【stop】停止
+	// 命令行参数解析，【-d】后台方式启动，【stop】停止，【restart】重启，【-v/version/--version/-version】查看版本
 	daemon := false
 	stop := false
 	restart := false
+	version := false
 	for index, arg := range os.Args {
 		if index == 0 {
 			continue
@@ -44,7 +30,30 @@ func init() {
 		if arg == "restart" {
 			restart = true
 		}
+		if arg == "-v" || arg == "version" || arg == "--version" || arg == "-version" {
+			version = true
+		}
 	}
+	// 查看版本
+	if version {
+		fmt.Printf("%s\n", VERSION)
+		os.Exit(0)
+	}
+
+	// 其余参数仅支持linux
+	if runtime.GOOS != "linux" {
+		return
+	}
+
+	// pid 目录、文件
+	pidpath := "."
+	pidfile := "glc.pid"
+	u, err := user.Current()
+	if err == nil {
+		pidpath = filepath.Join(u.HomeDir, ".glogcenter")
+		os.MkdirAll(pidpath, 0766)
+	}
+	pidpathfile := filepath.Join(pidpath, pidfile)
 
 	rs := checkPidFile(pidpathfile)
 	if rs != nil {

@@ -22,7 +22,7 @@ COPY . /goproject
 COPY --from=webbuilder /webproject/www/web/dist www/web/
 
 ENV GOPROXY https://goproxy.cn,direct
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-w -s"
 
 
 # ----------------------------
@@ -40,5 +40,5 @@ RUN alpine_version=`cat /etc/issue | head -1 | awk '{print $5}'` \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo "Asia/Shanghai" > /etc/timezone \
     && rm -rf /var/cache/apk/*
 
-EXPOSE 18080
+EXPOSE 8080
 ENTRYPOINT ["glc"]

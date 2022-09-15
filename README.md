@@ -34,10 +34,10 @@
 
 ## `docker`运行
 ```
-// 简单示例(0.5.*及以前的版本默认端口8080，0.6.*以后的版本端口改为18080)
+// 简单示例
 docker run -d -p 8080:8080 gotoeasy/glc
 
-// 外挂数据目录(0.5.*及以前的版本默认端口8080，0.6.*以后的版本端口改为18080)
+// 外挂数据目录
 docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
@@ -55,10 +55,13 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
 
-## 命令行启动参数
+## 命令行启动参数（适用`0.6.*`及以上版本）
+- [x] 支持命令行参数`-v`查看版本
 - [x] 在Linux系统下支持命令行参数`-d`以后台方式启动
 - [x] 在Linux系统下支持命令行参数`stop`关闭程序
 - [x] 在Linux系统下支持命令行参数`restart`重启程序
+- [x] 服务端口可通过环境变量`GLC_SERVER_PORT`设定，默认`8080`
+- [x] 其他环境变量同以上`docker`启动环境变量
 
 
 ## 接口
@@ -75,13 +78,12 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.5.1</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
 ```xml
 <!-- logback配置例子1，发送至 glogcenter -->
-<!-- 0.5.1及以上版本，可通过设定环境变量 GLC_ENABLE=false 关闭发送功能 -->
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
     <glcApiUrl>http://127.0.0.1:18080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
     <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                 <!-- 可通过环境变量 GLC_API_KEY 设定 -->
@@ -92,7 +94,6 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 </appender>
 
 <!-- logback配置例子2，发送至 rabbitmq -->
-<!-- 0.5.1及以上版本，可通过设定环境变量 GLC_ENABLE=false 关闭发送功能 -->
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcAmqpAppender">
     <amqpHost>127.0.0.1</amqpHost>                <!-- 可通过环境变量 GLC_AMQP_HOST 设定 -->
     <amqpPort>5672</amqpPort>                     <!-- 可通过环境变量 GLC_AMQP_PORT 设定 -->
@@ -114,11 +115,17 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [ ] 界面优化
 - [ ] 多语言
 - [ ] 分词优化
+
+
+### 版本`0.6.0`
+
 - [x] 升级使用Go1.19
-- [x] 支持命令行参数使用`-d`以后台方式启动
-- [x] 支持命令行参数使用`stop`停止程序
-- [x] 支持命令行参数使用`restart`重启程序
-- [x] 默认端口由`8080`改为`18080`
+- [x] 优化执行文件体积，此版本考虑直接运行发布，以适用更多部署场景
+- [x] 支持命令行参数使用`-v`查看版本
+- [x] 在Linux系统下支持命令行参数使用`-d`以后台方式启动
+- [x] 在Linux系统下支持命令行参数使用`stop`停止程序
+- [x] 在Linux系统下支持命令行参数使用`restart`重启程序
+- [x] `logback`用`jar`包，支持通过设定环境变量`GLC_ENABLE=false`关闭日志发送功能
 
 ### 版本`0.5.0`
 
