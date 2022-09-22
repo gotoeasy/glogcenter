@@ -30,6 +30,8 @@ var saveDays int
 var enableLogin bool
 var username string
 var password string
+var slaveHosts []string
+var enableSlaveTransfer bool
 
 func init() {
 	UpdateConfigByEnv()
@@ -62,6 +64,29 @@ func UpdateConfigByEnv() {
 	enableLogin = GetenvBool("GLC_ENABLE_LOGIN", false)                     // 是否开启用户密码登录，默认“false”
 	username = Getenv("GLC_USERNAME", "glc")                                // 登录用户名，默认“glc”
 	password = Getenv("GLC_PASSWORD", "glogcenter")                         // 登录密码，默认“glogcenter”
+	splitHost(Getenv("GLC_SLAVE_HOSTS", ""))                                // 从服务器地址，多个时逗号分开，默认“”
+	enableSlaveTransfer = GetenvBool("GLC_SLAVE_TRANSFER", false)           // 是否开启转发日志到其他GLC服务，默认false
+
+}
+
+// 取配置： 是否开启转发日志到其他GLC服务，可通过环境变量“GLC_SLAVE_TRANSFER”设定，默认false
+func IsEnableSlaveTransfer() bool {
+	return enableSlaveTransfer
+}
+
+// 取配置： 从服务器地址，可通过环境变量“GLC_SLAVE_HOSTS”设定，默认“”
+func GetSlaveHosts() []string {
+	return slaveHosts
+}
+
+func splitHost(str string) {
+	hosts := strings.Split(str, ";")
+	for i := 0; i < len(hosts); i++ {
+		url := strings.TrimSpace(hosts[i])
+		if url != "" {
+			slaveHosts = append(slaveHosts, url)
+		}
+	}
 }
 
 // 取配置： 是否开启用户密码登录，可通过环境变量“GLC_ENABLE_LOGIN”设定，默认“false”
