@@ -36,11 +36,12 @@ var enableSlaveTransfer bool
 func init() {
 	UpdateConfigByEnv()
 
-	// 自动判断创建目录
-	_, err := os.Stat(storeRoot)
-	if err != nil && os.IsNotExist(err) {
-		os.MkdirAll(storeRoot, 0766)
-	}
+	// 在这个地方建目录，如果创建失败就比较难看，比如仅命令行查看版本的情景
+	// // 自动判断创建目录
+	// _, err := os.Stat(storeRoot)
+	// if err != nil && os.IsNotExist(err) {
+	// 	os.MkdirAll(storeRoot, 0766)
+	// }
 
 }
 

@@ -2,6 +2,7 @@ package onstart
 
 import (
 	"fmt"
+	"glc/conf"
 	"os"
 	"os/exec"
 	"os/user"
@@ -43,6 +44,12 @@ func init() {
 	// 其余参数仅支持linux
 	if runtime.GOOS != "linux" {
 		return
+	}
+
+	// 自动判断创建目录
+	_, err := os.Stat(conf.GetStorageRoot())
+	if err != nil && os.IsNotExist(err) {
+		os.MkdirAll(conf.GetStorageRoot(), 0766)
 	}
 
 	// pid 目录、文件
