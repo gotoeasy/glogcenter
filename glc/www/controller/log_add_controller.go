@@ -38,11 +38,34 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return gweb.Ok()
 }
 
+// 添加日志（来自数据转发）
+func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
+
+	// 开启API秘钥校验时才检查
+	if conf.IsEnableSecurityKey() {
+		auth := req.GetHeader(conf.GetHeaderSecurityKey())
+		if auth != conf.GetSecurityKey() {
+			return gweb.Error(403, "未经授权的访问，拒绝服务")
+		}
+	}
+
+	md := &logdata.LogDataModel{}
+	err := req.BindJSON(md)
+	if err != nil {
+		log.Println("请求参数有误", err)
+		return gweb.Error500(err.Error())
+	}
+
+	engine := ldb.NewDefaultEngine()
+	engine.AddTextLog(md.Date, md.Text, md.System)
+	return gweb.Ok()
+}
+
 // 转发其他GLC服务
 func transferGlc(md *logdata.LogDataModel) {
 	hosts := conf.GetSlaveHosts()
 	for i := 0; i < len(hosts); i++ {
-		go httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/add", md.ToJson())
+		go httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", md.ToJson())
 	}
 }
 
