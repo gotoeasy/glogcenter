@@ -30,7 +30,7 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	}
 
 	if conf.IsEnableSlaveTransfer() {
-		transferGlc(md) // 转发其他GLC服务
+		TransferGlc(md.ToJson()) // 转发其他GLC服务
 	}
 
 	engine := ldb.NewDefaultEngine()
@@ -62,10 +62,10 @@ func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 }
 
 // 转发其他GLC服务
-func transferGlc(md *logdata.LogDataModel) {
+func TransferGlc(jsonlog string) {
 	hosts := conf.GetSlaveHosts()
 	for i := 0; i < len(hosts); i++ {
-		go httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", md.ToJson())
+		go httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", jsonlog)
 	}
 }
 

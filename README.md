@@ -25,6 +25,7 @@
 - [x] 提供`java`项目日志收集包，`java`项目闭环支持
 - [x] 支持从`RabbitMQ`收取日志信息，满足更多闭环需求
 - [x] 内置提供简洁的`VUE`实现的日志查询管理界面
+- [x] 支持多服务集群模式部署，确保服务及数据保存的冗余性
 
 <div align=center>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
@@ -32,13 +33,26 @@
 
 <br>
 
-## `docker`运行
+## `docker`单机部署模式简易示例
 ```
 // 简单示例
 docker run -d -p 8080:8080 gotoeasy/glc
 
 // 外挂数据目录
 docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
+```
+
+## `docker`集群部署模式简易示例
+```
+// 以下3台集群，配置实现上是无主模式，接收到日志时会自动转发到其他服务
+// 但鉴于日志的时序性较强，建议仅取其1作为发送日志数据的主服务入口
+
+// 服务1
+docker run -d -p 8091:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8092;http://127.0.0.1:8093  -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+// 服务2
+docker run -d -p 8092:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091;http://127.0.0.1:8093  -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+// 服务3
+docker run -d -p 8093:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091:http://127.0.0.1:8092  -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
 ```
 
 
@@ -54,6 +68,8 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
+- [x] `GLC_SLAVE_HOSTS`待转发的服务地址，多个时`;`分隔，默认空白
+- [x] `GLC_SLAVE_TRANSFER`是否开启转发日志到其他GLC服务，默认false
 
 ## 命令行启动参数（适用`0.6.*`及以上版本）
 - [x] 支持命令行参数`-v`查看版本
@@ -72,13 +88,13 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 
 
-## 使用`logback`的`java`项目，支持日志收集
+## 使用`logback`的`java`项目，支持日志收集，确保主次版本和GLC版本一致
 ```xml
 <!-- pom坐标 -->
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0</version>
 </dependency>
 ```
 
@@ -115,7 +131,15 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 - [ ] 界面优化
 - [ ] 多语言
 - [ ] 分词优化
+- [ ] 海量日志数据支持
+- [ ] 日志审计
 
+
+### 版本`0.7.0`
+
+- [x] 增加日志转发功能，支持多服务集群模式部署，确保服务及数据保存的冗余性
+- [x] 增加转发地址配置项`GLC_SLAVE_HOSTS`，多地址时可`;`分隔
+- [x] 增加转发开关配置项`GLC_SLAVE_TRANSFER`，默认是false不开启
 
 ### 版本`0.6.0`
 
