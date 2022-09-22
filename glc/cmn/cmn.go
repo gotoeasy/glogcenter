@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"glc/conf"
 	"hash/crc32"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -243,7 +242,7 @@ func JoinBytes(bts ...[]byte) []byte {
 }
 
 func GetStorageNames(path string, excludes ...string) []string {
-	fileinf, err := ioutil.ReadDir(path)
+	fileinf, err := os.ReadDir(path)
 	if err != nil {
 		log.Println("读取目录失败", err)
 		return []string{}
