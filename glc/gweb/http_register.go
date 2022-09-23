@@ -17,6 +17,7 @@ var filters []func(*HttpRequest) *HttpResult
 
 func init() {
 	mapHandleGet = make(map[string]*HttpController)
+	mapHandlePost = make(map[string]*HttpController)
 }
 
 func getHttpController(methodType string, path string) *HttpController {
