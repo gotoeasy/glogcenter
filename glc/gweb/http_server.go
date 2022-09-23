@@ -15,9 +15,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type IgnoreGinStdoutWritter struct{}
+
+func (w *IgnoreGinStdoutWritter) Write(p []byte) (n int, err error) {
+	return 0, nil
+}
+
 func Run() {
 
-	gin.SetMode(gin.ReleaseMode) // 开启Release模式
+	gin.DisableConsoleColor()                     // 关闭Gin日志颜色
+	gin.DefaultWriter = &IgnoreGinStdoutWritter{} // 关闭Gin默认日志的输出
+	gin.SetMode(gin.ReleaseMode)                  // 开启Release模式
 
 	ginEngine := gin.Default()
 
