@@ -8,7 +8,7 @@ import (
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
 	"glc/onexit"
-	"glc/www/controller"
+	"glc/www/service"
 	"log"
 	"sync"
 )
@@ -75,7 +75,7 @@ func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 	engine.AddTextLog(md.Date, md.Text, md.System)
 
 	if conf.IsEnableSlaveTransfer() {
-		controller.TransferGlc(md.ToJson()) // 转发其他GLC服务
+		service.TransferGlc(md.ToJson()) // 转发其他GLC服务
 	}
 
 	return true

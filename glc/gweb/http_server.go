@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"glc/cmn"
 	"glc/conf"
+	"glc/ldb/storage/logdata"
 	"glc/onexit"
+	"glc/www/service"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -23,9 +26,9 @@ func (w *IgnoreGinStdoutWritter) Write(p []byte) (n int, err error) {
 
 func Run() {
 
-	gin.DisableConsoleColor()                     // 关闭Gin日志颜色
-	gin.DefaultWriter = &IgnoreGinStdoutWritter{} // 关闭Gin默认日志的输出
-	gin.SetMode(gin.ReleaseMode)                  // 开启Release模式
+	gin.DisableConsoleColor()                     // 关闭Gin的日志颜色
+	gin.DefaultWriter = &IgnoreGinStdoutWritter{} // 关闭Gin的默认日志输出
+	gin.SetMode(gin.ReleaseMode)                  // 开启Gin的Release模式
 
 	ginEngine := gin.Default()
 
@@ -33,6 +36,34 @@ func Run() {
 	if conf.IsEnableWebGzip() {
 		ginEngine.Use(gzip.Gzip(gzip.DefaultCompression))
 	}
+
+	// 请求路径包含system变量，以方便代理转发控制
+	ginEngine.GET(conf.GetContextPath()+"/v2/log/add/:system", func(c *gin.Context) {
+
+		req := NewHttpRequest(c)
+		if conf.IsEnableSecurityKey() && req.GetHeader(conf.GetHeaderSecurityKey()) != conf.GetSecurityKey() {
+			c.JSON(http.StatusForbidden, "未经授权的访问，拒绝服务")
+			return
+		}
+
+		md := &logdata.LogDataModel{}
+		err := c.BindJSON(md)
+		if err != nil {
+			c.JSON(http.StatusOK, Error500(err.Error()))
+			return
+		}
+		md.System = c.Param("system")
+
+		matched, _ := regexp.MatchString(`^[0-9a-zA-Z]+$`, md.System)
+		if !matched {
+			log.Println("无效的system名： " + md.System + "，仅支持字母数字")
+			c.JSON(http.StatusBadRequest, "无效的system名： "+md.System+"，仅支持字母数字")
+			return
+		}
+
+		service.AddTextLog(md)
+		c.JSON(http.StatusOK, Ok())
+	})
 
 	ginEngine.NoRoute(func(c *gin.Context) {
 		req := NewHttpRequest(c)
@@ -71,7 +102,7 @@ func Run() {
 
 		rs := handle.Controller(req)
 		if rs != nil {
-			c.JSON(200, rs)
+			c.JSON(http.StatusOK, rs)
 		}
 	})
 

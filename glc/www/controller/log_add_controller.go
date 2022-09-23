@@ -3,23 +3,17 @@ package controller
 import (
 	"glc/conf"
 	"glc/gweb"
-	"glc/ldb"
 	"glc/ldb/storage/logdata"
-	"io"
+	"glc/www/service"
 	"log"
-	"net/http"
-	"strings"
 )
 
 // 添加日志（JSON提交方式）
 func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	// 开启API秘钥校验时才检查
-	if conf.IsEnableSecurityKey() {
-		auth := req.GetHeader(conf.GetHeaderSecurityKey())
-		if auth != conf.GetSecurityKey() {
-			return gweb.Error(403, "未经授权的访问，拒绝服务")
-		}
+	if conf.IsEnableSecurityKey() && req.GetHeader(conf.GetHeaderSecurityKey()) != conf.GetSecurityKey() {
+		return gweb.Error(403, "未经授权的访问，拒绝服务")
 	}
 
 	md := &logdata.LogDataModel{}
@@ -30,11 +24,10 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	}
 
 	if conf.IsEnableSlaveTransfer() {
-		TransferGlc(md.ToJson()) // 转发其他GLC服务
+		service.TransferGlc(md.ToJson()) // 转发其他GLC服务
 	}
 
-	engine := ldb.NewDefaultEngine()
-	engine.AddTextLog(md.Date, md.Text, md.System)
+	service.AddTextLog(md)
 	return gweb.Ok()
 }
 
@@ -42,11 +35,8 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	// 开启API秘钥校验时才检查
-	if conf.IsEnableSecurityKey() {
-		auth := req.GetHeader(conf.GetHeaderSecurityKey())
-		if auth != conf.GetSecurityKey() {
-			return gweb.Error(403, "未经授权的访问，拒绝服务")
-		}
+	if conf.IsEnableSecurityKey() && req.GetHeader(conf.GetHeaderSecurityKey()) != conf.GetSecurityKey() {
+		return gweb.Error(403, "未经授权的访问，拒绝服务")
 	}
 
 	md := &logdata.LogDataModel{}
@@ -56,38 +46,6 @@ func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error500(err.Error())
 	}
 
-	engine := ldb.NewDefaultEngine()
-	engine.AddTextLog(md.Date, md.Text, md.System)
+	service.AddTextLog(md)
 	return gweb.Ok()
-}
-
-// 转发其他GLC服务
-func TransferGlc(jsonlog string) {
-	hosts := conf.GetSlaveHosts()
-	for i := 0; i < len(hosts); i++ {
-		go httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", jsonlog)
-	}
-}
-
-func httpPostJson(url string, jsondata string) ([]byte, error) {
-
-	// 请求
-	req, err := http.NewRequest("POST", url, strings.NewReader(jsondata))
-	if err != nil {
-		return nil, err
-	}
-
-	// 请求头
-	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
-	req.Header.Set(conf.GetHeaderSecurityKey(), conf.GetSecurityKey())
-
-	// 读取响应内容
-	client := http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	return io.ReadAll(res.Body)
 }
