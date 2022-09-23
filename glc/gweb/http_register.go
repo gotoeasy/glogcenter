@@ -24,9 +24,9 @@ func getHttpController(methodType string, path string) *HttpController {
 	case method.GET:
 		return mapHandleGet[strings.ToLower(path)]
 	case method.POST:
-		return mapHandleGet[strings.ToLower(path)]
+		return mapHandlePost[strings.ToLower(path)]
 	default:
-		panic("unsuport method: " + methodType)
+		return nil
 	}
 }
 
@@ -46,7 +46,7 @@ func RegisterController(methodType string, path string, fnController func(*HttpR
 	case method.GET:
 		mapHandleGet[pathLower] = r
 	case method.POST:
-		mapHandleGet[pathLower] = r
+		mapHandlePost[pathLower] = r
 	default:
 		panic("unsuport method: " + methodType)
 	}
