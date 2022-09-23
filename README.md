@@ -34,25 +34,31 @@
 <br>
 
 ## `docker`单机部署模式简易示例
-```
-// 简单示例
+```shell
+# 简单示例
 docker run -d -p 8080:8080 gotoeasy/glc
 
-// 外挂数据目录
+# 外挂数据目录
 docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
 ## `docker`集群部署模式简易示例
-```
-// 以下3台集群，配置实现上是无主模式，接收到日志时会自动转发到其他服务
-// 但鉴于日志的时序性较强，建议仅取其1作为发送日志数据的主服务入口
+```shell
+# 以下3台集群，配置实现上是无主模式，接收到日志时会自动转发到其他服务
+# 但鉴于日志的时序性较强，建议仅取其1作为发送日志数据的主服务入口
 
-// 服务1
-docker run -d -p 8091:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8092;http://127.0.0.1:8093  -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
-// 服务2
-docker run -d -p 8092:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091;http://127.0.0.1:8093  -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
-// 服务3
-docker run -d -p 8093:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091:http://127.0.0.1:8092  -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+# 服务1
+docker run -d -p 8091:8080 \
+           -e GLC_SLAVE_HOSTS=http://127.0.0.1:8092;http://127.0.0.1:8093 \
+           -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+# 服务2
+docker run -d -p 8092:8080 \
+           -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091;http://127.0.0.1:8093 \
+           -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+# 服务3
+docker run -d -p 8093:8080 \
+           -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091:http://127.0.0.1:8092 \
+           -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
 ```
 
 
@@ -101,9 +107,9 @@ docker run -d -p 8093:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091:http://127.0
 ```xml
 <!-- logback配置例子1，发送至 glogcenter -->
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
-    <glcApiUrl>http://127.0.0.1:18080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
-    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                 <!-- 可通过环境变量 GLC_API_KEY 设定 -->
-    <system>Demo</system>                                        <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
+    <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
+    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!-- 可通过环境变量 GLC_API_KEY 设定 -->
+    <system>Demo</system>                                       <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
         <pattern><![CDATA[%p %m %n]]></pattern>
     </layout>
@@ -139,7 +145,7 @@ docker run -d -p 8093:8080 -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091:http://127.0
 
 - [x] 增加日志转发功能，支持多服务集群模式部署，确保服务及数据保存的冗余性
 - [x] 增加转发地址配置项`GLC_SLAVE_HOSTS`，多地址时可`;`分隔
-- [x] 增加转发开关配置项`GLC_SLAVE_TRANSFER`，默认是false不开启
+- [x] 增加转发开关配置项`GLC_SLAVE_TRANSFER`，默认是`false`不开启
 
 ### 版本`0.6.0`
 
