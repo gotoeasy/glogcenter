@@ -38,7 +38,7 @@ func Run() {
 	}
 
 	// 请求路径包含system变量，以方便代理转发控制
-	ginEngine.GET(conf.GetContextPath()+"/v2/log/add/:system", func(c *gin.Context) {
+	ginEngine.POST(conf.GetContextPath()+"/v2/log/add/:system", func(c *gin.Context) {
 
 		req := NewHttpRequest(c)
 		if conf.IsEnableSecurityKey() && req.GetHeader(conf.GetHeaderSecurityKey()) != conf.GetSecurityKey() {

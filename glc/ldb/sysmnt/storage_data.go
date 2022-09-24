@@ -8,6 +8,7 @@ import (
 	"glc/cmn"
 	"glc/conf"
 	"log"
+	"math"
 	"os"
 	"time"
 
@@ -98,8 +99,8 @@ func removeStorageByDays() {
 	dirs := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	for _, dir := range dirs {
 		ymd := cmn.RightRune(dir, 8)
-		if !cmn.StartwithsRune(ymd, "20") {
-			continue
+		if cmn.StringToUint32(ymd, math.MaxUint32) == math.MaxUint32 {
+			continue // 后8位不是数字的忽略
 		}
 
 		if ymd < minYmd {

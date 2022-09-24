@@ -19,7 +19,7 @@ func AddTextLog(md *logdata.LogDataModel) {
 func TransferGlc(jsonlog string) {
 	hosts := conf.GetSlaveHosts()
 	for i := 0; i < len(hosts); i++ {
-		go httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", jsonlog)
+		go httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", jsonlog) // TODO 失败处理
 	}
 }
 
