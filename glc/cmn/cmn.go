@@ -296,3 +296,27 @@ func GetSizeInfo(size uint64) string {
 func GetYyyymmdd(days int) string {
 	return time.Now().AddDate(0, 0, days).Format("20060102")
 }
+
+// 判断文件是否存在
+func IsExistFile(file string) bool {
+	s, err := os.Stat(file)
+	if err == nil {
+		return !s.IsDir()
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !s.IsDir()
+}
+
+// 判断文件夹是否存在
+func IsExistDir(dir string) bool {
+	s, err := os.Stat(dir)
+	if err == nil {
+		return s.IsDir()
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return s.IsDir()
+}
