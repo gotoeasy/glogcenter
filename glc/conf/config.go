@@ -64,7 +64,7 @@ func UpdateConfigByEnv() {
 	saveDays = GetenvInt("GLC_SAVE_DAYS", 180)                              // 日志分仓时的保留天数(0~180)，0表示不自动删除，默认180天
 	enableLogin = GetenvBool("GLC_ENABLE_LOGIN", false)                     // 是否开启用户密码登录，默认“false”
 	username = Getenv("GLC_USERNAME", "glc")                                // 登录用户名，默认“glc”
-	password = Getenv("GLC_PASSWORD", "glogcenter")                         // 登录密码，默认“glogcenter”
+	password = Getenv("GLC_PASSWORD", "GLogCenter100%666")                  // 登录密码，默认“GLogCenter100%666”
 	splitHost(Getenv("GLC_SLAVE_HOSTS", ""))                                // 从服务器地址，多个时逗号分开，默认“”
 	enableSlaveTransfer = GetenvBool("GLC_SLAVE_TRANSFER", false)           // 是否开启转发日志到其他GLC服务，默认false
 
