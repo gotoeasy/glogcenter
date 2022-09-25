@@ -32,6 +32,13 @@ var username string
 var password string
 var slaveHosts []string
 var enableSlaveTransfer bool
+var enableBackup bool
+var glcGroup string
+var minioUrl string
+var minioUser string
+var minioPassword string
+var minioBucket string
+var enableUploadMinio bool
 
 func init() {
 	UpdateConfigByEnv()
@@ -67,7 +74,48 @@ func UpdateConfigByEnv() {
 	password = Getenv("GLC_PASSWORD", "GLogCenter100%666")                  // 登录密码，默认“GLogCenter100%666”
 	splitHost(Getenv("GLC_SLAVE_HOSTS", ""))                                // 从服务器地址，多个时逗号分开，默认“”
 	enableSlaveTransfer = GetenvBool("GLC_SLAVE_TRANSFER", false)           // 是否开启转发日志到其他GLC服务，默认false
+	enableBackup = GetenvBool("GLC_ENABLE_BACKUP", false)                   // 是否开启备份，默认false
+	glcGroup = Getenv("GLC_GROUP", "default")                               // 日志中心分组名，默认“default”
+	minioUrl = Getenv("GLC_MINIO_URL", "")                                  // MINIO地址，默认“”
+	minioUser = Getenv("GLC_MINIO_USER", "")                                // MINIO用户名，默认“”
+	minioPassword = Getenv("GLC_MINIO_PASS", "")                            // MINIO密码，默认“”
+	minioBucket = Getenv("GLC_MINIO_BUCKET", "")                            // MINIO桶名，默认“”
+	enableUploadMinio = GetenvBool("GLC_ENABLE_UPLOAD_MINIO", false)        // 是否开启上传备份至MINIO服务器，默认false
+}
 
+// 取配置： 是否开启MINIO备份，可通过环境变量“GLC_ENABLE_BACKUP”设定，默认false
+func IsEnableBackup() bool {
+	return enableBackup
+}
+
+// 取配置： 日志中心分组名，可通过环境变量“GLC_GROUP”设定，默认“default”
+func GetGlcGroup() string {
+	return glcGroup
+}
+
+// 取配置： MINIO地址，可通过环境变量“GLC_MINIO_URL”设定，默认“”
+func GetMinioUrl() string {
+	return minioUrl
+}
+
+// 取配置： MINIO用户名，可通过环境变量“GLC_MINIO_USER”设定，默认“”
+func GetMinioUser() string {
+	return minioUser
+}
+
+// 取配置： MINIO密码，可通过环境变量“GLC_MINIO_PASS”设定，默认“”
+func GetMinioPassword() string {
+	return minioPassword
+}
+
+// 取配置： MINIO桶名，可通过环境变量“GLC_MINIO_BUCKET”设定，默认“”
+func GetMinioBucket() string {
+	return minioBucket
+}
+
+// 取配置： 是否开启上传备份至MINIO服务器，可通过环境变量“GLC_ENABLE_UPLOAD_MINIO”设定，默认false
+func IsEnableUploadMinio() bool {
+	return enableUploadMinio
 }
 
 // 取配置： 是否开启转发日志到其他GLC服务，可通过环境变量“GLC_SLAVE_TRANSFER”设定，默认false
