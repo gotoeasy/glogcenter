@@ -299,6 +299,15 @@ func (s *LogDataStorage) loadMetaData() {
 	idxw := indexword.NewWordIndexStorage(s.StoreName())
 	s.indexedCount = idxw.GetIndexedCount()
 	s.savedIndexedCount = s.indexedCount
+
+	// 检查更新系统管理存储器中的日志总件数
+	sysmntStore := sysmnt.NewSysmntStorage() // 系统管理存储器
+	if sysmntStore.GetStorageDataCount(s.storeName) != s.currentCount {
+		sysmntStore.SetStorageDataCount(s.storeName, s.currentCount)
+	}
+	if sysmntStore.GetStorageIndexCount(s.storeName) != s.currentCount {
+		sysmntStore.SetStorageIndexCount(s.storeName, s.indexedCount)
+	}
 }
 
 func (s *LogDataStorage) saveMetaData() {
