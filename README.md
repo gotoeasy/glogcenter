@@ -42,7 +42,7 @@ docker run -d -p 8080:8080 gotoeasy/glc
 docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
-## `docker`集群部署模式简易示例
+## `docker`集群部署模式简易示例（仅限0.7.0版本）
 ```shell
 # 以下3台集群，配置实现上是无主模式，接收到日志时会自动转发到其他服务
 # 但鉴于日志的时序性较强，建议仅取其1作为发送日志数据的主服务入口
