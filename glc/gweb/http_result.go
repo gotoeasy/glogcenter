@@ -72,3 +72,7 @@ func (r *HttpResult) ToJson() string {
 	return cmn.BytesToString(bt)
 
 }
+
+func (r *HttpResult) LoadBytes(bytes []byte) error {
+	return json.Unmarshal(bytes, r)
+}

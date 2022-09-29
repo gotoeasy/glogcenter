@@ -157,6 +157,15 @@ func (s *SysmntStorage) Get(key []byte) ([]byte, error) {
 	return s.leveldb.Get(key, nil)
 }
 
+// 直接从leveldb取数据
+func (s *SysmntStorage) Del(key []byte) error {
+	if s.closing {
+		return errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
+	}
+	s.lastTime = time.Now().Unix()
+	return s.leveldb.Delete(key, nil)
+}
+
 // 是否关闭中状态
 func (s *SysmntStorage) IsClose() bool {
 	return s.closing

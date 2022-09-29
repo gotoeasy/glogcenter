@@ -8,6 +8,7 @@ package conf
 
 import (
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -16,7 +17,9 @@ var storeRoot string
 var storeChanLength int
 var maxIdleTime int
 var storeNameAutoAddDate bool
-var serverPort int
+var serverUrl string
+var serverIp string
+var serverPort string
 var contextPath string
 var enableSecurityKey bool
 var securityKey string
@@ -30,8 +33,8 @@ var saveDays int
 var enableLogin bool
 var username string
 var password string
-var slaveHosts []string
-var enableSlaveTransfer bool
+var clusterMode bool
+var clusterUrls []string
 var enableBackup bool
 var glcGroup string
 var minioUrl string
@@ -58,7 +61,9 @@ func UpdateConfigByEnv() {
 	storeChanLength = GetenvInt("GLC_STORE_CHAN_LENGTH", 64)                // 存储通道长度
 	maxIdleTime = GetenvInt("GLC_MAX_IDLE_TIME", 180)                       // 最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
 	storeNameAutoAddDate = GetenvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
-	serverPort = GetenvInt("GLC_SERVER_PORT", 8080)                         // web服务端口，默认8080
+	serverUrl = Getenv("GLC_SERVER_URL", "")                                // 服务URL，默认“”，集群配置时自动获取地址可能不对，可通过这个设定
+	serverIp = Getenv("GLC_SERVER_IP", "")                                  // 服务IP，默认“”，当“”时会自动获取
+	serverPort = Getenv("GLC_SERVER_PORT", "8080")                          // web服务端口，默认“8080”
 	contextPath = Getenv("GLC_CONTEXT_PATH", "/glc")                        // web服务contextPath
 	enableSecurityKey = GetenvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
 	headerSecurityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")     // web服务API秘钥的header键名
@@ -72,8 +77,8 @@ func UpdateConfigByEnv() {
 	enableLogin = GetenvBool("GLC_ENABLE_LOGIN", false)                     // 是否开启用户密码登录，默认“false”
 	username = Getenv("GLC_USERNAME", "glc")                                // 登录用户名，默认“glc”
 	password = Getenv("GLC_PASSWORD", "GLogCenter100%666")                  // 登录密码，默认“GLogCenter100%666”
-	splitHost(Getenv("GLC_SLAVE_HOSTS", ""))                                // 从服务器地址，多个时逗号分开，默认“”
-	enableSlaveTransfer = GetenvBool("GLC_SLAVE_TRANSFER", false)           // 是否开启转发日志到其他GLC服务，默认false
+	clusterMode = GetenvBool("GLC_CLUSTER_MODE", false)                     // 是否开启集群模式，默认false
+	splitUrls(Getenv("GLC_CLUSTER_URLS", ""))                               // 从服务器地址，多个时逗号分开，默认“”
 	enableBackup = GetenvBool("GLC_ENABLE_BACKUP", false)                   // 是否开启备份，默认false
 	glcGroup = Getenv("GLC_GROUP", "default")                               // 日志中心分组名，默认“default”
 	minioUrl = Getenv("GLC_MINIO_URL", "")                                  // MINIO地址，默认“”
@@ -81,6 +86,11 @@ func UpdateConfigByEnv() {
 	minioPassword = Getenv("GLC_MINIO_PASS", "")                            // MINIO密码，默认“”
 	minioBucket = Getenv("GLC_MINIO_BUCKET", "")                            // MINIO桶名，默认“”
 	enableUploadMinio = GetenvBool("GLC_ENABLE_UPLOAD_MINIO", false)        // 是否开启上传备份至MINIO服务器，默认false
+}
+
+// 取配置： 服务URL，集群配置时自动获取地址可能不对，可通过环境变量“GLC_ENABLE_BACKUP”设定，默认“”
+func GetServerUrl() string {
+	return serverUrl
 }
 
 // 取配置： 是否开启MINIO备份，可通过环境变量“GLC_ENABLE_BACKUP”设定，默认false
@@ -118,24 +128,29 @@ func IsEnableUploadMinio() bool {
 	return enableUploadMinio
 }
 
-// 取配置： 是否开启转发日志到其他GLC服务，可通过环境变量“GLC_SLAVE_TRANSFER”设定，默认false
-func IsEnableSlaveTransfer() bool {
-	return enableSlaveTransfer
+// 取配置： 是否开启转发日志到其他GLC服务，可通过环境变量“GLC_CLUSTER_MODE”设定，默认false
+func IsClusterMode() bool {
+	return clusterMode
 }
 
 // 取配置： 从服务器地址，可通过环境变量“GLC_SLAVE_HOSTS”设定，默认“”
-func GetSlaveHosts() []string {
-	return slaveHosts
+func GetClusterUrls() []string {
+	return clusterUrls
 }
 
-func splitHost(str string) {
+func splitUrls(str string) {
 	hosts := strings.Split(str, ";")
 	for i := 0; i < len(hosts); i++ {
 		url := strings.TrimSpace(hosts[i])
 		if url != "" {
-			slaveHosts = append(slaveHosts, url)
+			clusterUrls = append(clusterUrls, url)
 		}
 	}
+
+	// 倒序
+	sort.Slice(clusterUrls, func(i, j int) bool {
+		return clusterUrls[i] > clusterUrls[j]
+	})
 }
 
 // 取配置： 是否开启用户密码登录，可通过环境变量“GLC_ENABLE_LOGIN”设定，默认“false”
@@ -203,8 +218,13 @@ func GetContextPath() string {
 	return contextPath
 }
 
+// 取配置： 服务IP，可通过环境变量“GLC_SERVER_IP”设定，默认值“”，自动获取
+func GetServerIp() string {
+	return serverIp
+}
+
 // 取配置： web服务端口，可通过环境变量“GLC_SERVER_PORT”设定，默认值“8080”
-func GetServerPort() int {
+func GetServerPort() string {
 	return serverPort
 }
 

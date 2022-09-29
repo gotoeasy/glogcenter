@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"glc/cmn"
 	"glc/conf"
+	"glc/ldb"
 	"glc/ldb/storage/logdata"
 	"glc/onexit"
-	"glc/www/service"
 	"log"
 	"net/http"
 	"regexp"
@@ -61,7 +61,7 @@ func Run() {
 			return
 		}
 
-		service.AddTextLog(md)
+		ldb.AddTextLog(md)
 		c.JSON(http.StatusOK, Ok())
 	})
 
@@ -107,7 +107,7 @@ func Run() {
 	})
 
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d", conf.GetServerPort()), // :8080
+		Addr:    fmt.Sprintf(":%v", conf.GetServerPort()), // :8080
 		Handler: ginEngine,
 	}
 

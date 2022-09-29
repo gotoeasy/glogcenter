@@ -2,11 +2,16 @@ package ldb
 
 import (
 	"fmt"
+	"glc/cmn"
 	"glc/ldb/sysmnt"
 	"log"
 	"testing"
 	"time"
 )
+
+func Test_GetIP(t *testing.T) {
+	log.Println(cmn.GetLocalIp())
+}
 
 func Test_GetSubDirs(t *testing.T) {
 	rs := sysmnt.GetStorageList()

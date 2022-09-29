@@ -5,6 +5,7 @@ import (
 	"glc/ldb/search"
 	"glc/ldb/storage"
 	"glc/ldb/storage/indexword"
+	"glc/ldb/storage/logdata"
 	"glc/ldb/tokenizer"
 	"log"
 )
@@ -79,4 +80,10 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 
 	// 多关键词查询模式
 	return search.SearchWordIndex(e.storeName, kws, pageSize, currentDocId, forward)
+}
+
+// 添加日志
+func AddTextLog(md *logdata.LogDataModel) {
+	engine := NewDefaultEngine()
+	engine.AddTextLog(md.Date, md.Text, md.System)
 }

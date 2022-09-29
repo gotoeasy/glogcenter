@@ -8,7 +8,7 @@ import (
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
 	"glc/onexit"
-	"glc/www/service"
+	"glc/www/controller"
 	"log"
 	"sync"
 )
@@ -74,8 +74,8 @@ func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 	engine := ldb.NewDefaultEngine()
 	engine.AddTextLog(md.Date, md.Text, md.System)
 
-	if conf.IsEnableSlaveTransfer() {
-		service.TransferGlc(md.ToJson()) // 转发其他GLC服务
+	if conf.IsClusterMode() {
+		go controller.TransferGlc(md.ToJson()) // 转发其他GLC服务
 	}
 
 	return true

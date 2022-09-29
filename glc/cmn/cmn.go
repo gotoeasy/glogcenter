@@ -8,8 +8,11 @@ import (
 	"glc/conf"
 	"hash/crc32"
 	"log"
+	"math/rand"
+	"net"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -37,25 +40,6 @@ func StringToUint32(s string, defaultVal uint32) uint32 {
 	}
 	return uint32(v & 0xFFFFFFFF)
 }
-
-// // 字符串(指定进制无符号整数形式)转uint64，进制base范围为2~36
-// // 参数错误或转换失败都返回默认值
-// func StringToUint64(s string, base int, defaultVal uint64) uint64 {
-// 	if s == "" || base < 2 || base > 36 {
-// 		return defaultVal
-// 	}
-
-// 	v, err := strconv.ParseUint(s, base, 64)
-// 	if err != nil {
-// 		return defaultVal
-// 	}
-// 	return v
-// }
-
-// // Uint64转指定进制形式字符串
-// func Uint64ToString(val uint64, base int) string {
-// 	return strconv.FormatUint(val, base)
-// }
 
 // Uint32转字符串
 func Uint32ToString(val uint32) string {
@@ -319,4 +303,65 @@ func IsExistDir(dir string) bool {
 		return false
 	}
 	return s.IsDir()
+}
+
+func IsLinux() bool {
+	return runtime.GOOS == "linux"
+}
+
+func IsWindows() bool {
+	return runtime.GOOS == "windows"
+}
+
+func Random() uint32 {
+	rand.Seed(time.Now().UnixNano())
+	for {
+		v := rand.Uint32()
+		if v != 0 {
+			return v
+		}
+	}
+}
+
+func Unique(s []string) []string {
+	m := make(map[string]struct{}, 0)
+	newS := make([]string, 0)
+	for _, i2 := range s {
+		if _, ok := m[i2]; !ok {
+			newS = append(newS, i2)
+			m[i2] = struct{}{}
+		}
+	}
+	return newS
+}
+
+func GetLocalGlcUrl() string {
+	if conf.GetServerUrl() != "" {
+		return conf.GetServerUrl()
+	}
+
+	if conf.GetServerIp() != "" {
+		return "http://" + conf.GetServerIp() + ":" + conf.GetServerPort()
+	}
+
+	return "http://" + GetLocalIp() + ":" + conf.GetServerPort()
+
+}
+
+var localIp string
+
+func GetLocalIp() string {
+	if localIp != "" {
+		return localIp
+	}
+
+	addrs, err := net.InterfaceAddrs()
+	if err == nil {
+		for _, address := range addrs {
+			if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+				localIp = ipnet.IP.String()
+			}
+		}
+	}
+	return localIp
 }

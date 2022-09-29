@@ -3,8 +3,8 @@ package controller
 import (
 	"glc/conf"
 	"glc/gweb"
+	"glc/ldb"
 	"glc/ldb/storage/logdata"
-	"glc/www/service"
 	"log"
 )
 
@@ -23,11 +23,12 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error500(err.Error())
 	}
 
-	if conf.IsEnableSlaveTransfer() {
-		service.TransferGlc(md.ToJson()) // 转发其他GLC服务
+	addTextLog(md)
+
+	if conf.IsClusterMode() {
+		go TransferGlc(md.ToJson()) // 转发其他GLC服务
 	}
 
-	service.AddTextLog(md)
 	return gweb.Ok()
 }
 
@@ -46,6 +47,12 @@ func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error500(err.Error())
 	}
 
-	service.AddTextLog(md)
+	addTextLog(md)
 	return gweb.Ok()
+}
+
+// 添加日志
+func addTextLog(md *logdata.LogDataModel) {
+	engine := ldb.NewDefaultEngine()
+	engine.AddTextLog(md.Date, md.Text, md.System)
 }

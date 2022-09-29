@@ -7,6 +7,7 @@ import (
 	"glc/gweb/method"
 	"glc/ldb"
 	"glc/rabbitmq"
+	"glc/www/cluster"
 	"glc/www/controller"
 	"glc/www/filter"
 	"glc/www/html"
@@ -43,9 +44,18 @@ func Run() {
 		gweb.RegisterController(method.POST, contextPath+"/v1/user/enableLogin", controller.IsEnableLoginController)     // 查询是否开启用户密码登录功能
 		gweb.RegisterController(method.POST, contextPath+"/v1/user/login", controller.LoginController)                   // Login
 
+		// 集群操作接口
+		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/info", controller.ClusterGetClusterInfoController)   // 获取集群信息
+		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/save", controller.ClusterMasterSaveKvDataController) // 保存集群信息
+		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/async", controller.ClusterMasterAsyncDataController) // 保存Master发来的集群信息
+		gweb.RegisterController(method.POST, contextPath+"/sys/item/get", controller.ClusterGetItemController)              // KV获取
+		gweb.RegisterController(method.POST, contextPath+"/sys/item/set", controller.ClusterSetItemController)              // KV设定
+		gweb.RegisterController(method.POST, contextPath+"/sys/item/del", controller.ClusterDelItemController)              // KV删除
+
 		// 默认引擎空转一下，触发未建索引继续建
 		go ldb.NewDefaultEngine().AddTextLog("", "", "")
 
+		cluster.Start() // 显式调用触发加入集群或初始化集群
 		rabbitmq.Start()
 	})
 
