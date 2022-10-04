@@ -48,16 +48,16 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 # 服务1
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.51:8080 \
-           -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
-           gotoeasy/glc
+       -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+       gotoeasy/glc
 # 服务2
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.52:8080 \
-           -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
-           gotoeasy/glc
+       -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+       gotoeasy/glc
 # 服务3
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.53:8080 \
-           -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
-           gotoeasy/glc
+       -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+       gotoeasy/glc
 ```
 
 
@@ -73,8 +73,9 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
-- [x] `GLC_SLAVE_HOSTS`待转发的服务地址，多个时`;`分隔，默认空白
-- [x] `GLC_SLAVE_TRANSFER`是否开启转发日志到其他GLC服务，默认false
+- [x] `GLC_CLUSTER_MODE`是否集群模式启动，默认`false`
+- [x] `GLC_SERVER_URL`集群模式时的本节点服务地址，默认空白
+- [x] `GLC_CLUSTER_URLS`集群模式时的关联节点服务地址，多个时`;`分隔，默认空白
 
 ## 命令行启动参数（适用`0.6.*`及以上版本）
 - [x] 支持命令行参数`-v`查看版本
