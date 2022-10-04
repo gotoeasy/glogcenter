@@ -25,7 +25,7 @@
 - [x] 提供`java`项目日志收集包，`java`项目闭环支持
 - [x] 支持从`RabbitMQ`收取日志信息，满足更多闭环需求
 - [x] 内置提供简洁的`VUE`实现的日志查询管理界面
-- [x] 支持多服务集群模式部署，确保服务及数据保存的冗余性
+- [x] 支持多服务集群模式部署，确保服务及数据的冗余性
 
 <div align=center>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
@@ -42,23 +42,22 @@ docker run -d -p 8080:8080 gotoeasy/glc
 docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
-## `docker`集群部署模式简易示例（仅限0.7.0版本）
+## `docker`集群部署模式简易示例（`latest`或`0.8.0`及以上版本）
 ```shell
-# 以下3台集群，配置实现上是无主模式，接收到日志时会自动转发到其他服务
-# 但鉴于日志的时序性较强，建议仅取其1作为发送日志数据的主服务入口
+# 以下3台以集群方式启动，配置本节点地址及关联节点地址即可
 
 # 服务1
-docker run -d -p 8091:8080 \
-           -e GLC_SLAVE_HOSTS=http://127.0.0.1:8092;http://127.0.0.1:8093 \
-           -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.51:8080 \
+           -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+           gotoeasy/glc
 # 服务2
-docker run -d -p 8092:8080 \
-           -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091;http://127.0.0.1:8093 \
-           -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.52:8080 \
+           -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+           gotoeasy/glc
 # 服务3
-docker run -d -p 8093:8080 \
-           -e GLC_SLAVE_HOSTS=http://127.0.0.1:8091:http://127.0.0.1:8092 \
-           -e GLC_SLAVE_TRANSFER=true gotoeasy/glc:0.7.0
+docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.53:8080 \
+           -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+           gotoeasy/glc
 ```
 
 
@@ -140,8 +139,9 @@ docker run -d -p 8093:8080 \
 - [ ] 海量日志数据支持
 - [ ] 日志审计
 - [x] 集群支持自动选举Master
-- [x] 集群支持动态扩增节点
+- [x] 集群支持动态扩增节点，日志自动转发
 - [ ] 集群支持动态删减节点
+- [x] 隔日前的历史日志仓自动检查同步
 
 
 ### 版本`0.7.0`
