@@ -45,6 +45,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ## `docker`集群部署模式简易示例（`latest`或`0.8.0`及以上版本）
 ```shell
 # 以下3台以集群方式启动，配置本节点地址及关联节点地址即可
+# 采用“乐观集群”方式，简易选主（简单排序）+日志群发（忽略失败）+数据补偿（隔日历史数据）
 
 # 服务1
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.51:8080 \
