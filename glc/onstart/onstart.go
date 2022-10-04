@@ -48,6 +48,7 @@ func Run() {
 		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/info", controller.ClusterGetClusterInfoController)   // 获取集群信息
 		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/save", controller.ClusterMasterSaveKvDataController) // 保存集群信息
 		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/async", controller.ClusterMasterAsyncDataController) // 保存Master发来的集群信息
+		gweb.RegisterController(method.GET, contextPath+"/sys/cluster/down", controller.ClusterDownloadStoreDataController) // 打包下载指定日志仓数据
 		gweb.RegisterController(method.POST, contextPath+"/sys/item/get", controller.ClusterGetItemController)              // KV获取
 		gweb.RegisterController(method.POST, contextPath+"/sys/item/set", controller.ClusterSetItemController)              // KV设定
 		gweb.RegisterController(method.POST, contextPath+"/sys/item/del", controller.ClusterDelItemController)              // KV删除

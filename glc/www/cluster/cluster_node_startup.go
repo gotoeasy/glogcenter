@@ -64,32 +64,44 @@ func init() {
 
 	// 集群模式（准备加入集群，找Master，无Master时选举）
 	var masters []*ClusterInfo
+	var onlines []string
 	for i := 0; i < len(urls); i++ {
 		if urls[i] == localGlcUrl {
 			continue
 		}
 		master := httpGetMasterFromRemote(urls[i])
 		if master != nil {
-			masters = append(masters, master)
+			onlines = append(onlines, urls[i])
+			if master.MasterUrl != "" {
+				masters = append(masters, master)
+			}
 		}
 	}
 
 	if len(masters) == 0 {
-		// 还没有master
-		ary := []string{}
-		ary = append(ary, localGlcUrl)
-		ary = append(ary, urls...)
-		ary = cmn.Unique(ary) // 去重
-		// 倒序(选举)
-		sort.Slice(ary, func(i, j int) bool {
-			return ary[i] > ary[j]
+		// 还没有master， 在线范围倒序选举
+		aryUp := []string{}
+		aryUp = append(aryUp, localGlcUrl)
+		aryUp = append(aryUp, onlines...)
+		aryUp = cmn.Unique(aryUp) // 去重
+		sort.Slice(aryUp, func(i, j int) bool {
+			return aryUp[i] > aryUp[j] // 倒序
+		})
+
+		// 所有节点
+		aryall := []string{}
+		aryall = append(aryall, localGlcUrl)
+		aryall = append(aryall, urls...)
+		aryall = cmn.Unique(aryall) // 去重
+		sort.Slice(aryall, func(i, j int) bool {
+			return aryall[i] < aryall[j] // 升序
 		})
 
 		// 保存节点信息
-		masterUrl := ary[0]
+		masterUrl := aryUp[0]
 		ci := &ClusterInfo{
 			MasterUrl: masterUrl,
-			NodeUrls:  strings.Join(ary, ";"),
+			NodeUrls:  strings.Join(aryall, ";"),
 			Version:   "1",
 		}
 		kv := &service.KeyValue{
@@ -106,9 +118,9 @@ func init() {
 
 		jsonstr := kv.ToJson()
 		log.Println("本节点已保存集群信息", masterUrl, ci.NodeUrls)
-		for i := 0; i < len(ary); i++ {
-			if ary[i] != cmn.GetLocalGlcUrl() {
-				go httpClusterAsyncData(ary[i], jsonstr) // 异步发送数据给全部节点保存
+		for i := 0; i < len(aryUp); i++ {
+			if aryUp[i] != cmn.GetLocalGlcUrl() {
+				go httpClusterAsyncData(aryUp[i], jsonstr) // 异步发送数据给全部节点保存
 			}
 		}
 
@@ -124,7 +136,10 @@ func init() {
 		nodes := strings.Split(ourls, ";")
 		nodes = append(nodes, localGlcUrl) // 当前节点加入集群
 		nodes = cmn.Unique(nodes)          // 去重
-		nurls := strings.Join(nodes, ";")  // 分号分隔保存
+		sort.Slice(nodes, func(i, j int) bool {
+			return nodes[i] < nodes[j] // 升序
+		})
+		nurls := strings.Join(nodes, ";") // 分号分隔保存
 
 		// 先尝试在原Master上保存集群信息（需触发异步群发同步集群信息）
 		master := masters[0]
@@ -140,7 +155,7 @@ func init() {
 		if err != nil {
 			log.Fatalln("保存集群信息失败", err)
 		} else {
-			log.Println("本节点保存集群信息成功", master.MasterUrl)
+			log.Println("本节点保存集群信息成功", master.MasterUrl, nurls)
 		}
 
 		if master.MasterUrl != cmn.GetLocalGlcUrl() {
@@ -229,7 +244,7 @@ func httpGetClusterInfo(serverUrl string) *service.KeyValue {
 	rs.LoadBytes(by)
 	if !rs.Success {
 		log.Println("从", serverUrl, "取集群信息失败", rs.Message)
-		return nil
+		return &service.KeyValue{} // 能通信，只是没数据
 	}
 
 	kv := &service.KeyValue{}

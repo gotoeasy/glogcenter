@@ -19,4 +19,7 @@ func Start() {
 	} else {
 		log.Println(kv.ToJson())
 	}
+
+	// 异步检查更新数据
+	go dataAsync()
 }

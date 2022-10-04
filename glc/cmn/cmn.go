@@ -242,6 +242,8 @@ func GetStorageNames(path string, excludes ...string) []string {
 		delete(mapDir, excludes[i])
 	}
 
+	delete(mapDir, ".tmp")
+
 	var rs []string
 	for k := range mapDir {
 		rs = append(rs, k)

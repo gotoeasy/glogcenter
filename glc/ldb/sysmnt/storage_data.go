@@ -20,11 +20,12 @@ type StorageResult struct {
 	Data []*StorageModel `json:"data,omitempty"` // 占用空间
 }
 type StorageModel struct {
-	Name       string `json:"name"`       // 名称
-	LogCount   uint32 `json:"logCount"`   // 日志量
-	IndexCount uint32 `json:"indexCount"` // 已建索引数量
-	FileCount  uint32 `json:"fileCount"`  // 文件数量
-	TotalSize  string `json:"totalSize"`  // 占用空间
+	NodeUrl    string `json:"nodeUrl,omitempty"`    // 名称
+	Name       string `json:"name,omitempty"`       // 名称
+	LogCount   uint32 `json:"logCount,omitempty"`   // 日志量
+	IndexCount uint32 `json:"indexCount,omitempty"` // 已建索引数量
+	FileCount  uint32 `json:"fileCount,omitempty"`  // 文件数量
+	TotalSize  string `json:"totalSize,omitempty"`  // 占用空间
 }
 
 func init() {
@@ -47,7 +48,8 @@ func GetStorageList() *StorageResult {
 	names := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	for _, name := range names {
 		d := &StorageModel{
-			Name: name,
+			Name:    name,
+			NodeUrl: cmn.GetLocalGlcUrl(),
 		}
 
 		cnt, size, _ := cmn.GetDirInfo(conf.GetStorageRoot() + cmn.PathSeparator() + name)

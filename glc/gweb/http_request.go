@@ -8,7 +8,7 @@ import (
 )
 
 type HttpRequest struct {
-	ginCtx  *gin.Context
+	GinCtx  *gin.Context
 	mapHead map[string][]string
 }
 
@@ -27,13 +27,13 @@ func NewHttpRequest(c *gin.Context) *HttpRequest {
 	}
 
 	return &HttpRequest{
-		ginCtx:  c,
+		GinCtx:  c,
 		mapHead: mapHead,
 	}
 }
 
 func (r *HttpRequest) SetHeader(key string, value string) {
-	r.ginCtx.Header(key, value)
+	r.GinCtx.Header(key, value)
 }
 
 func (r *HttpRequest) GetHeader(name string) string {
@@ -53,37 +53,37 @@ func (r *HttpRequest) GetHeaders(name string) []string {
 }
 
 func (r *HttpRequest) GetUrlParameter(name string) string {
-	return r.ginCtx.Query(name)
+	return r.GinCtx.Query(name)
 }
 
 func (r *HttpRequest) GetFormParameter(name string) string {
-	return r.ginCtx.Request.PostFormValue(name)
+	return r.GinCtx.Request.PostFormValue(name)
 }
 
 func (r *HttpRequest) Redirect(url string) {
-	r.ginCtx.Redirect(http.StatusMovedPermanently, url)
+	r.GinCtx.Redirect(http.StatusMovedPermanently, url)
 }
 
 func (r *HttpRequest) ResponseData(code int, contentType string, bytes []byte) {
-	r.ginCtx.Data(code, contentType, bytes)
+	r.GinCtx.Data(code, contentType, bytes)
 }
 
 func (r *HttpRequest) GetMethod() string {
-	return r.ginCtx.Request.Method
+	return r.GinCtx.Request.Method
 }
 
 func (r *HttpRequest) AbortWithStatus(code int) {
-	r.ginCtx.AbortWithStatus(code)
+	r.GinCtx.AbortWithStatus(code)
 }
 
 func (r *HttpRequest) RequestURI() string {
-	return r.ginCtx.Request.RequestURI
+	return r.GinCtx.Request.RequestURI
 }
 
 func (r *HttpRequest) RequestUrlPath() string {
-	return r.ginCtx.Request.URL.Path
+	return r.GinCtx.Request.URL.Path
 }
 
 func (r *HttpRequest) BindJSON(obj any) error {
-	return r.ginCtx.BindJSON(obj)
+	return r.GinCtx.BindJSON(obj)
 }
