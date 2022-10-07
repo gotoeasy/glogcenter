@@ -53,7 +53,7 @@ func checkAndCopyDataFromRemote() {
 
 		// 筛选出最完整的日志仓信息
 		for j := 0; j < len(storelist); j++ {
-			md := storelist[i]
+			md := storelist[j]
 			mstore := mapStore[md.Name]
 			if mstore == nil {
 				mapStore[md.Name] = md
@@ -79,13 +79,15 @@ func checkAndCopyDataFromRemote() {
 
 	// 远程有，本地无，复制
 	for k, remoteStore := range mapStore {
+		log.Println("日志仓有无检查同步", remoteStore.NodeUrl, remoteStore.Name)
 		if k == todayStoreName {
+			log.Println("跳过当天的日志仓", todayStoreName)
 			continue // 跳过当天的日志仓
 		}
 
 		if mapLocalStore[k] == nil {
 			// 下载
-			log.Println("开始从", remoteStore.NodeUrl, "复制日志仓", remoteStore.Name)
+			log.Println("本地无日志仓", k, "开始从", remoteStore.NodeUrl, "复制", remoteStore.Name)
 			tarfile, err := httpDownloadStoreFile(remoteStore.NodeUrl, remoteStore.Name) // 下载
 			if err != nil {
 				continue
@@ -99,18 +101,23 @@ func checkAndCopyDataFromRemote() {
 			sysdb.SetStorageDataCount(remoteStore.Name, remoteStore.LogCount)
 			sysdb.SetStorageIndexCount(remoteStore.Name, remoteStore.IndexCount)
 			log.Println("完成从", remoteStore.NodeUrl, "复制日志仓", remoteStore.Name)
+		} else {
+			log.Println("本地有日志仓", k)
 		}
 	}
 
 	// 远程全，本地缺，覆盖
 	for i := 0; i < len(localStores); i++ {
 		md := localStores[i]
+		log.Println("日志仓数据检查同步", md.NodeUrl, md.Name)
 		if md.Name == todayStoreName {
+			log.Println("跳过当天的日志仓", todayStoreName)
 			continue // 跳过当天的日志仓
 		}
 
 		mstore := mapStore[md.Name]
 		if mstore == nil || md.LogCount >= mstore.LogCount {
+			log.Println("本地更完整，跳过", md.Name)
 			continue // 本地更完整
 		}
 

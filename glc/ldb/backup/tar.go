@@ -26,8 +26,8 @@ func TarDir(directory string, tarfilename string) error {
 	lenPrefix := cmn.LenRune(filepath.Dir(dir)) // 绝对路径除去末尾目录名后的长度
 
 	// 创建文件
-	os.MkdirAll(filepath.Dir(tarfilename), 0666)                      // 建目录确保目录存在
-	f, err := os.OpenFile(tarfilename, os.O_WRONLY|os.O_CREATE, 0666) // 建文件
+	os.MkdirAll(filepath.Dir(tarfilename), 0777)                      // 建目录确保目录存在
+	f, err := os.OpenFile(tarfilename, os.O_WRONLY|os.O_CREATE, 0777) // 建文件
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -59,7 +59,7 @@ func TarDir(directory string, tarfilename string) error {
 			Name:    name,          // 用相对目录名
 			Format:  tar.FormatGNU, // 支持中文目录文件名
 			Size:    info.Size(),
-			Mode:    0666,
+			Mode:    0777,
 			ModTime: info.ModTime(),
 		}
 
@@ -109,10 +109,10 @@ func UnTar(tarFile string, dist string) error {
 			full = filepath.Join(distDir, strings.ReplaceAll(hdr.Name, "/", "\\"))
 		}
 		if hdr.FileInfo().IsDir() {
-			os.MkdirAll(full, 0666)
+			os.MkdirAll(full, 0777)
 			continue
 		} else {
-			os.MkdirAll(filepath.Dir(full), 0666)
+			os.MkdirAll(filepath.Dir(full), 0777)
 		}
 
 		fw, err := os.Create(full) // 创建一个空文件，用来写入解包后的数据
