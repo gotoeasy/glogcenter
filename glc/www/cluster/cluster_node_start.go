@@ -13,6 +13,7 @@ func Start() {
 	}
 
 	log.Println("集群节点启动", cmn.GetLocalGlcUrl())
+	joinCluster()
 	kv, err := service.GetSysmntItem(KEY_CLUSTER)
 	if err != nil {
 		log.Println(err)

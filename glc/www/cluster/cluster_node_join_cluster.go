@@ -34,7 +34,7 @@ func (d *ClusterInfo) LoadJson(jsonstr string) error {
 }
 
 // 启动时加入集群
-func init() {
+func joinCluster() {
 	if !conf.IsClusterMode() {
 		return
 	}

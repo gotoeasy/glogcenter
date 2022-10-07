@@ -65,6 +65,11 @@ func checkAndCopyDataFromRemote() {
 		}
 	}
 
+	if len(mapStore) == 0 {
+		log.Println("历史数据检查同步结束（没有其他节点数据可对比）")
+		return
+	}
+
 	// 本地
 	todayStoreName := cmn.GeyStoreNameByDate("") // 当天日志仓名
 	rs := sysmnt.GetStorageList()
@@ -117,7 +122,7 @@ func checkAndCopyDataFromRemote() {
 
 		mstore := mapStore[md.Name]
 		if mstore == nil || md.LogCount >= mstore.LogCount {
-			log.Println("本地更完整，跳过", md.Name)
+			log.Println("本地完整，跳过", md.Name)
 			continue // 本地更完整
 		}
 
