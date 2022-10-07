@@ -50,7 +50,6 @@ func checkAndCopyDataFromRemote() {
 
 		// 查询日志仓列表信息
 		storelist := httpGetStoresInfo(urls[i])
-		// todayStoreName := cmn.GeyStoreNameByDate("")  // 当天日志仓名
 
 		// 筛选出最完整的日志仓信息
 		for j := 0; j < len(storelist); j++ {
@@ -122,7 +121,7 @@ func checkAndCopyDataFromRemote() {
 			continue
 		}
 
-		// 本地先删除
+		// 本地先删除（日志仓使用中会删除失败，忽略，待下次同步处理）
 		err = sysmnt.DeleteStorage(mstore.Name)
 		if err != nil {
 			log.Println("本地日志仓", mstore.Name, "删除失败", err)
