@@ -27,6 +27,7 @@
 - [x] 内置提供简洁的`VUE`实现的日志查询管理界面
 - [x] 支持多服务集群模式部署，确保服务及数据的冗余性
 
+
 <div align=center>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
 </div>
@@ -42,7 +43,7 @@ docker run -d -p 8080:8080 gotoeasy/glc
 docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ```
 
-## `docker`集群部署模式简易示例（`latest`或`0.8.0`及以上版本）
+## `docker`集群部署模式简易示例
 ```shell
 # 以下3台以集群方式启动，配置本节点地址及关联节点地址即可
 # 采用“乐观集群”方式，简易选主（简单排序）+日志群发（忽略失败）+数据补偿（隔日历史数据）
@@ -101,7 +102,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0</version>
 </dependency>
 ```
 
@@ -148,7 +149,6 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] 集群支持动态扩增节点，日志自动转发
 - [x] 集群支持自动选举Master
 - [x] 隔日之前的历史日志仓自动检查同步
-- [x] 在Linux系统下支持命令行参数`status`查看状态
 
 ### 版本`0.7.0`
 
