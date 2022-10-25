@@ -68,7 +68,7 @@ func UpdateConfigByEnv() {
 	enableSecurityKey = GetenvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
 	headerSecurityKey = Getenv("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")     // web服务API秘钥的header键名
 	securityKey = Getenv("GLC_SECURITY_KEY", "glogcenter")                  // web服务API秘钥
-	enableWebGzip = GetenvBool("GLC_ENABLE_WEB_GZIP", true)                 // web服务是否开启Gzip
+	enableWebGzip = GetenvBool("GLC_ENABLE_WEB_GZIP", false)                // web服务是否开启Gzip
 	enableAmqpConsume = GetenvBool("GLC_ENABLE_AMQP_CONSUME", false)        // 是否开启rabbitMq消费者接收日志
 	amqpAddr = Getenv("GLC_AMQP_ADDR", "")                                  // rabbitMq连接地址，例："amqp://user:password@ip:port/"
 	amqpQueueName = Getenv("GLC_AMQP_QUEUE_NAME", "glc-log-queue")          // rabbitMq队列名
