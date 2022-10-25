@@ -19,7 +19,7 @@
 
           <el-table :stripe="true" v-loading="loading" :data="data" :height="tableHeight" style="width: 100%">
 
-            <el-table-column type="index" label="#" width="50" />
+            <el-table-column type="index" label="#" width="52" />
             <el-table-column prop="name" label="名称"/>
             <el-table-column prop="logCount" label="日志数量" />
             <el-table-column prop="indexCount" label="已建索引数量" />
