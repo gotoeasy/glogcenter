@@ -31,7 +31,7 @@ type StorageModel struct {
 func init() {
 	go func() {
 		if conf.IsStoreNameAutoAddDate() && conf.GetSaveDays() > 0 {
-			removeStorageByDays()
+			// removeStorageByDays() // 注释掉，没必要启动时就清理
 			ticker := time.NewTicker(time.Hour) // 一小时检查一次是否有待删除的日志仓
 			for {
 				<-ticker.C
