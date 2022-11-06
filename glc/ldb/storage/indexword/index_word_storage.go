@@ -54,7 +54,6 @@ func NewWordIndexStorage(storeName string) *WordIndexStorage { // 存储器，�
 
 	// 缓存有则取用
 	subPath := "inverted" + cmn.PathSeparator() + "k"
-	// subPath := "inverted" + cmn.PathSeparator() + "k_" + cmn.HashAndMod(word, 10)
 	cacheName := storeName + cmn.PathSeparator() + subPath
 	cacheStore := getStorage(cacheName)
 	if cacheStore != nil {

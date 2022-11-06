@@ -5,8 +5,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"glc/conf"
-	"hash/crc32"
-	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -16,11 +14,6 @@ import (
 
 	"github.com/gotoeasy/glang/cmn"
 )
-
-// 字符串哈希处理后取模(余数)，返回值最大不超过mod值
-func HashAndMod(str string, mod uint32) string {
-	return fmt.Sprint(crc32.ChecksumIEEE(cmn.StringToBytes(str)) % mod)
-}
 
 func ToBytes(data any) []byte {
 	buffer := new(bytes.Buffer)
@@ -38,7 +31,6 @@ func GeyStoreNameByDate(name string) string {
 	}
 	if conf.IsStoreNameAutoAddDate() {
 		return fmt.Sprint(name, "-", time.Now().Format("20060102")) // name-yyyymmdd
-		// return fmt.Sprint(name, "-", time.Now().Format("200601021504")) // name-yyyymmddHHMM
 	}
 	return name
 }
@@ -50,7 +42,7 @@ func JoinBytes(bts ...[]byte) []byte {
 func GetStorageNames(path string, excludes ...string) []string {
 	fileinf, err := os.ReadDir(path)
 	if err != nil {
-		log.Println("读取目录失败", err)
+		cmn.Error("读取目录失败", err)
 		return []string{}
 	}
 
