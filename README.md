@@ -78,6 +78,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_CLUSTER_MODE`是否集群模式启动，默认`false`
 - [x] `GLC_SERVER_URL`集群模式时的本节点服务地址，默认空白
 - [x] `GLC_CLUSTER_URLS`集群模式时的关联节点服务地址，多个时`;`分隔，默认空白
+- [x] `GLC_LOG_LEVEL`日志级别，可设定值为`debug/info/warn/error`，默认`info`
 
 ## 命令行启动参数（适用`0.6.*`及以上版本）
 - [x] 支持命令行参数`-v`查看版本
@@ -147,6 +148,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 ### 版本`0.8.1`
 
 - [x] 代码重构改善
+- [x] 支持日志级别配置`GLC_LOG_LEVEL`，可设定值为`debug/info/warn/error`，默认`info`
 
 ### 版本`0.8.0`
 
