@@ -6,7 +6,8 @@ package logdata
 
 import (
 	"encoding/json"
-	"glc/cmn"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 // Text是必须有的日志内容，Id自增，内置其他属性可选

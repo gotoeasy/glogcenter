@@ -3,10 +3,12 @@ package controller
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
 	"glc/gweb"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 var sessionid string
@@ -39,14 +41,14 @@ func IsEnableLoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 }
 
 func createSessionid() string {
-	ymd := cmn.GetYyyymmdd(0)
+	ymd := com.GetYyyymmdd(0)
 	by1 := md5.Sum(cmn.StringToBytes(conf.GetUsername() + ymd))
 	by2 := md5.Sum(cmn.StringToBytes(ymd + conf.GetPassword()))
 	by3 := md5.Sum(cmn.StringToBytes(ymd + "添油" + conf.GetUsername() + "加醋" + conf.GetPassword()))
 	str1 := hex.EncodeToString(by1[:])
 	str2 := hex.EncodeToString(by2[:])
 	str3 := hex.EncodeToString(by3[:])
-	return cmn.RightRune(str1, 15) + cmn.LeftRune(str2, 15) + cmn.LeftRune(str3, 30)
+	return cmn.Right(str1, 15) + cmn.Left(str2, 15) + cmn.Left(str3, 30)
 }
 
 func GetSessionid() string {

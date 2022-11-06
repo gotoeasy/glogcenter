@@ -7,13 +7,12 @@ package sysmnt
 
 import (
 	"errors"
-	"glc/cmn"
 	"glc/conf"
 	"glc/onexit"
-	"log"
 	"sync"
 	"time"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -57,7 +56,7 @@ func NewSysmntStorage() *SysmntStorage { // 存储器，文档，自定义对象
 	dbPath := conf.GetStorageRoot() + cmn.PathSeparator() + cacheName
 	db, err := leveldb.OpenFile(dbPath, nil) // 打开（在指定子目录中存放数据）
 	if err != nil {
-		log.Println("打开SysmntStorage失败：", dbPath)
+		cmn.Error("打开SysmntStorage失败：", dbPath)
 		panic(err)
 	}
 	store.leveldb = db
@@ -66,7 +65,7 @@ func NewSysmntStorage() *SysmntStorage { // 存储器，文档，自定义对象
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()
 
-	log.Println("打开SysmntStorage：", cacheName)
+	cmn.Info("打开SysmntStorage：", cacheName)
 	return store
 }
 
@@ -100,7 +99,7 @@ func (s *SysmntStorage) Close() {
 	s.leveldb.Close()
 	sysmntStorage = nil
 
-	log.Println("关闭SysmntStorage：", s.subPath)
+	cmn.Info("关闭SysmntStorage：", s.subPath)
 }
 
 func (s *SysmntStorage) GetStorageDataCount(storeName string) uint32 {
@@ -175,5 +174,5 @@ func onExit() {
 	if sysmntStorage != nil {
 		sysmntStorage.Close()
 	}
-	log.Println("退出SysmntStorage")
+	cmn.Info("退出SysmntStorage")
 }

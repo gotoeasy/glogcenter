@@ -8,7 +8,8 @@ package sysmnt
 import (
 	"bytes"
 	"encoding/gob"
-	"glc/cmn"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type SysmntData struct {

@@ -7,10 +7,9 @@
 package storage
 
 import (
-	"glc/cmn"
 	"glc/ldb/storage/logdata"
-	"log"
-	"strings"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 var mapStorageHandle map[string](*LogDataStorageHandle)
@@ -43,14 +42,14 @@ func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 
 // 添加日志（参数是普通文本日志）
 func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system string) {
-	txt := strings.TrimSpace(logText)
+	txt := cmn.Trim(logText)
 	if txt == "" {
 		return
 	}
-	ary := strings.Split(txt, "\n")
+	ary := cmn.Split(txt, "\n")
 
 	d := new(logdata.LogDataModel)
-	d.Text = strings.TrimSpace(ary[0])
+	d.Text = cmn.Trim(ary[0])
 	if len(ary) > 1 {
 		d.Detail = txt
 	}
@@ -62,7 +61,7 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 	}
 	err := s.storage.Add(d)
 	if err != nil {
-		log.Println("竟然失败，再来一次", s.storage.IsClose(), err)
+		cmn.Error("竟然失败，再来一次", s.storage.IsClose(), err)
 		if s.storage.IsClose() {
 			s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 		}
@@ -72,8 +71,8 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 
 // 添加日志（参数LogDataModel）
 func (s *LogDataStorageHandle) AddLogDataModel(data *logdata.LogDataModel) {
-	ary := strings.Split(data.Text, "\n")
-	data.Text = strings.TrimSpace(ary[0])
+	ary := cmn.Split(data.Text, "\n")
+	data.Text = cmn.Trim(ary[0])
 	if len(ary) > 1 {
 		data.Detail = data.Text
 	}
@@ -83,7 +82,7 @@ func (s *LogDataStorageHandle) AddLogDataModel(data *logdata.LogDataModel) {
 	}
 	err := s.storage.Add(data)
 	if err != nil {
-		log.Println("竟然失败，再来一次", s.storage.IsClose(), err)
+		cmn.Error("竟然失败，再来一次", s.storage.IsClose(), err)
 		if s.storage.IsClose() {
 			s.storage = logdata.NewLogDataStorage(s.storage.StoreName())
 		}

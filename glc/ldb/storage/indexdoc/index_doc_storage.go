@@ -6,14 +6,14 @@
 package indexdoc
 
 import (
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
 	"glc/ldb/status"
 	"glc/onexit"
-	"log"
 	"sync"
 	"time"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/filter"
 	"github.com/syndtr/goleveldb/leveldb/opt"
@@ -75,7 +75,7 @@ func NewDocIndexStorage(storeName string) *DocIndexStorage { // 存储器，文�
 	option.Filter = filter.NewBloomFilter(10)   // 使用布隆过滤器
 	db, err := leveldb.OpenFile(dbPath, option) // 打开（在指定子目录中存放数据）
 	if err != nil {
-		log.Println("打开DocIndexStorage失败：", dbPath)
+		cmn.Error("打开DocIndexStorage失败：", dbPath)
 		panic(err)
 	}
 	store.leveldb = db
@@ -85,7 +85,7 @@ func NewDocIndexStorage(storeName string) *DocIndexStorage { // 存储器，文�
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()
 
-	log.Println("打开DocIndexStorage：", cacheName)
+	cmn.Info("打开DocIndexStorage：", cacheName)
 	return store
 }
 
@@ -107,9 +107,9 @@ func (s *DocIndexStorage) autoCloseWhenMaxIdle() {
 func (s *DocIndexStorage) AddWordDocSeq(word string, docId uint32, seq uint32) error {
 
 	s.lastTime = time.Now().Unix()
-	err := s.leveldb.Put(cmn.JoinBytes(cmn.StringToBytes(word), cmn.Uint32ToBytes(docId)), cmn.Uint32ToBytes(seq), nil)
+	err := s.leveldb.Put(com.JoinBytes(cmn.StringToBytes(word), cmn.Uint32ToBytes(docId)), cmn.Uint32ToBytes(seq), nil)
 	if err != nil {
-		log.Println("保存日志反向索引失败", err)
+		cmn.Error("保存日志反向索引失败", err)
 		return err
 	}
 	return nil
@@ -121,7 +121,7 @@ func (s *DocIndexStorage) GetWordDocSeq(word string, docId uint32) uint32 {
 		return 0
 	}
 	s.lastTime = time.Now().Unix()
-	b, err := s.leveldb.Get(cmn.JoinBytes(cmn.StringToBytes(word), cmn.Uint32ToBytes(docId)), nil)
+	b, err := s.leveldb.Get(com.JoinBytes(cmn.StringToBytes(word), cmn.Uint32ToBytes(docId)), nil)
 	if err != nil {
 		return 0
 	}
@@ -146,7 +146,7 @@ func (s *DocIndexStorage) Close() {
 	defer idxMu.Unlock()          // map解锁
 	mapStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
 
-	log.Println("关闭DocIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
+	cmn.Info("关闭DocIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
 // 存储目录名
@@ -163,5 +163,5 @@ func onExit() {
 	for k := range mapStorage {
 		mapStorage[k].Close()
 	}
-	log.Println("退出DocIndexStorage")
+	cmn.Info("退出DocIndexStorage")
 }

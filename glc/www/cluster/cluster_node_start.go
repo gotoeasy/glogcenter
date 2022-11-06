@@ -1,10 +1,11 @@
 package cluster
 
 import (
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
 	"glc/www/service"
-	"log"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 func Start() {
@@ -12,13 +13,13 @@ func Start() {
 		return
 	}
 
-	log.Println("集群节点启动", cmn.GetLocalGlcUrl())
+	cmn.Info("集群节点启动", com.GetLocalGlcUrl())
 	joinCluster()
 	kv, err := service.GetSysmntItem(KEY_CLUSTER)
 	if err != nil {
-		log.Println(err)
+		cmn.Error(err)
 	} else {
-		log.Println(kv.ToJson())
+		cmn.Info(kv.ToJson())
 	}
 
 	// 异步检查更新数据

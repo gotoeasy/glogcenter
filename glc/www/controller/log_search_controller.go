@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"glc/cmn"
 	"glc/conf"
 	"glc/gweb"
 	"glc/ldb"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 // 日志检索（表单提交方式）

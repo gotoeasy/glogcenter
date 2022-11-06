@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type PidFile struct {
@@ -43,7 +45,7 @@ func savePid(path string, pid string) error {
 	}
 
 	if err := os.WriteFile(path, []byte(pid), 0644); err != nil {
-		log.Println("save pid file failed", path)
+		cmn.Error("save pid file failed", path, err)
 		return err
 	}
 

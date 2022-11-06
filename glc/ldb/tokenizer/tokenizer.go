@@ -4,10 +4,7 @@
 package tokenizer
 
 import (
-	"glc/conf"
-	"os"
-	"strings"
-
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/wangbin/jiebago"
 )
 
@@ -18,20 +15,16 @@ var ignoreWords []string  // 默认忽略的单词
 // 初始化装载字典
 func init() {
 	// 分词字典文件默认是“dict.txt”，支持通过环境变量“DICT_FILE”设定
-	dictFile := os.Getenv("DICT_FILE")
-	if dictFile == "" {
-		dictFile = "dict.txt"
-	}
+	dictFile := cmn.GetEnvStr("DICT_FILE", "dict.txt") // TODO
 
 	// 默认忽略的单字，主要是键盘能直接敲出的全角半角符号，字母数字不大好说不做排除
-	ignoreWords = strings.Split("`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n", "")
+	ignoreWords = cmn.Split("`~!@# $%^&*()-_=+[{]}\\|;:'\",<.>/?，。《》；：‘　’“”、|】｝【｛＋－—（）×＆…％￥＃＠！～·\t\r\n", "")
 
 	// 有些关键词是要按规则忽略的，支持通过环境变量“INGORE_WORDS”设定，以半角逗号分隔
-	strWords := conf.Getenv("INGORE_WORDS", "")
+	strWords := cmn.GetEnvStr("INGORE_WORDS", "") // TODO
 	if strWords != "" {
-		ignoreWords = append(ignoreWords, strings.Split(strWords, ",")...)
+		ignoreWords = append(ignoreWords, cmn.Split(strWords, ",")...)
 	}
-	//log.Println("默认忽略的单词: ", ignoreWords)
 
 	// simpleCutMode = conf.GetenvBool("SIMPLE_CUT_MODE", true)
 
@@ -46,18 +39,18 @@ func CutForSearch(text string) []string {
 // 按搜索引擎模式进行分词后返回分词数组，可自定义添加或删除分词
 func CutForSearchEx(text string, addWords []string, delWords []string) []string {
 
-	if strings.TrimSpace(text) == "" {
+	if cmn.Trim(text) == "" {
 		return []string{}
 	}
 
-	txt := strings.ToLower(text)
+	txt := cmn.ToLower(text)
 
 	// 结巴分词
-	sch := seg.CutForSearch(txt+" "+strings.Join(addWords, " "), true) // TODO 暂且补丁
+	sch := seg.CutForSearch(txt+" "+cmn.Join(addWords, " "), true) // TODO 暂且补丁
 	var mapStr = make(map[string]string)
 	tmp := ""
 	for word := range sch {
-		tmp = strings.TrimSpace(word)
+		tmp = cmn.Trim(word)
 		if tmp != "" {
 			mapStr[tmp] = ""
 		}
@@ -85,15 +78,15 @@ func CutForSearchEx(text string, addWords []string, delWords []string) []string 
 
 	// 自定义添加分词
 	for _, word := range addWords {
-		tmp = strings.TrimSpace(strings.ToLower(word))
+		tmp = cmn.Trim(cmn.ToLower(word))
 		if tmp != "" {
-			mapStr[strings.TrimSpace(strings.ToLower(word))] = ""
+			mapStr[cmn.Trim(cmn.ToLower(word))] = ""
 		}
 	}
 
 	// 自定义删除分词
 	for _, word := range delWords {
-		tmp = strings.TrimSpace(strings.ToLower(word))
+		tmp = cmn.Trim(cmn.ToLower(word))
 		delete(mapStr, tmp)
 	}
 

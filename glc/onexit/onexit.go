@@ -1,10 +1,11 @@
 package onexit
 
 import (
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 var fnExits []func()
@@ -14,7 +15,7 @@ func init() {
 		osc := make(chan os.Signal, 1)
 		signal.Notify(osc, syscall.SIGTERM, syscall.SIGINT)
 		<-osc
-		log.Println("收到退出信号准备退出")
+		cmn.Info("收到退出信号准备退出")
 		for _, fnExit := range fnExits {
 			fnExit()
 		}

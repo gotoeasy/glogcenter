@@ -5,7 +5,8 @@ import (
 	"glc/gweb"
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
-	"log"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 // 添加日志（JSON提交方式）
@@ -19,7 +20,7 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	md := &logdata.LogDataModel{}
 	err := req.BindJSON(md)
 	if err != nil {
-		log.Println("请求参数有误", err)
+		cmn.Error("请求参数有误", err)
 		return gweb.Error500(err.Error())
 	}
 
@@ -43,7 +44,7 @@ func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	md := &logdata.LogDataModel{}
 	err := req.BindJSON(md)
 	if err != nil {
-		log.Println("请求参数有误", err)
+		cmn.Error("请求参数有误", err)
 		return gweb.Error500(err.Error())
 	}
 

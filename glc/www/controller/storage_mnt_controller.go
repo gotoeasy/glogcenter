@@ -2,12 +2,13 @@ package controller
 
 import (
 	"fmt"
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
 	"glc/gweb"
 	"glc/ldb/status"
 	"glc/ldb/sysmnt"
-	"log"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 // 查询日志仓名称列表
@@ -16,7 +17,7 @@ func StorageNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error403() // 登录检查
 	}
 
-	rs := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
+	rs := com.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	return gweb.Result(rs)
 }
 
@@ -41,8 +42,8 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error500("不能删除 .sysmnt")
 	} else if conf.IsStoreNameAutoAddDate() {
 		if conf.GetSaveDays() > 0 {
-			ymd := cmn.RightRune(name, 8)
-			if cmn.LenRune(ymd) == 8 && cmn.StartwithsRune(ymd, "20") {
+			ymd := cmn.Right(name, 8)
+			if cmn.Len(ymd) == 8 && cmn.Startwiths(ymd, "20") {
 				msg := fmt.Sprintf("当前是日志仓自动维护模式，最多保存 %d 天，不能手动删除", conf.GetSaveDays())
 				return gweb.Error500(msg)
 			}
@@ -57,8 +58,7 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	err := sysmnt.DeleteStorage(name)
 	if err != nil {
-		msg := err.Error()
-		log.Println("日志仓", name, "删除失败", msg)
+		cmn.Error("日志仓", name, "删除失败", err)
 		return gweb.Error500("日志仓 " + name + " 正在使用，不能删除")
 	}
 	return gweb.Ok()

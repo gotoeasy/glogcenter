@@ -2,9 +2,9 @@ package gweb
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type HttpRequest struct {
@@ -17,7 +17,7 @@ func NewHttpRequest(c *gin.Context) *HttpRequest {
 	// header整理，键忽略大小写
 	mapHead := make(map[string][]string)
 	for k, v := range c.Request.Header {
-		key := strings.ToLower(k)
+		key := cmn.ToLower(k)
 		val := mapHead[key]
 		if val == nil {
 			val = []string{}
@@ -37,7 +37,7 @@ func (r *HttpRequest) SetHeader(key string, value string) {
 }
 
 func (r *HttpRequest) GetHeader(name string) string {
-	ary := r.mapHead[strings.ToLower(name)]
+	ary := r.mapHead[cmn.ToLower(name)]
 	if ary == nil {
 		return ""
 	}
@@ -45,7 +45,7 @@ func (r *HttpRequest) GetHeader(name string) string {
 }
 
 func (r *HttpRequest) GetHeaders(name string) []string {
-	ary := r.mapHead[strings.ToLower(name)]
+	ary := r.mapHead[cmn.ToLower(name)]
 	if ary == nil {
 		return []string{}
 	}

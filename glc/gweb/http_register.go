@@ -2,7 +2,8 @@ package gweb
 
 import (
 	"glc/gweb/method"
-	"strings"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type HttpController struct {
@@ -23,16 +24,16 @@ func init() {
 func getHttpController(methodType string, path string) *HttpController {
 	switch methodType {
 	case method.GET:
-		return mapHandleGet[strings.ToLower(path)]
+		return mapHandleGet[cmn.ToLower(path)]
 	case method.POST:
-		return mapHandlePost[strings.ToLower(path)]
+		return mapHandlePost[cmn.ToLower(path)]
 	default:
 		return nil
 	}
 }
 
 func RegisterController(methodType string, path string, fnController func(*HttpRequest) *HttpResult) {
-	pathLower := strings.ToLower(path) // path匹配比较忽略大小写
+	pathLower := cmn.ToLower(path) // path匹配比较忽略大小写
 	if mapHandleGet[pathLower] != nil || mapHandlePost[pathLower] != nil {
 		panic("duplicate controller path: " + path)
 	}

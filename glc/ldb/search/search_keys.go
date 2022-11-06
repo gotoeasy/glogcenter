@@ -7,12 +7,12 @@
 package search
 
 import (
-	"fmt"
-	"glc/cmn"
 	"glc/ldb/storage"
 	"glc/ldb/storage/indexdoc"
 	"glc/ldb/storage/indexword"
 	"glc/ldb/storage/logdata"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type SearchResult struct {
@@ -206,6 +206,6 @@ func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *sto
 		}
 	}
 
-	rs.Total = fmt.Sprintf("%d", storeLogData.TotalCount())
+	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount())
 	return rs
 }

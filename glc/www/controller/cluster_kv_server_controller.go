@@ -4,7 +4,8 @@ import (
 	"glc/conf"
 	"glc/gweb"
 	"glc/www/service"
-	"log"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 func ClusterGetItemController(req *gweb.HttpRequest) *gweb.HttpResult {
@@ -15,13 +16,13 @@ func ClusterGetItemController(req *gweb.HttpRequest) *gweb.HttpResult {
 	pkv := &service.KeyValue{}
 	err := req.BindJSON(pkv)
 	if err != nil || pkv.Key == "" {
-		log.Println("请求参数有误", err)
+		cmn.Error("请求参数有误", err)
 		return gweb.Error500(err.Error())
 	}
 
 	dkv, err := service.GetSysmntItem(pkv.Key)
 	if err != nil || pkv.Key == "" {
-		log.Println(err.Error())
+		cmn.Error(err.Error())
 		return gweb.Error500(err.Error())
 	}
 
@@ -36,13 +37,13 @@ func ClusterSetItemController(req *gweb.HttpRequest) *gweb.HttpResult {
 	pkv := &service.KeyValue{}
 	err := req.BindJSON(pkv)
 	if err != nil || pkv.Key == "" {
-		log.Println("请求参数有误", err)
+		cmn.Error("请求参数有误", err)
 		return gweb.Error500(err.Error())
 	}
 
 	_, err = service.SetSysmntItem(pkv)
 	if err != nil {
-		log.Println(err.Error())
+		cmn.Error(err.Error())
 		return gweb.Error500(err.Error())
 	}
 
@@ -57,13 +58,13 @@ func ClusterDelItemController(req *gweb.HttpRequest) *gweb.HttpResult {
 	pkv := &service.KeyValue{}
 	err := req.BindJSON(pkv)
 	if err != nil || pkv.Key == "" {
-		log.Println("请求参数有误", err)
+		cmn.Error("请求参数有误", err)
 		return gweb.Error500(err.Error())
 	}
 
 	err = service.DelSysmntItem(pkv.Key)
 	if err != nil {
-		log.Println(err.Error())
+		cmn.Error(err.Error())
 		return gweb.Error500(err.Error())
 	}
 

@@ -2,15 +2,16 @@ package cluster
 
 import (
 	"encoding/json"
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
 	"glc/gweb"
 	"glc/www/service"
 	"io"
-	"log"
 	"net/http"
 	"sort"
 	"strings"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 const KEY_CLUSTER string = "$cluster"
@@ -41,12 +42,12 @@ func joinCluster() {
 
 	service.DelSysmntItem(KEY_CLUSTER) // 刚启动，默认本机不是Master
 
-	localGlcUrl := cmn.GetLocalGlcUrl()
+	localGlcUrl := com.GetLocalGlcUrl()
 	urls := conf.GetClusterUrls()
 
 	// 仅单节点
 	if len(urls) == 0 || (len(urls) == 1 && urls[0] == localGlcUrl) {
-		log.Println("单节点", cmn.GetLocalGlcUrl())
+		cmn.Info("单节点", com.GetLocalGlcUrl())
 		ci := &ClusterInfo{
 			MasterUrl: localGlcUrl,
 			NodeUrls:  localGlcUrl,
@@ -58,7 +59,7 @@ func joinCluster() {
 			Version: "1",
 		}
 		service.SetSysmntItem(kv) // 保存节点信息
-		log.Println("集群模式，当前为单节点")
+		cmn.Info("集群模式，当前为单节点")
 		return
 	}
 
@@ -83,7 +84,7 @@ func joinCluster() {
 		aryUp := []string{}
 		aryUp = append(aryUp, localGlcUrl)
 		aryUp = append(aryUp, onlines...)
-		aryUp = cmn.Unique(aryUp) // 去重
+		aryUp = com.Unique(aryUp) // 去重
 		sort.Slice(aryUp, func(i, j int) bool {
 			return aryUp[i] > aryUp[j] // 倒序
 		})
@@ -92,7 +93,7 @@ func joinCluster() {
 		aryall := []string{}
 		aryall = append(aryall, localGlcUrl)
 		aryall = append(aryall, urls...)
-		aryall = cmn.Unique(aryall) // 去重
+		aryall = com.Unique(aryall) // 去重
 		sort.Slice(aryall, func(i, j int) bool {
 			return aryall[i] < aryall[j] // 升序
 		})
@@ -101,7 +102,7 @@ func joinCluster() {
 		masterUrl := aryUp[0]
 		ci := &ClusterInfo{
 			MasterUrl: masterUrl,
-			NodeUrls:  strings.Join(aryall, ";"),
+			NodeUrls:  cmn.Join(aryall, ";"),
 			Version:   "1",
 		}
 		kv := &service.KeyValue{
@@ -110,16 +111,16 @@ func joinCluster() {
 			Version: "1",
 		}
 
-		log.Println("当前无Master，选定Master为", masterUrl)
+		cmn.Info("当前无Master，选定Master为", masterUrl)
 		_, err := service.SetSysmntItem(kv) // 保存
 		if err != nil {
-			log.Fatalln("保存集群信息失败", err)
+			cmn.Error("保存集群信息失败", err)
 		}
 
 		jsonstr := kv.ToJson()
-		log.Println("本节点已保存集群信息", masterUrl, ci.NodeUrls)
+		cmn.Info("本节点已保存集群信息", masterUrl, ci.NodeUrls)
 		for i := 0; i < len(aryUp); i++ {
-			if aryUp[i] != cmn.GetLocalGlcUrl() {
+			if aryUp[i] != com.GetLocalGlcUrl() {
 				go httpClusterAsyncData(aryUp[i], jsonstr) // 异步发送数据给全部节点保存
 			}
 		}
@@ -133,13 +134,13 @@ func joinCluster() {
 		// 更新保存集群信息
 		nversion := cmn.Uint32ToString(cmn.StringToUint32(masters[0].Version, 0) + 1)
 		ourls := masters[0].NodeUrls
-		nodes := strings.Split(ourls, ";")
+		nodes := cmn.Split(ourls, ";")
 		nodes = append(nodes, localGlcUrl) // 当前节点加入集群
-		nodes = cmn.Unique(nodes)          // 去重
+		nodes = com.Unique(nodes)          // 去重
 		sort.Slice(nodes, func(i, j int) bool {
 			return nodes[i] < nodes[j] // 升序
 		})
-		nurls := strings.Join(nodes, ";") // 分号分隔保存
+		nurls := cmn.Join(nodes, ";") // 分号分隔保存
 
 		// 先尝试在原Master上保存集群信息（需触发异步群发同步集群信息）
 		master := masters[0]
@@ -153,17 +154,17 @@ func joinCluster() {
 
 		_, err := service.SetSysmntItem(kv) // 保存
 		if err != nil {
-			log.Fatalln("保存集群信息失败", err)
+			cmn.Error("保存集群信息失败", err)
 		} else {
-			log.Println("本节点保存集群信息成功", master.MasterUrl, nurls)
+			cmn.Info("本节点保存集群信息成功", master.MasterUrl, nurls)
 		}
 
-		if master.MasterUrl != cmn.GetLocalGlcUrl() {
+		if master.MasterUrl != com.GetLocalGlcUrl() {
 			mkv := httpClusterSaveData(master.MasterUrl, kv) // 发送数据给Master节点保存
 			if mkv == nil {
 				// Master保存失败则更换Master保存，可能和上一步重复（当做再试一遍）
 				for i := 0; i < len(nodes); i++ {
-					if nodes[i] == cmn.GetLocalGlcUrl() {
+					if nodes[i] == com.GetLocalGlcUrl() {
 						continue
 					}
 
@@ -175,18 +176,18 @@ func joinCluster() {
 					}
 					mkv := httpClusterSaveData(master.MasterUrl, kv) // 发送集群信息给Master节点保存
 					if mkv != nil {
-						log.Println("保存集群信息到", master.MasterUrl, "成功")
+						cmn.Info("保存集群信息到", master.MasterUrl, "成功")
 						break // 保存成功
 					}
 				}
 			} else {
-				log.Println("保存集群信息到", master.MasterUrl, "成功")
+				cmn.Info("保存集群信息到", master.MasterUrl, "成功")
 			}
 		} else {
 			// 当前节点是Master且已保存，群发给其他节点
 			jsonstr := kv.ToJson()
 			for i := 0; i < len(nodes); i++ {
-				if nodes[i] != cmn.GetLocalGlcUrl() {
+				if nodes[i] != com.GetLocalGlcUrl() {
 					go httpClusterAsyncData(nodes[i], jsonstr) // 异步发送数据给全部节点保存
 				}
 			}
@@ -217,7 +218,7 @@ func httpGetClusterInfo(serverUrl string) *service.KeyValue {
 	// 请求
 	req, err := http.NewRequest("POST", serverUrl+conf.GetContextPath()+"/sys/cluster/info", strings.NewReader(""))
 	if err != nil {
-		log.Println("从", serverUrl, "取集群信息失败", err)
+		cmn.Error("从", serverUrl, "取集群信息失败", err)
 		return nil
 	}
 
@@ -229,27 +230,27 @@ func httpGetClusterInfo(serverUrl string) *service.KeyValue {
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Println("从", serverUrl, "取集群信息失败", err)
+		cmn.Error("从", serverUrl, "取集群信息失败", err)
 		return nil
 	}
 	defer res.Body.Close()
 
 	by, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Println("从", serverUrl, "取集群信息失败", err)
+		cmn.Error("从", serverUrl, "取集群信息失败", err)
 		return nil
 	}
 
 	rs := &gweb.HttpResult{}
 	rs.LoadBytes(by)
 	if !rs.Success {
-		log.Println("从", serverUrl, "取集群信息失败", rs.Message)
+		cmn.Error("从", serverUrl, "取集群信息失败", rs.Message)
 		return &service.KeyValue{} // 能通信，只是没数据
 	}
 
 	kv := &service.KeyValue{}
 	kv.LoadJson(rs.Result.(string))
-	log.Println("从", serverUrl, "取集群信息成功", kv.ToJson())
+	cmn.Info("从", serverUrl, "取集群信息成功", kv.ToJson())
 	return kv
 }
 
@@ -258,7 +259,7 @@ func httpClusterSaveData(serverUrl string, clusterKv *service.KeyValue) *service
 	// 请求
 	req, err := http.NewRequest("POST", serverUrl+conf.GetContextPath()+"/sys/cluster/save", strings.NewReader(clusterKv.ToJson()))
 	if err != nil {
-		log.Println("请求", serverUrl, "保存集群信息失败", err)
+		cmn.Error("请求", serverUrl, "保存集群信息失败", err)
 		return nil
 	}
 
@@ -270,27 +271,27 @@ func httpClusterSaveData(serverUrl string, clusterKv *service.KeyValue) *service
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Println("请求", serverUrl, "保存集群信息失败", err)
+		cmn.Error("请求", serverUrl, "保存集群信息失败", err)
 		return nil
 	}
 	defer res.Body.Close()
 
 	by, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Println("请求", serverUrl, "保存集群信息失败", err)
+		cmn.Error("请求", serverUrl, "保存集群信息失败", err)
 		return nil
 	}
 
 	rs := &gweb.HttpResult{}
 	rs.LoadBytes(by)
 	if !rs.Success {
-		log.Println("请求", serverUrl, "保存集群信息失败", rs.Message)
+		cmn.Error("请求", serverUrl, "保存集群信息失败", rs.Message)
 		return nil
 	}
 
 	kv := &service.KeyValue{}
 	kv.LoadJson(rs.Result.(string))
-	log.Println("请求", serverUrl, "保存集群信息成功", kv.Value)
+	cmn.Info("请求", serverUrl, "保存集群信息成功", kv.Value)
 	return kv
 }
 
@@ -299,7 +300,7 @@ func httpClusterAsyncData(serverUrl string, kvJson string) *service.KeyValue {
 	// 请求
 	req, err := http.NewRequest("POST", serverUrl+conf.GetContextPath()+"/sys/cluster/async", strings.NewReader(kvJson))
 	if err != nil {
-		log.Println("异步发送集群信息到", serverUrl, "失败1", err)
+		cmn.Error("异步发送集群信息到", serverUrl, "失败1", err)
 		return nil
 	}
 
@@ -311,27 +312,27 @@ func httpClusterAsyncData(serverUrl string, kvJson string) *service.KeyValue {
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Println("异步发送集群信息到", serverUrl, "失败2", err)
+		cmn.Error("异步发送集群信息到", serverUrl, "失败2", err)
 		return nil
 	}
 	defer res.Body.Close()
 
 	by, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Println("异步发送集群信息到", serverUrl, "失败3", err)
+		cmn.Error("异步发送集群信息到", serverUrl, "失败3", err)
 		return nil
 	}
 
 	rs := &gweb.HttpResult{}
 	rs.LoadBytes(by)
 	if !rs.Success {
-		log.Println("异步发送集群信息到", serverUrl, "失败4", rs.Message)
+		cmn.Error("异步发送集群信息到", serverUrl, "失败4", rs.Message)
 		return nil
 	}
 
 	kv := &service.KeyValue{}
 	kv.LoadJson(rs.Result.(string))
 
-	log.Println("异步发送集群信息到", serverUrl, "成功")
+	cmn.Info("异步发送集群信息到", serverUrl, "成功")
 	return kv
 }

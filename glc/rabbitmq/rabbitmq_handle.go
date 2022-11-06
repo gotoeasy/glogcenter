@@ -6,8 +6,9 @@ package rabbitmq
 import (
 	"glc/conf"
 	"glc/rabbitmq/consume"
-	"log"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 func Start() {
@@ -15,12 +16,12 @@ func Start() {
 		if conf.IsEnableAmqpConsume() {
 			err := consume.StartRabbitMQConsume()
 			if err != nil {
-				log.Println("RabbitMQ连接失败（10秒后再试）", err)
+				cmn.Error("RabbitMQ连接失败（10秒后再试）", err)
 				timer := time.NewTimer(time.Second * 10)
 				<-timer.C
 				Start() // 10秒后再试
 			} else {
-				log.Println("启动RabbitMQ日志消费")
+				cmn.Info("启动RabbitMQ日志消费")
 			}
 		}
 	}()
@@ -29,6 +30,6 @@ func Start() {
 func Stop() {
 	if conf.IsEnableAmqpConsume() {
 		consume.StopRabbitMQConsume()
-		log.Println("停止RabbitMQ日志消费")
+		cmn.Info("停止RabbitMQ日志消费")
 	}
 }

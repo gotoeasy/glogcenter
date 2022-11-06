@@ -1,12 +1,12 @@
 package html
 
 import (
-	"glc/cmn"
 	"glc/conf"
 	"glc/gweb"
 	"glc/www"
-	"log"
 	"os"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 // [/]重定向到[/glc/]
@@ -42,24 +42,24 @@ func StaticFileController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // urlPath如[/glc/assets/index.f0b375ee.js]
 func getStaticFilePath(urlPath string) string {
-	path := cmn.SubStringRune(urlPath, len(conf.GetContextPath()), len(urlPath))
+	path := cmn.SubString(urlPath, len(conf.GetContextPath()), len(urlPath))
 	return "web/dist" + path
 }
 
 func getContentType(urlPath string) string {
 
-	if cmn.EndwithsRune(urlPath, ".html") {
+	if cmn.Endwiths(urlPath, ".html") {
 		return "text/html"
-	} else if cmn.EndwithsRune(urlPath, ".css") {
+	} else if cmn.Endwiths(urlPath, ".css") {
 		return "text/css"
-	} else if cmn.EndwithsRune(urlPath, ".js") {
+	} else if cmn.Endwiths(urlPath, ".js") {
 		return "application/x-javascript"
-	} else if cmn.EndwithsRune(urlPath, ".png") {
+	} else if cmn.Endwiths(urlPath, ".png") {
 		return "image/png"
-	} else if cmn.EndwithsRune(urlPath, ".ico") {
+	} else if cmn.Endwiths(urlPath, ".ico") {
 		return "image/x-icon"
 	} else {
-		log.Println("未识别出ContentType，按text/html处理", urlPath)
+		cmn.Info("未识别出ContentType，按text/html处理", urlPath)
 		return "text/html"
 	}
 

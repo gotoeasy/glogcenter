@@ -2,7 +2,7 @@ package ldb
 
 import (
 	"fmt"
-	"glc/cmn"
+	"glc/com"
 	"glc/ldb/sysmnt"
 	"log"
 	"testing"
@@ -10,7 +10,7 @@ import (
 )
 
 func Test_GetIP(t *testing.T) {
-	log.Println(cmn.GetLocalIp())
+	log.Println(com.GetLocalIp())
 }
 
 func Test_GetSubDirs(t *testing.T) {

@@ -4,9 +4,9 @@
 package consume
 
 import (
-	"fmt"
 	"glc/conf"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/streadway/amqp"
 )
 
@@ -65,7 +65,7 @@ func (r *RabbitMQ) SimplePublish(message string) {
 	)
 
 	if err != nil {
-		fmt.Println(err)
+		cmn.Error(err)
 	}
 	r.channel.Publish(
 		"",          // 交换机

@@ -3,7 +3,6 @@ package gweb
 import (
 	"context"
 	"fmt"
-	"glc/cmn"
 	"glc/conf"
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
@@ -11,11 +10,11 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type IgnoreGinStdoutWritter struct{}
@@ -79,21 +78,21 @@ func Run() {
 		}
 
 		// 静态文件
-		path := strings.ToLower(c.Request.URL.Path)
-		if cmn.EndwithsRune(path, ".html") {
+		path := cmn.ToLower(c.Request.URL.Path)
+		if cmn.Endwiths(path, ".html") {
 			path = "/**/*.html"
-		} else if cmn.EndwithsRune(path, ".css") {
+		} else if cmn.Endwiths(path, ".css") {
 			path = "/**/*.css"
-		} else if cmn.EndwithsRune(path, ".js") {
+		} else if cmn.Endwiths(path, ".js") {
 			path = "/**/*.js"
-		} else if cmn.EndwithsRune(path, ".png") {
+		} else if cmn.Endwiths(path, ".png") {
 			path = "/**/*.png"
-		} else if cmn.EndwithsRune(path, ".ico") {
+		} else if cmn.Endwiths(path, ".ico") {
 			path = "/**/*.ico"
 		}
 
 		// controller
-		method := strings.ToUpper(c.Request.Method)
+		method := cmn.ToUpper(c.Request.Method)
 		handle := getHttpController(method, path)
 		if handle == nil {
 			c.JSON(http.StatusNotFound, Error404())

@@ -1,13 +1,14 @@
 package backup
 
 import (
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
 	"glc/onexit"
-	"log"
 	"math"
 	"path/filepath"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 var backupBusy bool = false
@@ -40,26 +41,27 @@ func BackupStorage(storeName string) bool {
 	if cmn.IsExistDir(dir) {
 		return false // 目录不存在
 	}
-	ymd := cmn.StringToUint32(cmn.RightRune(storeName, 8), math.MaxUint32)
-	today := cmn.StringToUint32(cmn.GetYyyymmdd(0), 0)
+	ymd := cmn.StringToUint32(cmn.Right(storeName, 8), math.MaxUint32)
+	today := cmn.StringToUint32(com.GetYyyymmdd(0), 0)
 	if ymd >= today {
 		return false // 仅支持压缩过去日期的日志仓目录
 	}
 
 	tarfile := storeName + ".tar"
 	tarfilename := filepath.Join(conf.GetStorageRoot(), ".bak", tarfile)
-	err := TarDir(dir, tarfilename)
+	err := cmn.TarDir(dir, tarfilename)
 	if err != nil {
-		log.Println(err.Error())
+		cmn.Error(err)
 		return false
 	}
 
 	// 上传Minio
 	if conf.IsEnableUploadMinio() {
 		group := conf.GetGlcGroup()
-		err := UploadMinio(tarfilename, group+"/"+tarfile)
+		minio := cmn.NewMinio(conf.GetMinioUrl(), conf.GetMinioUser(), conf.GetMinioPassword(), conf.GetMinioBucket())
+		err := minio.Upload(tarfilename, group+"/"+tarfile)
 		if err != nil {
-			log.Println(err.Error())
+			cmn.Error(err)
 			return false
 		}
 	}

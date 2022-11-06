@@ -8,7 +8,6 @@ package logdata
 
 import (
 	"errors"
-	"glc/cmn"
 	"glc/conf"
 	"glc/ldb/status"
 	"glc/ldb/storage/indexword"
@@ -19,6 +18,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -84,7 +84,7 @@ func NewLogDataStorage(storeName string) *LogDataStorage { // 存储器，文档
 	dbPath := conf.GetStorageRoot() + cmn.PathSeparator() + cacheName
 	db, err := leveldb.OpenFile(dbPath, nil) // 打开（在指定子目录中存放数据）
 	if err != nil {
-		log.Println("打开LogDataStorage失败：", dbPath)
+		cmn.Error("打开LogDataStorage失败：", dbPath)
 		panic(err)
 	}
 	store.leveldb = db
@@ -101,7 +101,7 @@ func NewLogDataStorage(storeName string) *LogDataStorage { // 存储器，文档
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()
 
-	log.Println("打开LogDataStorage：", cacheName)
+	cmn.Info("打开LogDataStorage：", cacheName)
 	return store
 }
 
@@ -163,7 +163,7 @@ func (s *LogDataStorage) saveLogData(model *LogDataModel) {
 
 	// 保存
 	s.put(cmn.Uint32ToBytes(doc.Id), doc.ToBytes()) // 日志数据
-	//log.Println("保存日志数据 ", doc.Id)
+	cmn.Debug("保存日志数据 ", doc.Id)
 }
 
 // 创建日志索引（一次建一条日志的索引）,没有可建索引时返回false
@@ -177,7 +177,7 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	s.indexedCount++                               // 下一条要建索引的日志id
 	docm, err := s.GetLogDataModel(s.indexedCount) // 取出日志模型数据
 	if err != nil {
-		log.Println("取日志模型数据失败：", s.indexedCount, err)
+		cmn.Error("取日志模型数据失败：", s.indexedCount, err)
 		return 2
 	}
 
@@ -186,14 +186,13 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	adds = append(adds, docm.Tags...)
 	adds = append(adds, docm.Client, docm.Server, docm.System, docm.User)
 	kws := tokenizer.CutForSearchEx(docm.Text, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
-	//	log.Println("GetLogDataModel=", docm.ToJson(), kws)
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {
 		idxw := indexword.NewWordIndexStorage(s.StoreName())
 		idxw.Add(word, cmn.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
-	//log.Println("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
+	cmn.Debug("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
 
 	return 1
 }
@@ -281,7 +280,7 @@ func (s *LogDataStorage) Close() {
 	mapStorage[s.storeName] = nil                  // 设空，下回GetStorage时自动再创建
 	status.UpdateStorageStatus(s.storeName, false) // 更新状态：当前日志仓关闭
 
-	log.Println("关闭LogDataStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
+	cmn.Info("关闭LogDataStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
 func (s *LogDataStorage) loadMetaData() {
@@ -317,7 +316,7 @@ func (s *LogDataStorage) saveMetaData() {
 		s.leveldb.Put(zeroUint32Bytes, cmn.Uint32ToBytes(s.savedCurrentCount), nil) // 保存日志总件数
 		sysmntStore := sysmnt.NewSysmntStorage()                                    // 系统管理存储器
 		sysmntStore.SetStorageDataCount(s.storeName, s.savedCurrentCount)           // 保存日志总件数
-		log.Println("保存LogDataStorage件数:", s.savedCurrentCount)
+		cmn.Info("保存LogDataStorage件数:", s.savedCurrentCount)
 	}
 
 	if s.savedIndexedCount < s.indexedCount {
@@ -326,7 +325,7 @@ func (s *LogDataStorage) saveMetaData() {
 		idxw.SaveIndexedCount(s.savedIndexedCount)                         // 保存索引总件数
 		sysmntStore := sysmnt.NewSysmntStorage()                           // 系统管理存储器
 		sysmntStore.SetStorageIndexCount(s.storeName, s.savedCurrentCount) // 保存索引总件数
-		log.Println("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
+		cmn.Info("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
 	}
 }
 
@@ -349,5 +348,5 @@ func onExit() {
 	for k := range mapStorage {
 		mapStorage[k].Close()
 	}
-	log.Println("退出LogDataStorage")
+	cmn.Info("退出LogDataStorage")
 }

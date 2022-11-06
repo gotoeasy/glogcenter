@@ -9,8 +9,9 @@ import (
 	"glc/ldb/storage/logdata"
 	"glc/onexit"
 	"glc/www/controller"
-	"log"
 	"sync"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type RabbitMQConsume struct {
@@ -56,11 +57,11 @@ func StopRabbitMQConsume() {
 
 func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 	if err != nil {
-		log.Println(err)
+		cmn.Error(err)
 		return false
 	}
 
-	log.Println("接收到rabbitmq的日志", jsonLog)
+	cmn.Debug("接收到rabbitmq的日志", jsonLog)
 
 	md := &logdata.LogDataModel{}
 	if conf.IsAmqpJsonFormat() {

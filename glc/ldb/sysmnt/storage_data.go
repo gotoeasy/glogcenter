@@ -5,13 +5,13 @@ package sysmnt
 
 import (
 	"fmt"
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
-	"log"
 	"math"
 	"os"
 	"time"
 
+	"github.com/gotoeasy/glang/cmn"
 	"github.com/shirou/gopsutil/disk"
 )
 
@@ -45,15 +45,15 @@ func GetStorageList() *StorageResult {
 
 	var datas []*StorageModel
 	var sum int64
-	names := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
+	names := com.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	for _, name := range names {
 		d := &StorageModel{
 			Name:    name,
-			NodeUrl: cmn.GetLocalGlcUrl(),
+			NodeUrl: com.GetLocalGlcUrl(),
 		}
 
-		cnt, size, _ := cmn.GetDirInfo(conf.GetStorageRoot() + cmn.PathSeparator() + name)
-		d.TotalSize = cmn.GetSizeInfo(uint64(size))
+		cnt, size, _ := com.GetDirInfo(conf.GetStorageRoot() + cmn.PathSeparator() + name)
+		d.TotalSize = com.GetSizeInfo(uint64(size))
 		d.FileCount = cnt
 
 		sum += size
@@ -73,7 +73,7 @@ func GetStorageList() *StorageResult {
 	stat, _ := disk.Usage(conf.GetStorageRoot())
 
 	rs := &StorageResult{
-		Info: fmt.Sprintf("共占用空间 " + cmn.GetSizeInfo(uint64(sum)) + "，剩余空间 " + cmn.GetSizeInfo(stat.Free)),
+		Info: fmt.Sprintf("共占用空间 " + com.GetSizeInfo(uint64(sum)) + "，剩余空间 " + com.GetSizeInfo(stat.Free)),
 		Data: datas,
 	}
 	return rs
@@ -97,10 +97,10 @@ func DeleteStorage(name string) error {
 
 func removeStorageByDays() {
 	// 日志按日期分仓存储时，按保存天数自动删除
-	minYmd := cmn.GetYyyymmdd(-1 * conf.GetSaveDays())
-	dirs := cmn.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
+	minYmd := com.GetYyyymmdd(-1 * conf.GetSaveDays())
+	dirs := com.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	for _, dir := range dirs {
-		ymd := cmn.RightRune(dir, 8)
+		ymd := cmn.Right(dir, 8)
 		if cmn.StringToUint32(ymd, math.MaxUint32) == math.MaxUint32 {
 			continue // 后8位不是数字的忽略
 		}
@@ -108,9 +108,9 @@ func removeStorageByDays() {
 		if ymd < minYmd {
 			err := DeleteStorage(dir)
 			if err != nil {
-				log.Println("日志仓最多保存", conf.GetSaveDays(), "天，", "删除", dir, "失败", err)
+				cmn.Info("日志仓最多保存", conf.GetSaveDays(), "天，", "删除", dir, "失败", err)
 			} else {
-				log.Println("日志仓最多保存", conf.GetSaveDays(), "天，", "已删除", dir)
+				cmn.Info("日志仓最多保存", conf.GetSaveDays(), "天，", "已删除", dir)
 			}
 		}
 	}

@@ -2,13 +2,12 @@ package controller
 
 import (
 	"fmt"
-	"glc/cmn"
 	"glc/conf"
 	"glc/gweb"
-	"glc/ldb/backup"
-	"log"
 	"path/filepath"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 // 打包下载指定日志仓数据
@@ -27,9 +26,9 @@ func ClusterDownloadStoreDataController(req *gweb.HttpRequest) *gweb.HttpResult 
 	tarfile := storeName + "-" + fmt.Sprintf("%d", time.Now().UnixNano()) + ".tar" // logdata-20221030-1491888244752784461.tar
 	tarfilename := filepath.Join(conf.GetStorageRoot(), ".tmp", tarfile)           // %ROOT%/.tmp/logdata-20221030-1491888244752784461.tar，会自动建目录
 
-	err := backup.TarDir(dir, tarfilename)
+	err := cmn.TarDir(dir, tarfilename)
 	if err != nil {
-		log.Println(err)
+		cmn.Error(err)
 		return nil // 打包失败
 	}
 

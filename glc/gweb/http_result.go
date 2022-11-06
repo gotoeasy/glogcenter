@@ -2,7 +2,8 @@ package gweb
 
 import (
 	"encoding/json"
-	"glc/cmn"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type HttpResult struct {

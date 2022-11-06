@@ -1,33 +1,34 @@
 package controller
 
 import (
-	"glc/cmn"
+	"glc/com"
 	"glc/conf"
 	"glc/www/cluster"
 	"glc/www/service"
 	"io"
-	"log"
 	"net/http"
 	"strings"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 // 转发其他GLC服务
 func TransferGlc(jsonlog string) {
 	kv, err := service.GetSysmntItem(cluster.KEY_CLUSTER)
 	if kv == nil || err != nil {
-		log.Println("转发日志失败（取集群信息失败）", err)
+		cmn.Error("转发日志失败（取集群信息失败）", err)
 		return
 	}
 
 	ci := &cluster.ClusterInfo{}
 	ci.LoadJson(kv.Value)
 
-	hosts := strings.Split(ci.NodeUrls, ";")
+	hosts := cmn.Split(ci.NodeUrls, ";")
 	for i := 0; i < len(hosts); i++ {
-		if hosts[i] != cmn.GetLocalGlcUrl() {
+		if hosts[i] != com.GetLocalGlcUrl() {
 			_, err := httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", jsonlog)
 			if err != nil {
-				log.Println("转发日志失败", hosts[i], err)
+				cmn.Error("转发日志失败", hosts[i], err)
 			}
 		}
 	}

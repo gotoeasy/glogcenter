@@ -2,8 +2,9 @@ package service
 
 import (
 	"encoding/json"
-	"glc/cmn"
 	"glc/ldb/sysmnt"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 type KeyValue struct {
