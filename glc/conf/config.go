@@ -44,7 +44,7 @@ var minioBucket string
 var enableUploadMinio bool
 
 func init() {
-	cmn.SetLogLevel("INFO")
+	cmn.SetLogLevel(cmn.GetEnvStr("GLC_LOG_LEVEL", "INFO")) // 默认INFO级别日志
 	UpdateConfigByEnv()
 
 	// 在这个地方建目录，如果创建失败就比较难看，比如仅命令行查看版本的情景

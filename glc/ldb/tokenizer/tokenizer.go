@@ -60,7 +60,7 @@ func CutForSearchEx(text string, addWords []string, delWords []string) []string 
 	// if simpleCutMode {
 	// 	// 针对日志再保留特殊字符（【.】用于包名，【/】用工于路径或日期，【_】常用于表名，【-】常用于日期或连词）
 	// 	txt = replaceByRegex(txt, "[,/;\"'?？，。!！=@#\\[\\]【】\\\\:]", " ")
-	// 	//log.Println(txt)
+	// 	//cmn.Println(txt)
 	// 	keys := strings.Split(txt, " ")
 	// 	for _, word := range keys {
 	// 		tmp = strings.TrimSpace(word)
@@ -136,6 +136,6 @@ func CutForSearchEx(text string, addWords []string, delWords []string) []string 
 // 	}
 
 // 	// TODO
-// 	log.Println("搜索关键词", kws, "优化后搜索", rs)
+// 	cmn.Println("搜索关键词", kws, "优化后搜索", rs)
 // 	return strings.Join(rs, " ")
 // }

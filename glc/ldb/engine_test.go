@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"glc/com"
 	"glc/ldb/sysmnt"
-	"log"
 	"testing"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 func Test_GetIP(t *testing.T) {
-	log.Println(com.GetLocalIp())
+	cmn.Println(com.GetLocalIp())
 }
 
 func Test_GetSubDirs(t *testing.T) {
 	rs := sysmnt.GetStorageList()
 
 	for i := 0; i < len(rs.Data); i++ {
-		log.Println(rs.Data[i])
+		cmn.Println(rs.Data[i])
 	}
 
 }
@@ -41,9 +42,9 @@ func Test_all(t *testing.T) {
 	// time.Sleep(time.Duration(5) * time.Second)
 
 	rs := engine.Search(`              them java     `, 5, 0, true)
-	log.Println("共查到", rs.Total, "件")
+	cmn.Println("共查到", rs.Total, "件")
 	for _, v := range rs.Data {
-		log.Println(v.Id, v.Text)
+		cmn.Println(v.Id, v.Text)
 	}
 
 }

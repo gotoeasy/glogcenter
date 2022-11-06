@@ -2,16 +2,17 @@ package rabbitmq
 
 import (
 	"glc/rabbitmq/consume"
-	"log"
 	"testing"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 func Test_all(t *testing.T) {
 
 	r, err := consume.NewSimpleRabbitMQ()
 	if err != nil {
-		log.Println(err)
+		cmn.Error(err)
 	}
 
 	for i := 0; i < 1456; i++ {

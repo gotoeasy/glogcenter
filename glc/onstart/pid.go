@@ -1,7 +1,6 @@
 package onstart
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,7 +39,7 @@ func readPid(path string) string {
 
 func savePid(path string, pid string) error {
 	if err := os.MkdirAll(filepath.Dir(path), os.FileMode(0755)); err != nil {
-		log.Println("create pid file failed", path)
+		cmn.Error("create pid file failed", path)
 		return err
 	}
 

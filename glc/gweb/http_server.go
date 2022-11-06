@@ -7,7 +7,6 @@ import (
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
 	"glc/onexit"
-	"log"
 	"net/http"
 	"regexp"
 	"time"
@@ -55,7 +54,7 @@ func Run() {
 
 		matched, _ := regexp.MatchString(`^[0-9a-zA-Z]+$`, md.System)
 		if !matched {
-			log.Println("无效的system名： " + md.System + "，仅支持字母数字")
+			cmn.Error("无效的system名： " + md.System + "，仅支持字母数字")
 			c.JSON(http.StatusBadRequest, "无效的system名： "+md.System+"，仅支持字母数字")
 			return
 		}
@@ -114,15 +113,15 @@ func Run() {
 	onexit.RegisterExitHandle(func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		log.Println("退出Web服务")
+		cmn.Info("退出Web服务")
 		if err := httpServer.Shutdown(ctx); err != nil {
-			log.Println(err)
+			cmn.Error(err)
 		}
 	})
 
 	// 启动Web服务
 	err := httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
-		log.Fatalf("%s", err) // 启动失败的话打印错误信息后退出
+		cmn.Fatalln("%s", err) // 启动失败的话打印错误信息后退出
 	}
 }
