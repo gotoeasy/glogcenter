@@ -13,6 +13,7 @@
 [![Golang](https://img.shields.io/badge/golang-1.19-brightgreen.svg)](https://golang.google.cn)
 [![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
 [![GitHub release](https://img.shields.io/github/release/gotoeasy/glogcenter.svg)](https://github.com/gotoeasy/glogcenter/releases/latest)
+[![License](https://github.com/gotoeasy/glogcenter/blob/master/LICENSE)](https://img.shields.io/github/license/gotoeasy/glogcenter)
 <br>
 
 
