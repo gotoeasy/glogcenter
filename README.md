@@ -142,13 +142,14 @@ export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add'
 export GLC_API_KEY='X-GLC-AUTH:glogcenter'
 export GLC_SYSTEM=demo
 export GLC_ENABLE=true
-export GLC_LOG_LEVEL=debug
+export GLC_LOG_LEVEL=debug # 日志级别（trace/debug/info/warn/error/fatal）
 ```
 
 ```golang
-# 方式1： 通过 cmn.Debug(...)、cmn.Info(...)等输出日志
-# 方式2： 通过 cmn.NewGLogCenterClient()创建客户端对象后使用
-# 详见文档 https://pkg.go.dev/github.com/gotoeasy/glang
+// 方式1： 通过 cmn.Debug(...)、cmn.Info(...)等方式，打印日志的同时发送至日志中心
+// 方式2： 通过 cmn.NewGLogCenterClient()创建客户端对象后使用
+//        更多内容详见文档 https://pkg.go.dev/github.com/gotoeasy/glang
+
 import "github.com/gotoeasy/glang/cmn"
 
 func main() {
