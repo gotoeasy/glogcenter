@@ -132,6 +132,34 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 
 ```
 
+## 使用`golang`语言的项目，提供工具包，开箱即用
+```shell
+# 引入工具包
+go get github.com/gotoeasy/glang
+
+# 按需设定环境变量
+export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add'
+export GLC_API_KEY='X-GLC-AUTH:glogcenter'
+export GLC_SYSTEM=demo
+export GLC_ENABLE=true
+export GLC_LOG_LEVEL=debug
+```
+
+```golang
+# 方式1： 通过 cmn.Debug(...)、cmn.Info(...)等输出日志
+# 方式2： 通过 cmn.NewGLogCenterClient()创建客户端对象后使用
+# 详见文档 https://pkg.go.dev/github.com/gotoeasy/glang
+import "github.com/gotoeasy/glang/cmn"
+
+func main() {
+	cmn.Info("启动WEB服务")
+	err := cmn.NewFasthttpServer().Start()
+	if err != nil {
+		cmn.Fatalln("启动失败", err)
+	}
+}
+```
+
 
 ## 更新履历
 
