@@ -10,6 +10,7 @@
 目标： 逐步替换线上的`ELK`
 <br>
 
+[![Golang](https://img.shields.io/badge/golang-1.19-brightgreen.svg)](https://golang.google.cn)
 [![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
 [![GitHub release](https://img.shields.io/github/release/gotoeasy/glogcenter.svg)](https://github.com/gotoeasy/glogcenter/releases/latest)
 <br>
@@ -23,6 +24,7 @@
 - [x] 支持个性化环境变量开关控制，支持日志仓自动化维护，灵活省心
 - [x] 提供`docker`镜像，支持容器化部署，方便之极
 - [x] 提供`java`项目日志收集包，`java`项目闭环支持
+- [x] 提供`golang`项目日志收集包，`golang`项目闭环支持
 - [x] 支持从`RabbitMQ`收取日志信息，满足更多闭环需求
 - [x] 内置提供简洁的`VUE`实现的日志查询管理界面
 - [x] 支持多服务集群模式部署，确保服务及数据的冗余性
