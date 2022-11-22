@@ -4,16 +4,21 @@ import (
 	"fmt"
 	"glc/com"
 	"glc/ldb/sysmnt"
+	"glc/ldb/tokenizer"
 	"testing"
 	"time"
 
 	"github.com/gotoeasy/glang/cmn"
 )
 
+func Test_CutWords(t *testing.T) {
+	ws := tokenizer.CutForSearch("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错的")
+	cmn.Println(ws)
+}
+
 func Test_GetIP(t *testing.T) {
 	cmn.Println(com.GetLocalIp())
 }
-
 func Test_GetSubDirs(t *testing.T) {
 	rs := sysmnt.GetStorageList()
 
