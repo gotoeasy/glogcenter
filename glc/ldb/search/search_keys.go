@@ -149,18 +149,26 @@ func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *sto
 			pos-- //  相对文档ID有的话才顺移
 		}
 
-		for i := pos; i > 0; i-- {
+		tmpMinPos := pos
+		tmpMinIdx := minIdx
+		for i := tmpMinPos; i > 0; {
 			// 取值
 			docId := minIdx.idxwordStorage.GetDocId(minIdx.word, i)
 			// 比较
 			flg = true
-			for i := 0; i < cnt; i++ {
-				if widxs[i] == minIdx {
+			for n := 0; n < cnt; n++ {
+				if widxs[n] == minIdx {
 					continue // 跳过比较自己
 				}
-				if widxs[i].idxdocStorage.GetWordDocSeq(widxs[i].word, docId) == 0 {
+
+				seq := widxs[n].idxdocStorage.GetWordDocSeq(widxs[n].word, docId)
+				if seq == 0 {
 					flg = false // 没找到
 					break
+				}
+				if seq < tmpMinPos {
+					tmpMinPos = seq
+					tmpMinIdx = widxs[n] // 当前最短索引，存起来下回比较用
 				}
 			}
 			// 找到则加入结果
@@ -171,6 +179,10 @@ func findSame(pageSize int, currentDocId uint32, forward bool, storeLogData *sto
 					break // 最多找一页
 				}
 			}
+
+			minIdx = tmpMinIdx // 当前最短索引
+			i = tmpMinPos - 1  // 当前最短索引的后一个位置
+			tmpMinPos--        // 当前最短索引可能不变，得正常减1，若变化则会被覆盖没有关系
 		}
 	} else {
 		// 有相对文档ID且是前一页方向
