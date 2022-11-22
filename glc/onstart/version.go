@@ -1,3 +1,3 @@
 package onstart
 
-const VERSION = "glogcenter 0.8.1"
+const VERSION = "glogcenter 0.8.2"
