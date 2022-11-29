@@ -7,8 +7,9 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
-	"runtime"
 	"time"
+
+	"github.com/gotoeasy/glang/cmn"
 )
 
 func init() {
@@ -42,7 +43,7 @@ func init() {
 	}
 
 	// 其余参数仅支持linux
-	if runtime.GOOS != "linux" {
+	if !cmn.IsLinux() {
 		return
 	}
 
