@@ -7,7 +7,6 @@ import (
 	"glc/conf"
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
-	"glc/onexit"
 	"glc/www/controller"
 	"sync"
 
@@ -23,7 +22,7 @@ var rabbitMQConsume *RabbitMQConsume
 
 func init() {
 	rabbitMQConsume = new(RabbitMQConsume)
-	onexit.RegisterExitHandle(onExit)
+	cmn.OnExit(onExit)
 }
 
 func StartRabbitMQConsume() error {

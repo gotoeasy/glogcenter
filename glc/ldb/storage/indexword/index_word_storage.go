@@ -10,7 +10,6 @@ import (
 	"glc/conf"
 	"glc/ldb/status"
 	"glc/ldb/storage/indexdoc"
-	"glc/onexit"
 	"sync"
 	"time"
 
@@ -38,7 +37,7 @@ var mapStorage map[string](*WordIndexStorage)
 
 func init() {
 	mapStorage = make(map[string](*WordIndexStorage))
-	onexit.RegisterExitHandle(onExit) // 优雅退出
+	cmn.OnExit(onExit) // 优雅退出
 }
 
 func getStorage(cacheName string) *WordIndexStorage {

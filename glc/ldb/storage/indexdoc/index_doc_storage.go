@@ -9,7 +9,6 @@ import (
 	"glc/com"
 	"glc/conf"
 	"glc/ldb/status"
-	"glc/onexit"
 	"sync"
 	"time"
 
@@ -33,7 +32,7 @@ var mapStorage map[string](*DocIndexStorage)
 
 func init() {
 	mapStorage = make(map[string](*DocIndexStorage))
-	onexit.RegisterExitHandle(onExit) // 优雅退出
+	cmn.OnExit(onExit) // 优雅退出
 }
 
 func getStorage(cacheName string) *DocIndexStorage {

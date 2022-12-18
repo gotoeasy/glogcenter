@@ -8,7 +8,6 @@ package sysmnt
 import (
 	"errors"
 	"glc/conf"
-	"glc/onexit"
 	"sync"
 	"time"
 
@@ -28,7 +27,7 @@ var sdbMu sync.Mutex             // 锁
 var sysmntStorage *SysmntStorage // 缓存用存储器
 
 func init() {
-	onexit.RegisterExitHandle(onExit) // 优雅退出
+	cmn.OnExit(onExit) // 优雅退出
 }
 
 // 获取存储对象，线程安全（带缓存无则创建有则直取）
