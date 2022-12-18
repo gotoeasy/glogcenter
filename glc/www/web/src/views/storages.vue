@@ -2,7 +2,7 @@
   <el-container>
     
     <el-main style="padding-top:0">
-      <div id="dashboard">
+      <div>
         <el-card>
           <template #header>
 
@@ -33,13 +33,11 @@
 
           </el-table>
 
-   
             <div class="header">
               <div style="display:flex;justify-content:space-between;">
                 <div v-html="info" class="x-info"></div>
               </div>
             </div>
-
  
         </el-card>
       </div>
@@ -49,12 +47,11 @@
 
 <script>
 import api from '../api'
-//import jsonViewer from 'vue-json-viewer'
 
 const FixHeight = 215  // 177
 
 export default {
-  name: 'dashboard',
+//  name: 'dashboard',
   components: {  },
   data() {
     return {

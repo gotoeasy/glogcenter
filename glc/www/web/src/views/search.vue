@@ -2,7 +2,7 @@
   <el-container>
     
     <el-main style="padding-top:0">
-      <div id="dashboard">
+      <div>
         <el-card>
           <template #header>
 
@@ -69,13 +69,12 @@
 
 <script>
 import api from '../api'
-//import jsonViewer from 'vue-json-viewer'
 import { ref } from 'vue'
 
 const FixHeight = 215  // 177
 
 export default {
-  name: 'dashboard',
+//  name: 'dashboard',
   components: {  },
   data() {
     return {

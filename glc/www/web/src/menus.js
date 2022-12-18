@@ -3,14 +3,21 @@ import { Coin, DataAnalysis, DataLine, Discount, Document, Search, Setting } fro
 const menus = [
   {
     path: '/',
-    name: 'dashboard',
+    redirect: '/glc/search',
+    hidden: true,
+  },{
+    path: '/glc',
+    redirect: '/glc/search',
+    hidden: true,
+  },{
+    path: '/glc/search',
+    name: 'search',
     icon: Search,
     label: '日志检索',
     color: '#0081dd',
-    component: () => import('./views/dashboard.vue'),
-  },
-  {
-    path: '/',
+    component: () => import('./views/search.vue'),
+  },{
+    path: '/glc/storages',
     name: 'storages',
     icon: Coin,
     label: '日志仓管理',

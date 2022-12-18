@@ -1,4 +1,3 @@
-
 <template>
   <el-container>
     <el-container>
@@ -94,7 +93,7 @@ export default {
           this.isLogin = true;
           this.username = '';
           this.password = '';
-          this.$router.push({name:'dashboard'})
+          this.$router.push({name:'search'})
         }else{
           this.$message({type: 'error', message: res.message});
         }
