@@ -6,7 +6,6 @@ import (
 	"glc/conf"
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
-	"glc/onexit"
 	"net/http"
 	"regexp"
 	"time"
@@ -110,7 +109,7 @@ func Run() {
 	}
 
 	// 优雅退出
-	onexit.RegisterExitHandle(func() {
+	cmn.OnExit(func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		cmn.Info("退出Web服务")

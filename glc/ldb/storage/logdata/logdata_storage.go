@@ -13,7 +13,6 @@ import (
 	"glc/ldb/storage/indexword"
 	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"
-	"glc/onexit"
 	"sync"
 	"time"
 
@@ -43,7 +42,7 @@ var mapStorage map[string](*LogDataStorage)
 
 func init() {
 	mapStorage = make(map[string](*LogDataStorage))
-	onexit.RegisterExitHandle(onExit) // 优雅退出
+	cmn.OnExit(onExit) // 优雅退出
 }
 
 func getCacheStore(cacheName string) *LogDataStorage {

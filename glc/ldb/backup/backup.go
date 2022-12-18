@@ -3,7 +3,6 @@ package backup
 import (
 	"glc/com"
 	"glc/conf"
-	"glc/onexit"
 	"math"
 	"path/filepath"
 	"time"
@@ -17,7 +16,7 @@ func init() {
 	if !conf.IsEnableBackup() {
 		return
 	}
-	onexit.RegisterExitHandle(onExit)
+	cmn.OnExit(onExit)
 }
 
 func Start() {

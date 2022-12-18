@@ -3,7 +3,7 @@ module glc
 go 1.19
 
 require (
-	github.com/gotoeasy/glang v0.0.0-20221129060837-2dac80459439
+	github.com/gotoeasy/glang v0.0.0-20221215063310-d39cd67685c4
 	github.com/syndtr/goleveldb v1.0.0
 )
 
