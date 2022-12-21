@@ -23,8 +23,10 @@ func Run() {
 		gweb.RegisterFilter(filter.CrossFilter)
 
 		// 控制器（跳转）
-		gweb.RegisterController(method.GET, "/", html.RedirectToHomeController)
-		gweb.RegisterController(method.GET, contextPath, html.RedirectToHomeController)
+		gweb.RegisterController(method.GET, "/", html.RedirectToHomeController)                     // 自动跳转
+		gweb.RegisterController(method.GET, contextPath, html.RedirectToHomeController)             // 自动跳转
+		gweb.RegisterController(method.GET, contextPath+"/search", html.RedirectToHomeController)   // 自动跳转
+		gweb.RegisterController(method.GET, contextPath+"/storages", html.RedirectToHomeController) // 自动跳转
 
 		// Html静态文件
 		gweb.RegisterController(method.GET, contextPath+"/", html.HomeIndexHtmlController)
