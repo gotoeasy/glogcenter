@@ -93,7 +93,11 @@ func Run() {
 		method := cmn.ToUpper(c.Request.Method)
 		handle := getHttpController(method, path)
 		if handle == nil {
-			c.JSON(http.StatusNotFound, Error404())
+			if cmn.Contains(path, ".") {
+				c.JSON(http.StatusNotFound, Error404()) // 有后缀名的文件请求，找不到则404
+			} else {
+				req.Redirect(conf.GetContextPath() + "/") // 默认统一跳转大到[/glc/]
+			}
 			return
 		}
 
