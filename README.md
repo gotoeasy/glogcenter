@@ -82,7 +82,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_SERVER_URL`集群模式时的本节点服务地址，默认空白
 - [x] `GLC_CLUSTER_URLS`集群模式时的关联节点服务地址，多个时`;`分隔，默认空白
 - [x] `GLC_LOG_LEVEL`日志级别，可设定值为`debug/info/warn/error`，默认`info`
-- [x] `GLC_GOMAXPROCS`使用最大CPU数量，设定值不在实际范围内时按最大值看待，默认最大值，通常非`docker`方式启动使用
+- [x] `GLC_GOMAXPROCS`使用最大CPU数量，设定值不在实际范围内时按最大值看待，默认最大值，`docker`更常用
 
 ## 命令行启动参数（适用`0.6.*`及以上版本）
 - [x] 支持命令行参数`-v`查看版本
