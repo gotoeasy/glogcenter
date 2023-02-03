@@ -10,7 +10,7 @@
 目标： 逐步替换线上的`ELK`
 <br>
 
-[![Golang](https://img.shields.io/badge/golang-1.19-brightgreen.svg)](https://golang.google.cn)
+[![Golang](https://img.shields.io/badge/golang-1.20-brightgreen.svg)](https://golang.google.cn)
 [![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
 [![GitHub release](https://img.shields.io/github/release/gotoeasy/glogcenter.svg)](https://github.com/gotoeasy/glogcenter/releases/latest)
 [![License](https://img.shields.io/github/license/gotoeasy/glogcenter)](https://github.com/gotoeasy/glogcenter/blob/master/LICENSE)
