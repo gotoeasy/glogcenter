@@ -1,6 +1,6 @@
 module glc
 
-go 1.19
+go 1.20
 
 require (
 	github.com/gotoeasy/glang v0.0.0-20221215063310-d39cd67685c4
