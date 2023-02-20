@@ -37,7 +37,7 @@
               <template #default="scope">
                 <div class="x-detail">
                   <el-scrollbar :class="{'x-scrollbar':(scope.row.detail && scope.row.detail.split('\n').length>20)}">
-                    <div v-html="(scope.row.detail || scope.row.text).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')" style="word-break: break-all;"></div>
+                    <div v-html="(scope.row.detail || scope.row.text).replace(/</g, '&amp;lt;').replace(/>/g, '&amp;gt;').replace(/\n/g, '<br>')" style="word-break: break-all;"></div>
                   </el-scrollbar>
                 </div>
               </template>
