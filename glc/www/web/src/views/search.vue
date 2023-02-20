@@ -37,7 +37,7 @@
               <template #default="scope">
                 <div class="x-detail">
                   <el-scrollbar :class="{'x-scrollbar':(scope.row.detail && scope.row.detail.split('\n').length>20)}">
-                    <div v-html="(scope.row.detail || scope.row.text).replace(/\n/g, '<br>')" style="word-break: break-all;"></div>
+                    <div v-html="(scope.row.detail || scope.row.text).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')" style="word-break: break-all;"></div>
                   </el-scrollbar>
                 </div>
               </template>
@@ -47,7 +47,7 @@
             <el-table-column prop="date" label="日期时间" width="208"/>
             <el-table-column prop="text" label="内容" :show-overflow-tooltip="true">
               <template #default="scope">
-                <span v-html="scope.row.text"></span>
+                <span v-text="scope.row.text"></span>
               </template>
             </el-table-column>
 
