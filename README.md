@@ -99,6 +99,11 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
       字段`date`： 字符串，对应页面的`日期时间` <br>
       字段`text`： 字符串，对应页面的`日志内容` <br>
 
+```shell
+# 发送测试数据的参考脚本
+curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo log text"}' \
+     -H "Content-Type:application/json" http://127.0.0.1:8080/glc/v1/log/add
+```
 
 
 ## 使用`logback`的`java`项目，支持日志收集，确保主次版本和GLC版本一致
