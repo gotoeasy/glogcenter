@@ -5,9 +5,7 @@
 
 # 缘起
 
-日志中心，一直是用传统的三件套`ELK`，感激之余，终究还是不理想（定制安装并非简单、页面打开初始化太慢，界面操作不习惯，最主要的是资源占用太厉害，甚至隔段时间就会崩溃），替代品总是找不到。终于，用`go`试写一个`logcenter`，结果各种优异表现确实是惊艳到了自己，故起名`glogcenter`，简称`GLC`，开仓建库<br>
-<br>
-目标： 逐步替换线上的`ELK`
+日志中心，一直是用传统的三件套`ELK`，但终究还是不理想（定制安装并非简单、需要维护索引、页面打开初始化太慢，界面操作不习惯，资源占用太厉害甚至容易崩溃），替代品总是找不到。终于，用`go`试写一个`logcenter`，结果各种优异表现确实是惊艳到了自己，故起名`glogcenter`，简称`GLC`，开仓建库<br>
 <br>
 
 [![Golang](https://img.shields.io/badge/golang-1.20-brightgreen.svg)](https://golang.google.cn)
@@ -49,7 +47,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 ## `docker`集群部署模式简易示例
 ```shell
 # 以下3台以集群方式启动，配置本节点地址及关联节点地址即可
-# 采用“乐观集群”方式，简易选主（简单排序）+日志群发（忽略失败）+数据补偿（隔日历史数据）
+# 采用“乐观集群”方式，简易选主（简单排序）+日志群发（忽略失败）+数据补偿（隔日同步历史数据）
 
 # 服务1
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.51:8080 \
@@ -162,11 +160,11 @@ export GLC_LOG_LEVEL=debug # 日志级别（trace/debug/info/warn/error/fatal）
 import "github.com/gotoeasy/glang/cmn"
 
 func main() {
-	cmn.Info("启动WEB服务")
-	err := cmn.NewFasthttpServer().Start()
-	if err != nil {
-		cmn.Fatalln("启动失败", err)
-	}
+    cmn.Info("启动WEB服务")
+    err := cmn.NewFasthttpServer().Start()
+    if err != nil {
+        cmn.Fatalln("启动失败", err)
+    }
 }
 ```
 
