@@ -81,7 +81,7 @@ export default {
   },
   methods: {
     clickLogo() {
-      location.href = "https://github.com/gotoeasy/glogcenter"
+      location.href = window.location.href;
     },
     login(){
       this.loading = true

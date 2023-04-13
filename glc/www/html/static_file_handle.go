@@ -9,13 +9,13 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
-// [/]重定向到[/glc/]
+// RedirectToHomeController [/]重定向到[/glc/]
 func RedirectToHomeController(req *gweb.HttpRequest) *gweb.HttpResult {
 	defer req.Redirect(conf.GetContextPath() + "/")
 	return nil
 }
 
-// 响应请求[/glc/]，读取index.html返回
+// HomeIndexHtmlController 响应请求[/glc/]，读取index.html返回
 func HomeIndexHtmlController(req *gweb.HttpRequest) *gweb.HttpResult {
 	file, err := www.Static.ReadFile("web/dist/index.html")
 	if err != nil && os.IsNotExist(err) {
@@ -26,7 +26,7 @@ func HomeIndexHtmlController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return nil
 }
 
-// 响应 *.html/*.css/*.js/*.png 等静态文件请求
+// StaticFileController 响应 *.html/*.css/*.js/*.png 等静态文件请求
 func StaticFileController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	urlPath := req.RequestUrlPath()

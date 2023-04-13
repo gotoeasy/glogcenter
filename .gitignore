@@ -18,3 +18,4 @@
 /**/node_modules/
 /glc/glc
 /glc/Dockerfile
+*_amd64

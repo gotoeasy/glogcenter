@@ -11,7 +11,7 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
-var sessionid string
+var sessionid []map[string]string
 
 func init() {
 	if conf.IsEnableLogin() {
@@ -29,28 +29,39 @@ func init() {
 func LoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 	username := req.GetFormParameter("username")
 	password := req.GetFormParameter("password")
-	if username != conf.GetUsername() || password != conf.GetPassword() {
-		return gweb.Error500("用户名或密码错误")
+	userList := conf.GetUserList()
+	for _, user := range userList {
+		if username == user.Username && password == user.Password {
+			for _, s := range sessionid {
+				if s["username"] == username {
+					return gweb.Result(s["sessionid"])
+				}
+			}
+		}
 	}
 
-	return gweb.Result(sessionid)
+	return gweb.Error500("用户名或密码错误")
 }
 
 func IsEnableLoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return gweb.Result(conf.IsEnableLogin())
 }
 
-func createSessionid() string {
-	ymd := com.GetYyyymmdd(0)
-	by1 := md5.Sum(cmn.StringToBytes(conf.GetUsername() + ymd))
-	by2 := md5.Sum(cmn.StringToBytes(ymd + conf.GetPassword()))
-	by3 := md5.Sum(cmn.StringToBytes(ymd + "添油" + conf.GetUsername() + "加醋" + conf.GetPassword()))
-	str1 := hex.EncodeToString(by1[:])
-	str2 := hex.EncodeToString(by2[:])
-	str3 := hex.EncodeToString(by3[:])
-	return cmn.Right(str1, 15) + cmn.Left(str2, 15) + cmn.Left(str3, 30)
+func createSessionid() []map[string]string {
+	userList := conf.GetUserList()
+	for _, user := range userList {
+		ymd := com.GetYyyymmdd(0)
+		by1 := md5.Sum(cmn.StringToBytes(user.Username + ymd))
+		by2 := md5.Sum(cmn.StringToBytes(ymd + conf.GetPassword()))
+		by3 := md5.Sum(cmn.StringToBytes(ymd + "添油" + conf.GetUsername() + "加醋" + conf.GetPassword()))
+		str1 := hex.EncodeToString(by1[:])
+		str2 := hex.EncodeToString(by2[:])
+		str3 := hex.EncodeToString(by3[:])
+		sessionid = append(sessionid, map[string]string{"username": user.Username, "sessionid": cmn.Right(str1, 15) + cmn.Left(str2, 15) + cmn.Left(str3, 30)})
+	}
+	return sessionid
 }
 
-func GetSessionid() string {
+func GetSessionid() []map[string]string {
 	return sessionid
 }

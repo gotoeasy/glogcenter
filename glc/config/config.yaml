@@ -1,0 +1,34 @@
+storeRoot: /glogcenter # 日志存储根目录
+storeChanLength: 64 # 日志存储通道长度
+maxIdleTime: 180 # 最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
+storeNameAutoAddDate: true #  存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
+serverUrl: "" # 服务URL，默认“”，集群配置时自动获取地址可能不对，可通过这个设定
+serverIp: "" # 服务IP，默认“”，当“”时会自动获取
+serverPort: "8080" # web服务端口，默认“8080”
+contextPath: /glc # web服务contextPath，默认“/glc”
+enableSecurityKey: false # web服务是否开启API秘钥校验，默认false
+securityKey: glogcenter #  web服务API秘钥
+headerSecurityKey: X-GLC-AUTH # web服务API秘钥的header键名
+enableAmqpConsume: false # 是否开启rabbitMq消费者接收日志
+enableWebGzip: false # 是否开启web服务gzip压缩
+amqpAddr: "" # rabbitMq连接地址，例："amqp://user:password@ip:port/"
+amqpQueueName: glc-log-queue # rabbitMq队列名
+amqpJsonFormat: true # rabbitMq消息文本是否为json格式，默认true
+saveDays: 180 # 日志分仓时的保留天数(0~180)，0表示不自动删除，默认180天
+enableLogin: true # 是否开启用户密码登录，默认“false”
+user:
+- username: admin # 用户名
+  password: admin@@2023 # 密码
+- username: test
+  password: admin@@2023
+clusterMode: false # 是否开启集群模式，默认“false”
+clusterUrls: [] # 集群模式下的其他节点地址，例：["http://ip:port/glc"]
+enableBackup: false # 是否开启备份，默认“false”
+glcGroup: default # 日志中心分组名，默认“default”
+minioUrl: "" # minio地址，例："http://ip:port/"
+minioUser: "" # minio用户名
+minioPassword: "" # minio密码
+minioBucket: "" # minio存储桶名
+enableUploadMinio: false # 是否开启上传到minio，默认“false”
+goMaxProcess: 16 # 使用的最大CPU数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
+logLevel: INFO # 日志级别，默认“INFO”
