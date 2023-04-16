@@ -32,7 +32,7 @@
         :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
 
         <el-input placeholder="请输入用户名" v-model="username" maxlength="100"></el-input><p/>
-        <el-input placeholder="请输入密码" type="password" v-model="password" maxlength="100"></el-input>
+        <el-input placeholder="请输入密码" type="password" v-model="password" maxlength="100" autocomplete="new-password"></el-input>
         
         <template #footer>
           <span class="dialog-footer">

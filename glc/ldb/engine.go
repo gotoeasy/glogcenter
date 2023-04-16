@@ -43,7 +43,7 @@ func (e *Engine) AddTextLog(date string, logText string, system string) {
 	e.logStorage.AddTextLog(date, logText, system)
 }
 
-func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, forward bool) *search.SearchResult {
+func (e *Engine) Search(searchKey string, minDatetime string, maxDatetime string, pageSize int, currentDocId uint32, forward bool) *search.SearchResult {
 
 	// 检查修正pageSize
 	if pageSize < 1 {
@@ -76,11 +76,11 @@ func (e *Engine) Search(searchKey string, pageSize int, currentDocId uint32, for
 
 	if len(kws) == 0 {
 		// 无条件浏览模式
-		return search.SearchLogData(e.storeName, pageSize, currentDocId, forward)
+		return search.SearchLogData(e.storeName, pageSize, currentDocId, forward, minDatetime, maxDatetime)
 	}
 
 	// 多关键词查询模式
-	return search.SearchWordIndex(e.storeName, kws, pageSize, currentDocId, forward)
+	return search.SearchWordIndex(e.storeName, kws, pageSize, currentDocId, forward, minDatetime, maxDatetime)
 }
 
 // 添加日志
