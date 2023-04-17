@@ -10,20 +10,81 @@
               <div style="display:flex;justify-content:space-between;">
                 <div>
 
-                  <el-select v-if="storageOptions.length > 1" v-model="storage" filterable placeholder="请选择日志仓" style="width:260px">
-                    <el-option
-                      v-for="item in storageOptions"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-
-                  <el-input @keyup.enter="search()" v-model="params.searchKey" placeholder="请输入关键词检索" style="width:600px">
+                  <el-input @keyup.enter="search()" v-model="params.searchKey" placeholder="请输入关键词检索" style="width:600px;">
                     <template #append>
-                      <el-button type="primary" @click="search()" class="x-search">全文检索</el-button>
+                      <el-button type="primary" @click="search" class="x-search">
+                        <el-icon>
+                          <Search />
+                        </el-icon>
+                        <span>检 索</span>                      
+                      </el-button>
                     </template>
                   </el-input>
+
+                  <el-button class="c-btn" @click="fnResetSearchForm" style="margin-left:10px;">
+                    <el-icon>
+                      <RefreshLeft />
+                    </el-icon>
+                    <span>重 置</span>
+                  </el-button>
+
+                  <el-badge is-dot :hidden="hasMoreCondition" type="primary" style="margin-left:10px;">
+                    <el-button circle @click="() => (showSearchPanel = !showSearchPanel)">
+                      <el-icon>
+                        <ArrowUp v-if="showSearchPanel" />
+                        <ArrowDown v-else />
+                      </el-icon>
+                    </el-button>
+                  </el-badge>
+
+
+                  <div v-show="showSearchPanel" class="c-down-panel">
+                    <el-form ref="form" :inline="true" label-width="100">
+                    <el-row>
+                      <el-form-item label="选择日志仓">
+                        <el-select v-if="storageOptions.length > 0" v-model="storage" filterable placeholder="请选择" style="width:420px;">
+                          <el-option
+                            v-for="item in storageOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          />
+                        </el-select>
+                      </el-form-item>
+                    </el-row>
+                    <el-row>
+                      <el-form-item label="时间范围">
+                        <el-date-picker 
+                          v-model="params.datetime"
+                          type="datetimerange"
+                          :shortcuts="shortcuts"
+                          range-separator="～"
+                          value-format="YYYY-MM-DD HH:mm:ss"
+                          start-placeholder="开始时间"
+                          end-placeholder="结束时间"
+                        />
+                      </el-form-item>
+                    </el-row>
+                  </el-form>
+                    <el-divider style="margin: 0 0 10px;" />
+
+                    <el-row justify="center">
+                      <el-button type="primary" class="x-search" @click="search">
+                        <el-icon size="14">
+                          <Search />
+                        </el-icon>
+                        <span>检 索</span>
+                      </el-button>
+                      <el-button class="c-btn" @click="() => (showSearchPanel = false)">
+                        <el-icon size="14">
+                          <ArrowUp />
+                        </el-icon>
+                        <span>收 起</span>
+                      </el-button>
+                    </el-row>
+                  </div>
+
+
                 </div>
               </div>
             </div>
@@ -70,6 +131,7 @@
 <script>
 import api from '../api'
 import { ref } from 'vue'
+import { Search, RefreshLeft, ArrowUp, ArrowDown } from '@element-plus/icons-vue'
 
 const FixHeight = 215  // 177
 
@@ -83,6 +145,7 @@ export default {
       params: {
         storeName: '',
         searchKey: '',
+        datetime: null,
         pageSize: 100,
         currentId: '',
         forward: true,
@@ -91,6 +154,90 @@ export default {
       info: '',
       storage: ref(''),
       storageOptions: [],
+      showSearchPanel: ref(false),
+      shortcuts: [
+                    {
+                      text: '近5分钟',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 5 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '近10分钟',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 10 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '近15分钟',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 15 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '最近20分钟',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 20 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '最近30分钟',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 30 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '近1小时',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 60 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '近2小时',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 2 * 60 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '近3小时',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 3 * 60 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                    {
+                      text: '近4小时',
+                      value: () => {
+                        const start = new Date()
+                        start.setTime(start.getTime() - 4 * 60 * 60 * 1000)
+                        const end = new Date()
+                        return [start, end]
+                      },
+                    },
+                  ],
     }
   },
   created(){
@@ -128,7 +275,18 @@ export default {
     this.search() 
 
   },
+  computed:{
+    hasMoreCondition(){
+      return !this.params.datetime && !this.storage;
+    }
+  },
   methods: {
+    fnResetSearchForm(){
+      this.params.searchKey = '';
+      this.params.datetime = null;
+      this.storage = '';
+      this.search();
+    },
     searchMore() {
       if (this.data.length >= 5000) {
         if (this.info.indexOf('请考虑') < 0){
@@ -164,6 +322,8 @@ export default {
 
       this.params.storeName = this.storage
       this.params.currentId = ''
+      this.params.datetimeFrom = (this.params.datetime || ['', ''])[0]
+      this.params.datetimeTo = (this.params.datetime || ['', ''])[1]
      // console.info("----------this.params",this.params)
       api.search(this.params).then(rs => {
         let res = rs.data
@@ -183,6 +343,8 @@ export default {
       }).finally(() => {
         this.loading = false
       })
+
+      this.showSearchPanel = false;
     },
   },
 }
@@ -244,5 +406,46 @@ button.el-button.x-search{
 <style>
 .el-popper.is-dark{
   display: none;
+}
+
+.c-down-panel {
+  position: absolute;
+  z-index: 100;
+  width: 550px;
+  padding: 20px;
+  margin-top: 10px;
+  margin-left: 425px;
+  background-color: white;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 30%);
+}
+
+button.el-button:focus {
+  color: var(--el-button-text-color);
+  background-color: var(--el-button-bg-color);
+  border-color: var(--el-button-border-color);
+}
+
+button.el-button:hover {
+  color: var(--el-button-hover-text-color);
+  background-color: var(--el-button-hover-bg-color);
+  border-color: var(--el-button-hover-border-color);
+}
+
+button.el-button:active {
+  color: var(--el-button-active-text-color);
+  background-color: var(--el-button-active-bg-color);
+  border-color: var(--el-button-active-border-color);
+}
+
+button.el-button.is-link:focus {
+  color: var(--el-button-focus-link-text-color);
+}
+
+button.el-button.is-link:hover {
+  color: var(--el-button-hover-link-text-color);
+}
+
+button.el-button.is-link:active {
+  color: var(--el-button-active-link-text-color);
 }
 </style>

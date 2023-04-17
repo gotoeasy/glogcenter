@@ -18,9 +18,10 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 			pageSize := cmn.StringToInt(req.GetFormParameter("pageSize"), 20)
 			currentId := cmn.StringToUint32(req.GetFormParameter("currentId"), 0)
 			forward := cmn.StringToBool(req.GetFormParameter("forward"), true)
-
+			datetimeFrom := req.GetFormParameter("datetimeFrom")
+			datetimeTo := req.GetFormParameter("datetimeTo")
 			eng := ldb.NewEngine(storeName)
-			rs := eng.Search(searchKey, pageSize, currentId, forward)
+			rs := eng.Search(searchKey,datetimeFrom, datetimeTo, pageSize, currentId, forward)
 			return gweb.Result(rs)
 
 		}
