@@ -184,7 +184,7 @@ export default {
                       },
                     },
                     {
-                      text: '最近20分钟',
+                      text: '近20分钟',
                       value: () => {
                         const start = new Date()
                         start.setTime(start.getTime() - 20 * 60 * 1000)
@@ -193,7 +193,7 @@ export default {
                       },
                     },
                     {
-                      text: '最近30分钟',
+                      text: '近30分钟',
                       value: () => {
                         const start = new Date()
                         start.setTime(start.getTime() - 30 * 60 * 1000)
