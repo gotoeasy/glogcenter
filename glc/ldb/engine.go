@@ -38,7 +38,7 @@ func NewDefaultEngine() *Engine {
 	}
 }
 
-// 添加日志
+// AddTextLog 添加日志
 func (e *Engine) AddTextLog(date string, logText string, system string) {
 	e.logStorage.AddTextLog(date, logText, system)
 }
@@ -83,7 +83,7 @@ func (e *Engine) Search(searchKey string, minDatetime string, maxDatetime string
 	return search.SearchWordIndex(e.storeName, kws, pageSize, currentDocId, forward, minDatetime, maxDatetime)
 }
 
-// 添加日志
+// AddTextLog 添加日志
 func AddTextLog(md *logdata.LogDataModel) {
 	engine := NewDefaultEngine()
 	engine.AddTextLog(md.Date, md.Text, md.System)

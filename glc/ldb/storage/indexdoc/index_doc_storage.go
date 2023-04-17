@@ -3,6 +3,7 @@
  * 1）获取存储对象线程安全，带缓存无则创建有则直取，空闲超时自动关闭leveldb，再次获取时自动打开
  * 2）单线程调用设计，由日志存储器内部控制安全的调用，其他地方调用可能会有问题
  */
+
 package indexdoc
 
 import (
@@ -43,7 +44,7 @@ func getStorage(cacheName string) *DocIndexStorage {
 	return nil
 }
 
-// 获取存储对象，线程安全（带缓存无则创建有则直取）
+// NewDocIndexStorage 获取存储对象，线程安全（带缓存无则创建有则直取）
 func NewDocIndexStorage(storeName string) *DocIndexStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
@@ -101,7 +102,7 @@ func (s *DocIndexStorage) autoCloseWhenMaxIdle() {
 	}
 }
 
-// 添加日志反向索引
+// AddWordDocSeq 添加日志反向索引
 func (s *DocIndexStorage) AddWordDocSeq(word string, docId uint32, seq uint32) error {
 
 	s.lastTime = time.Now().Unix()
@@ -113,7 +114,7 @@ func (s *DocIndexStorage) AddWordDocSeq(word string, docId uint32, seq uint32) e
 	return nil
 }
 
-// 取日志所在关键词索引中的序号（返回0表示有问题）
+// GetWordDocSeq 取日志所在关键词索引中的序号（返回0表示有问题）
 func (s *DocIndexStorage) GetWordDocSeq(word string, docId uint32) uint32 {
 	if s.closing {
 		return 0
@@ -126,7 +127,7 @@ func (s *DocIndexStorage) GetWordDocSeq(word string, docId uint32) uint32 {
 	return cmn.BytesToUint32(b)
 }
 
-// 关闭Storage
+// Close 关闭Storage
 func (s *DocIndexStorage) Close() {
 	if s == nil || s.closing { // 优雅退出时可能会正好nil，判断一下优雅点
 		return
@@ -147,12 +148,12 @@ func (s *DocIndexStorage) Close() {
 	cmn.Info("关闭DocIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
-// 存储目录名
+// StoreName 存储目录名
 func (s *DocIndexStorage) StoreName() string {
 	return s.storeName
 }
 
-// 是否关闭中状态
+// IsClose 是否关闭中状态
 func (s *DocIndexStorage) IsClose() bool {
 	return s.closing
 }

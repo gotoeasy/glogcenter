@@ -4,6 +4,7 @@
  * 2）有关键词时检索索引
  * 3）支持指定相对ID及方向进行前后翻页检索
  */
+
 package search
 
 import (
@@ -28,7 +29,7 @@ type WidxStorage struct {
 	idxwordStorage *indexword.WordIndexStorage
 }
 
-// 多关键词时计算关键词索引交集
+// SearchWordIndex 多关键词时计算关键词索引交集
 func SearchWordIndex(storeName string, kws []string, pageSize int, currentDocId uint32, forward bool, minDatetime string, maxDatetime string) *SearchResult {
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 
@@ -76,7 +77,7 @@ func SearchWordIndex(storeName string, kws []string, pageSize int, currentDocId 
 	return findSame(pageSize, currentDocId, forward, minDocumentId, maxDocumentId, storeLogData, widxs...)
 }
 
-// 无关键词时走全量检索
+// SearchLogData 无关键词时走全量检索
 func SearchLogData(storeName string, pageSize int, currentDocId uint32, forward bool, minDatetime string, maxDatetime string) *SearchResult {
 
 	var rs = new(SearchResult)                                 // 检索结果

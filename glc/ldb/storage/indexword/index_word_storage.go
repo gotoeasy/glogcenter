@@ -48,7 +48,7 @@ func getStorage(cacheName string) *WordIndexStorage {
 	return nil
 }
 
-// 获取存储对象，线程安全（带缓存无则创建有则直取）
+// NewWordIndexStorage 获取存储对象，线程安全（带缓存无则创建有则直取）
 func NewWordIndexStorage(storeName string) *WordIndexStorage { // 存储器，文档，自定义对象
 
 	// 缓存有则取用
@@ -107,7 +107,7 @@ func (s *WordIndexStorage) autoCloseWhenMaxIdle() {
 	}
 }
 
-// 取已建索引件数
+// GetIndexedCount 取已建索引件数
 func (s *WordIndexStorage) GetIndexedCount() uint32 {
 	return s.indexedCount
 }
@@ -120,13 +120,13 @@ func (s *WordIndexStorage) loadIndexedCount() {
 	}
 }
 
-// 保存已建索引件数
+// SaveIndexedCount 保存已建索引件数
 func (s *WordIndexStorage) SaveIndexedCount(count uint32) error {
 	s.indexedCount = count
 	return s.leveldb.Put(zeroUint16Bytes, cmn.Uint32ToBytes(count), nil)
 }
 
-// 取关键词索引当前的文档数
+// GetTotalCount 取关键词索引当前的文档数
 func (s *WordIndexStorage) GetTotalCount(word string) uint32 {
 	wordBytes := cmn.StringToBytes(word)
 	bt, err := s.leveldb.Get(com.JoinBytes(wordBytes, zeroUint32Bytes), nil) // TODO 是否有性能问题?
@@ -141,7 +141,7 @@ func (s *WordIndexStorage) setTotalCount(word string, cnt uint32) error {
 	return s.leveldb.Put(com.JoinBytes(cmn.StringToBytes(word), zeroUint32Bytes), cmn.Uint32ToBytes(cnt), nil)
 }
 
-// 添加关键词反向索引
+// Add 添加关键词反向索引
 func (s *WordIndexStorage) Add(word string, docId uint32) error {
 
 	// 加关键词反向索引
@@ -172,7 +172,7 @@ func (s *WordIndexStorage) Add(word string, docId uint32) error {
 	return nil
 }
 
-// 取日志ID（返回0表示有问题）
+// GetDocId 取日志ID（返回0表示有问题）
 func (s *WordIndexStorage) GetDocId(word string, seq uint32) uint32 {
 	if s.closing {
 		return 0
@@ -185,7 +185,7 @@ func (s *WordIndexStorage) GetDocId(word string, seq uint32) uint32 {
 	return cmn.BytesToUint32(b)
 }
 
-// 关闭Storage
+// Close 关闭Storage
 func (s *WordIndexStorage) Close() {
 	if s == nil || s.closing { // 优雅退出时可能会正好nil，判断一下优雅点
 		return
@@ -206,12 +206,12 @@ func (s *WordIndexStorage) Close() {
 	cmn.Info("关闭WordIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
 
-// 存储目录名
+// StoreName 存储目录名
 func (s *WordIndexStorage) StoreName() string {
 	return s.storeName
 }
 
-// 是否关闭中状态
+// IsClose 是否关闭中状态
 func (s *WordIndexStorage) IsClose() bool {
 	return s.closing
 }

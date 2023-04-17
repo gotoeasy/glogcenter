@@ -4,6 +4,7 @@
  * 2）优先响应保存日志，闲时创建关键词反向索引
  * 3）获取存储对象线程安全，带缓存无则创建有则直取，空闲超时自动关闭leveldb，再次获取时自动打开
  */
+
 package logdata
 
 import (
@@ -20,7 +21,7 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
-// 存储结构体
+// LogDataStorage 存储结构体
 type LogDataStorage struct {
 	storeName         string             // 存储目录
 	subPath           string             // 存储目录下的相对路径（存放数据）
@@ -53,7 +54,7 @@ func getCacheStore(cacheName string) *LogDataStorage {
 	return nil
 }
 
-// 获取存储对象，线程安全（带缓存无则创建有则直取）
+// NewLogDataStorage 获取存储对象，线程安全（带缓存无则创建有则直取）
 func NewLogDataStorage(storeName string) *LogDataStorage { // 存储器，文档，自定义对象
 
 	subPath := "data"
@@ -218,7 +219,7 @@ func (s *LogDataStorage) put(key []byte, value []byte) error {
 	return s.leveldb.Put(key, value, nil)
 }
 
-// 直接从leveldb取数据
+// Get 直接从leveldb取数据
 func (s *LogDataStorage) Get(key []byte) ([]byte, error) {
 	if s.closing {
 		return nil, errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
@@ -227,7 +228,7 @@ func (s *LogDataStorage) Get(key []byte) ([]byte, error) {
 	return s.leveldb.Get(key, nil)
 }
 
-// 直接从leveldb取数据并转换为LogDataModel
+// GetLogDataModel 直接从leveldb取数据并转换为LogDataModel
 func (s *LogDataStorage) GetLogDataModel(id uint32) (*LogDataModel, error) {
 	if s.closing {
 		return nil, errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
@@ -243,7 +244,7 @@ func (s *LogDataStorage) GetLogDataModel(id uint32) (*LogDataModel, error) {
 	return doc.ToLogDataModel(), nil
 }
 
-// 添加数据，经通道后由自定义的保存函数处理保存
+// Add 添加数据，经通道后由自定义的保存函数处理保存
 func (s *LogDataStorage) Add(model *LogDataModel) error {
 	if s.closing {
 		return errors.New("current storage is closed") // 关闭中或已关闭时拒绝服务
@@ -257,7 +258,7 @@ func (s *LogDataStorage) Add(model *LogDataModel) error {
 	return nil
 }
 
-// 关闭Storage
+// Close 关闭Storage
 func (s *LogDataStorage) Close() {
 	if s == nil || s.closing { // 优雅退出时可能会正好nil，判断一下优雅点
 		return
@@ -327,17 +328,17 @@ func (s *LogDataStorage) saveMetaData() {
 	}
 }
 
-// 总件数
+// TotalCount 总件数
 func (s *LogDataStorage) TotalCount() uint32 {
 	return s.currentCount
 }
 
-// 存储目录名
+// StoreName 存储目录名
 func (s *LogDataStorage) StoreName() string {
 	return s.storeName
 }
 
-// 是否关闭中状态
+// IsClose 是否关闭中状态
 func (s *LogDataStorage) IsClose() bool {
 	return s.closing
 }

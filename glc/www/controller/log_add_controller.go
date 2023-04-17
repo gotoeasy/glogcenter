@@ -9,7 +9,7 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
-// 添加日志（JSON提交方式）
+// JsonLogAddController 添加日志（JSON提交方式）
 func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	// 开启API秘钥校验时才检查
@@ -33,7 +33,7 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return gweb.Ok()
 }
 
-// 添加日志（来自数据转发）
+// JsonLogTransferAddController 添加日志（来自数据转发）
 func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	// 开启API秘钥校验时才检查

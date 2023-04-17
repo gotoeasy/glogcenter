@@ -19,12 +19,12 @@ func init() {
 	jiebago = cmn.NewTokenizerJiebago(dictfile)
 }
 
-// 按搜索引擎模式进行分词后返回分词数组
+// CutForSearch 按搜索引擎模式进行分词后返回分词数组
 func CutForSearch(text string) []string {
 	return jiebago.CutForSearch(text)
 }
 
-// 按搜索引擎模式进行分词后返回分词数组，可自定义添加或删除分词
+// CutForSearchEx 按搜索引擎模式进行分词后返回分词数组，可自定义添加或删除分词
 func CutForSearchEx(text string, addWords []string, delWords []string) []string {
 	return jiebago.CutForSearchEx(text, addWords, delWords)
 }

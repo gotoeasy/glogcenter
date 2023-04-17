@@ -2,6 +2,7 @@
  * 日志模型
  * 1）面向日志接口，设定常用属性方便扩充
  */
+
 package logdata
 
 import (
@@ -10,6 +11,7 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
+// LogDataModel 日志模型
 // Text是必须有的日志内容，Id自增，内置其他属性可选
 // 其中Tags是空格分隔的标签，日期外各属性值会按空格分词
 // 对应的json属性统一全小写
