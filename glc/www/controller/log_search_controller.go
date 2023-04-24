@@ -23,8 +23,13 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	forward := cmn.StringToBool(req.GetFormParameter("forward"), true)
 	datetimeFrom := req.GetFormParameter("datetimeFrom")
 	datetimeTo := req.GetFormParameter("datetimeTo")
+	system := req.GetFormParameter("system")
+
+	if !cmn.IsBlank(system) {
+		system = "~" + cmn.Trim(system)
+	}
 
 	eng := ldb.NewEngine(storeName)
-	rs := eng.Search(searchKey, datetimeFrom, datetimeTo, pageSize, currentId, forward)
+	rs := eng.Search(searchKey, system, datetimeFrom, datetimeTo, pageSize, currentId, forward)
 	return gweb.Result(rs)
 }

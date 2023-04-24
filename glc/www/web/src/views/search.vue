@@ -40,7 +40,7 @@
 
                   <div v-show="showSearchPanel" class="c-down-panel">
                     <el-form ref="form" :inline="true" label-width="100">
-                    <el-row>
+                      <el-row>
                       <el-form-item label="选择日志仓">
                         <el-select v-if="storageOptions.length > 0" v-model="storage" filterable placeholder="请选择" style="width:420px;">
                           <el-option
@@ -50,6 +50,11 @@
                             :value="item.value"
                           />
                         </el-select>
+                      </el-form-item>
+                    </el-row>
+                    <el-row>
+                      <el-form-item label="分类名称">
+                        <el-input v-model="params.system" placeholder="请输入分类名" style="width:420px;"></el-input>
                       </el-form-item>
                     </el-row>
                     <el-row>
@@ -145,6 +150,7 @@ export default {
       params: {
         storeName: '',
         searchKey: '',
+        system: '',
         datetime: null,
         pageSize: 100,
         currentId: '',
@@ -277,12 +283,13 @@ export default {
   },
   computed:{
     hasMoreCondition(){
-      return !this.params.datetime && !this.storage;
+      return !this.params.datetime && !this.storage && !this.params.system;
     }
   },
   methods: {
     fnResetSearchForm(){
       this.params.searchKey = '';
+      this.params.system = '';
       this.params.datetime = null;
       this.storage = '';
       this.search();

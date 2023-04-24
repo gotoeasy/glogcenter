@@ -16,13 +16,14 @@ import (
 type LogDataModel struct {
 	Id         string   `json:"id,omitempty"`         // 从1开始递增(36进制字符串)
 	Text       string   `json:"text,omitempty"`       // 【必须】日志内容，多行时仅为首行，直接显示用，是全文检索对象
-	Detail     string   `json:"detail,omitempty"`     // 多行时的详细日志信息，通常是包含错误堆栈等的日志内容
-	Date       string   `json:"date,omitempty"`       // 日期（格式自定义）
+	Detail     string   `json:"detail,omitempty"`     // 多行时的详细日志信息，通常是包含错误堆栈等的日志内容（这部分内容不做索引处理）
+	Date       string   `json:"date,omitempty"`       // 日期（格式YYYY/MM/DD HH:MM:SS.SSS）
 	Tags       []string `json:"tags,omitempty"`       // 自定义标签，都作为关键词看待处理
 	Server     string   `json:"server,omitempty"`     // 服务器
 	Client     string   `json:"client,omitempty"`     // 客户端
 	User       string   `json:"user,omitempty"`       // 用户
 	System     string   `json:"system,omitempty"`     // 所属系统
+	LogType    string   `json:"logtype,omitempty"`    // 日志类型（如登录日志、操作日志）
 	TraceId    string   `json:"traceid,omitempty"`    // 跟踪ID
 	Keywords   []string `json:"keywords,omitempty"`   // 自定义的关键词
 	Sensitives []string `json:"sensitives,omitempty"` // 要删除的敏感词

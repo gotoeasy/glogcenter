@@ -182,8 +182,8 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	// 整理关键词
 	adds := docm.Keywords
 	adds = append(adds, docm.Tags...)
-	adds = append(adds, docm.Client, docm.Server, docm.System, docm.User)
-	kws := tokenizer.CutForSearchEx(docm.Text, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
+	adds = append(adds, docm.Client, docm.Server, "~"+docm.System, docm.User)         // 特殊处理system
+	kws := tokenizer.CutForSearchEx(docm.Text+" "+docm.System, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {

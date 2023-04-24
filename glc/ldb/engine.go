@@ -43,7 +43,7 @@ func (e *Engine) AddTextLog(date string, logText string, system string) {
 	e.logStorage.AddTextLog(date, logText, system)
 }
 
-func (e *Engine) Search(searchKey string, minDatetime string, maxDatetime string, pageSize int, currentDocId uint32, forward bool) *search.SearchResult {
+func (e *Engine) Search(searchKey string, system string, minDatetime string, maxDatetime string, pageSize int, currentDocId uint32, forward bool) *search.SearchResult {
 
 	// 检查修正pageSize
 	if pageSize < 1 {
@@ -54,7 +54,9 @@ func (e *Engine) Search(searchKey string, minDatetime string, maxDatetime string
 	}
 
 	// 分词后检索
-	kws := tokenizer.CutForSearch(searchKey) // TODO 检索用关键词处理
+	var adds []string
+	adds = append(adds, system)
+	kws := tokenizer.CutForSearchEx(searchKey, adds, nil) // 检索用关键词处理
 
 	if searchKey == "" {
 		cmn.Debug("无条件查询", "currentDocId =", currentDocId)

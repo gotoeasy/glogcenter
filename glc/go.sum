@@ -59,8 +59,8 @@ github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeN
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/gotoeasy/glang v0.0.0-20221215063310-d39cd67685c4 h1:oPNNL1xjus3RvIln/n3mWG2raL+NciiQRD1+dyZZ0oE=
-github.com/gotoeasy/glang v0.0.0-20221215063310-d39cd67685c4/go.mod h1:zRo6xc3N5z/VsPCKHlmEz/Uz9XyiQbV3IAv3xsSTPV8=
+github.com/gotoeasy/glang v0.0.0-20230424145432-766531f4dfc6 h1:BjHTPALXOecu31LReGpv1AR7W1O8f9xnaqjwPfOHLYw=
+github.com/gotoeasy/glang v0.0.0-20230424145432-766531f4dfc6/go.mod h1:zRo6xc3N5z/VsPCKHlmEz/Uz9XyiQbV3IAv3xsSTPV8=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76 h1:qNQ2+1IQT9Mor/vfEHePOQSbiapLoNI7sQmpxM7l1Ew=
 github.com/huichen/sego v0.0.0-20210824061530-c87651ea5c76/go.mod h1:Fymg8+khR/cKSuIwqRxy/jmZg7PIPLk7CauXzrbcMUM=

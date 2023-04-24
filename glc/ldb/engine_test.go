@@ -46,7 +46,7 @@ func Test_all(t *testing.T) {
 	// }
 	// time.Sleep(time.Duration(5) * time.Second)
 
-	rs := engine.Search(`              them java     `, "", "", 5, 0, true)
+	rs := engine.Search(`              them java     `, "", "", "", 5, 0, true)
 	cmn.Println("共查到", rs.Total, "件")
 	for _, v := range rs.Data {
 		cmn.Println(v.Id, v.Text)
