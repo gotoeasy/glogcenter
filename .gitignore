@@ -18,3 +18,8 @@
 /**/node_modules/
 /glc/glc
 /glc/Dockerfile
+
+/glc-logback-appender/.settings/
+/glc-logback-appender/target/
+/**/.classpath
+/**/.project
