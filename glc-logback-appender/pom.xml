@@ -28,7 +28,7 @@
 		</repository>
 	</repositories>
 
-	<name>gotoeasy-aop</name>
+	<name>glc-logback-appender</name>
 	<url>https://gitlab.gotoeasy.top/gotoeasy/framework.git</url>
 
 	<licenses>
