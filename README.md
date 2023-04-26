@@ -112,7 +112,7 @@ curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo l
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.8.0</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
@@ -126,7 +126,9 @@ curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo l
         <pattern><![CDATA[%p %m %n]]></pattern>
     </layout>
 </appender>
+```
 
+```xml
 <!-- logback配置例子2，发送至 rabbitmq -->
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcAmqpAppender">
     <amqpHost>127.0.0.1</amqpHost>                <!-- 可通过环境变量 GLC_AMQP_HOST 设定 -->
@@ -176,7 +178,6 @@ func main() {
 ### 开发版`latest`
 
 - [ ] 多语言
-- [ ] 分词优化
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
