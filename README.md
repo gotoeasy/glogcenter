@@ -140,7 +140,33 @@ curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo l
         <pattern><![CDATA[%p %m %n]]></pattern>
     </layout>
 </appender>
+```
 
+```xml
+<!-- 一个简单的logback-spring.xml配置例子 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <appender name="CONSOLE"
+        class="ch.qos.logback.core.ConsoleAppender">
+        <Target>System.out</Target>
+        <encoder>
+            <pattern>%d-%c-%t-%5p: %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
+        <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl>
+        <system>demo</system>
+        <layout>
+            <pattern><![CDATA[%p %m %n]]></pattern>
+        </layout>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="GLC" />
+    </root>
+</configuration>
 ```
 
 ## 使用`golang`语言的项目，提供工具包，开箱即用
