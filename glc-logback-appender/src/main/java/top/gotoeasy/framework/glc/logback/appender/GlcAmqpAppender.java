@@ -1,6 +1,8 @@
 package top.gotoeasy.framework.glc.logback.appender;
 
+import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
+import java.text.StringCharacterIterator;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -88,6 +90,10 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
      * @param text 日志
      */
     protected void sendToRabbitMQ(String text) {
+        if (text == null) {
+            return; // ignore
+        }
+
         try {
             if (channel == null) {
                 initConnectionChannel();
@@ -234,8 +240,46 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
     }
 
     private String encodeStr(String str) {
-        return "\"" + str.replaceAll("\"", "\\\\\"").replaceAll("\t", "\\\\t").replaceAll("\r", "\\\\r")
-                .replaceAll("\n", "\\\\n") + "\"";
+        StringBuilder buf = new StringBuilder();
+        buf.append('"');
+        CharacterIterator it = new StringCharacterIterator(str);
+        for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
+            if (c == '"')
+                buf.append("\\\"");
+            else if (c == '\\')
+                buf.append("\\\\");
+            else if (c == '/')
+                buf.append("\\/");
+            else if (c == '\b')
+                buf.append("\\b");
+            else if (c == '\f')
+                buf.append("\\f");
+            else if (c == '\n')
+                buf.append("\\n");
+            else if (c == '\r')
+                buf.append("\\r");
+            else if (c == '\t')
+                buf.append("\\t");
+            else if (Character.isISOControl(c)) {
+                addUnicode(buf, c);
+            } else {
+                buf.append(c);
+            }
+        }
+        buf.append('"');
+        return buf.toString();
+    }
+
+    static final char[] hex = "0123456789ABCDEF".toCharArray();
+
+    private void addUnicode(StringBuilder buf, char c) {
+        buf.append("\\u");
+        int n = c;
+        for (int i = 0; i < 4; ++i) {
+            int digit = (n & 0xf000) >> 12;
+            buf.append(hex[digit]);
+            n <<= 4;
+        }
     }
 
     private static String getDateString() {
