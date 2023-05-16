@@ -112,7 +112,7 @@ curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo l
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.9.0</version>
+    <version>0.9.1</version>
 </dependency>
 ```
 
@@ -206,6 +206,7 @@ func main() {
 - [ ] 多语言
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
+- [x] `glc-logback-appender:0.9.1` Java项目日志发送时的特殊字符BUG修复
 
 
 ### 版本`0.9.0`
