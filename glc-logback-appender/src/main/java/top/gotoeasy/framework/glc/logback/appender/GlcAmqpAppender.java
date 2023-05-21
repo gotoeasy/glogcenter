@@ -1,9 +1,5 @@
 package top.gotoeasy.framework.glc.logback.appender;
 
-import java.text.CharacterIterator;
-import java.text.SimpleDateFormat;
-import java.text.StringCharacterIterator;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -99,9 +95,11 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
                 initConnectionChannel();
             }
 
-            String body = "{" + encodeStr("text") + ":" + encodeStr(text.trim());
-            body += "," + encodeStr("date") + ":" + encodeStr(getDateString());
-            body += "," + encodeStr("system") + ":" + encodeStr(getSystem());
+            String body = "{\"text\":" + Util.encodeStr(text.trim());
+            body += ",\"date\":" + Util.encodeStr(Util.getDateString());
+            body += ",\"system\":" + Util.encodeStr(getSystem());
+            body += ",\"servername\":" + Util.encodeStr(Util.getServerName());
+            body += ",\"serverip\":" + Util.encodeStr(Util.getServerIp());
             body += "}";
 
             channel.basicPublish("", "glc-log-queue", null, body.getBytes("utf-8"));
@@ -237,72 +235,6 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
         } finally {
             this.connection = null;
         }
-    }
-
-    private String encodeStr(String str) {
-        StringBuilder buf = new StringBuilder();
-        buf.append('"');
-        CharacterIterator it = new StringCharacterIterator(str);
-        for (char c = it.first(); c != CharacterIterator.DONE; c = it.next()) {
-            if (c == '"')
-                buf.append("\\\"");
-            else if (c == '\\')
-                buf.append("\\\\");
-            else if (c == '/')
-                buf.append("\\/");
-            else if (c == '\b')
-                buf.append("\\b");
-            else if (c == '\f')
-                buf.append("\\f");
-            else if (c == '\n')
-                buf.append("\\n");
-            else if (c == '\r')
-                buf.append("\\r");
-            else if (c == '\t')
-                buf.append("\\t");
-            else if (Character.isISOControl(c)) {
-                addUnicode(buf, c);
-            } else {
-                buf.append(c);
-            }
-        }
-        buf.append('"');
-        return buf.toString();
-    }
-
-    static final char[] hex = "0123456789ABCDEF".toCharArray();
-
-    private void addUnicode(StringBuilder buf, char c) {
-        buf.append("\\u");
-        int n = c;
-        for (int i = 0; i < 4; ++i) {
-            int digit = (n & 0xf000) >> 12;
-            buf.append(hex[digit]);
-            n <<= 4;
-        }
-    }
-
-    private static String getDateString() {
-        SimpleDateFormat sdf = getSimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return sdf.format(new Date());
-    }
-
-    private static ThreadLocal<SimpleDateFormat> threadLocal = new ThreadLocal<SimpleDateFormat>();
-    private static Object lockObject = new Object();
-
-    private static SimpleDateFormat getSimpleDateFormat(String format) {
-        SimpleDateFormat simpleDateFormat = threadLocal.get();
-        if (simpleDateFormat == null) {
-            synchronized (lockObject) {
-                if (simpleDateFormat == null) {
-                    simpleDateFormat = new SimpleDateFormat(format);
-                    simpleDateFormat.setLenient(false);
-                    threadLocal.set(simpleDateFormat);
-                }
-            }
-        }
-        simpleDateFormat.applyPattern(format);
-        return simpleDateFormat;
     }
 
 }
