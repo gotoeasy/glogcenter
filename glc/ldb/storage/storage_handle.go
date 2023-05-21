@@ -71,6 +71,7 @@ func (s *LogDataStorageHandle) AddLogDataModel(data *logdata.LogDataModel) {
 	ary := cmn.Split(data.Text, "\n")
 	if len(ary) > 1 {
 		data.Detail = data.Text
+		data.Text = ary[0]
 	}
 
 	if s.storage.IsClose() {
