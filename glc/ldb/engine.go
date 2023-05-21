@@ -43,6 +43,11 @@ func (e *Engine) AddTextLog(date string, logText string, system string) {
 	e.logStorage.AddTextLog(date, logText, system)
 }
 
+// 添加日志
+func (e *Engine) AddLogDataModel(data *logdata.LogDataModel) {
+	e.logStorage.AddLogDataModel(data)
+}
+
 func (e *Engine) Search(searchKey string, system string, minDatetime string, maxDatetime string, pageSize int, currentDocId uint32, forward bool) *search.SearchResult {
 
 	// 检查修正pageSize

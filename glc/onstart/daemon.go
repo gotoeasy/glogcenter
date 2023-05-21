@@ -47,6 +47,13 @@ func init() {
 		os.Exit(0)
 	}
 
+	// 【非容器alpine系统时结束（测试用，二进制部署时应注释掉）】
+	info, _ := cmn.MeasureHost()
+	if info == nil || !cmn.ContainsIngoreCase(info.Platform, "alpine") {
+		fmt.Printf("%s\n", info.Platform)
+		os.Exit(0)
+	}
+
 	// 其余参数仅支持linux
 	if !cmn.IsLinux() {
 		return

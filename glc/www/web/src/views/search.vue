@@ -7,7 +7,7 @@
           <template #header>
 
             <div class="header">
-              <div style="display:flex;justify-content:space-between;">
+              <div style="display:flex;justify-content:space-between;width:100%">
                 <div>
 
                   <el-input @keyup.enter="search()" v-model="params.searchKey" placeholder="请输入关键词检索" style="width:600px;">
@@ -37,7 +37,6 @@
                     </el-button>
                   </el-badge>
 
-
                   <div v-show="showSearchPanel" class="c-down-panel">
                     <el-form ref="form" :inline="true" label-width="100">
                       <el-row>
@@ -52,22 +51,18 @@
                         </el-select>
                       </el-form-item>
                     </el-row>
-                    <el-row>
-                      <el-form-item label="分类名称">
-                        <el-input v-model="params.system" placeholder="请输入分类名" style="width:420px;"></el-input>
+                   <el-row>
+                      <el-form-item label="系统名">
+                        <el-select v-model="params.system" style="width:420px;" :multiple="false" filterable allow-create default-first-option clearable
+                           :reserve-keyword="true" placeholder="请输入系统名">
+                          <el-option v-for="item in systemOptions" :key="item.value" :label="item.label" :value="item.value"/>
+                        </el-select>
                       </el-form-item>
                     </el-row>
                     <el-row>
                       <el-form-item label="时间范围">
-                        <el-date-picker 
-                          v-model="params.datetime"
-                          type="datetimerange"
-                          :shortcuts="shortcuts"
-                          range-separator="～"
-                          value-format="YYYY-MM-DD HH:mm:ss"
-                          start-placeholder="开始时间"
-                          end-placeholder="结束时间"
-                        />
+                        <el-date-picker v-model="params.datetime" type="datetimerange" :shortcuts="shortcuts"
+                          range-separator="～" value-format="YYYY-MM-DD HH:mm:ss" start-placeholder="开始时间" end-placeholder="结束时间"/>
                       </el-form-item>
                     </el-row>
                   </el-form>
@@ -91,6 +86,23 @@
 
 
                 </div>
+
+                <div style="display: flex;align-items: end;">
+
+                  <el-dropdown trigger="click">
+                    <el-button size="small">
+                      <el-icon ><setting /></el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item @click="switchVisible('system')">{{systemVisible?'隐藏':'显示'}}系统名</el-dropdown-item>
+                        <el-dropdown-item @click="switchVisible('servername')">{{serverNameVisible?'隐藏':'显示'}}主机名</el-dropdown-item>
+                        <el-dropdown-item @click="switchVisible('serverip')">{{serverIpVisible?'隐藏':'显示'}}主机IP</el-dropdown-item>
+                        <el-dropdown-item @click="switchVisible('date')">{{dateVisible?'隐藏':'显示'}}日期时间</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
               </div>
             </div>
 
@@ -99,7 +111,7 @@
 
           <el-table :stripe="true" v-loading="loading" :data="data" :height="tableHeight" style="width: 100%">
 
-            <el-table-column fixed type="expand" width="60">
+            <el-table-column fixed type="expand" width="40">
               <template #default="scope">
                 <div class="x-detail">
                   <el-scrollbar :class="{'x-scrollbar':(scope.row.detail && scope.row.detail.split('\n').length>20)}">
@@ -109,9 +121,11 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="system" label="分类" width="120"/>
-            <el-table-column prop="date" label="日期时间" width="208"/>
-            <el-table-column prop="text" label="内容" :show-overflow-tooltip="true">
+            <el-table-column v-if="systemVisible" prop="system" label="系统名" width="120" :show-overflow-tooltip="true"/>
+            <el-table-column v-if="serverNameVisible" prop="servername" label="主机名" width="180" :show-overflow-tooltip="true"/>
+            <el-table-column v-if="serverIpVisible" prop="serverip" label="主机IP" width="130" :show-overflow-tooltip="true"/>
+            <el-table-column v-if="dateVisible" prop="date" label="日期时间" width="208" :show-overflow-tooltip="true"/>
+            <el-table-column prop="text" label="日志" :show-overflow-tooltip="true">
               <template #default="scope">
                 <span v-text="scope.row.text"></span>
               </template>
@@ -136,7 +150,7 @@
 <script>
 import api from '../api'
 import { ref } from 'vue'
-import { Search, RefreshLeft, ArrowUp, ArrowDown } from '@element-plus/icons-vue'
+import { Search, RefreshLeft, ArrowUp, ArrowDown, Check } from '@element-plus/icons-vue'
 
 const FixHeight = 215  // 177
 
@@ -151,16 +165,23 @@ export default {
         storeName: '',
         searchKey: '',
         system: '',
+        systems: [],
         datetime: null,
         pageSize: 100,
         currentId: '',
         forward: true,
       },
       data: [],
+      systemVisible: true,
+      serverNameVisible: false,
+      serverIpVisible: false,
+      dateVisible: true,
       info: '',
       storage: ref(''),
-      storageOptions: [],
+      storageOptions: ref([]),
       showSearchPanel: ref(false),
+      systemOptions: ref([]),
+      systemSet: new Set(),
       shortcuts: [
                     {
                       text: '近5分钟',
@@ -287,6 +308,12 @@ export default {
     }
   },
   methods: {
+    switchVisible(name){
+      name == 'system' && (this.systemVisible = !this.systemVisible);
+      name == 'servername' && (this.serverNameVisible = !this.serverNameVisible);
+      name == 'serverip' && (this.serverIpVisible = !this.serverIpVisible);
+      name == 'date' && (this.dateVisible = !this.dateVisible);
+    },
     fnResetSearchForm(){
       this.params.searchKey = '';
       this.params.system = '';
@@ -316,6 +343,13 @@ export default {
             }else{
               this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
             }
+
+            this.$nextTick(()=>{
+              res.result.data.forEach(item =>{
+                item.system && !this.systemSet.has(item.system) && this.systemSet.add(item.system) && this.systemOptions.push({value:item.system,label:item.system});
+              });
+            });
+
           }else{
             this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${this.data.length} 条，正展示前 ${this.data.length} 条`
           }
@@ -343,6 +377,13 @@ export default {
           }else{
             this.info = `日志总量 ${res.result.total} 条，当前条件最多匹配 ${res.result.count} 条，正展示前 ${this.data.length} 条`
           }
+
+          this.$nextTick(()=>{
+              res.result.data.forEach(item =>{
+                item.system && !this.systemSet.has(item.system) && this.systemSet.add(item.system) && this.systemOptions.push({value:item.system,label:item.system});
+              });
+          });
+
         }else if (res.code == 403){
           api.logout();
         }

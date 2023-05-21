@@ -43,9 +43,6 @@ func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 // 添加日志（参数是普通文本日志）
 func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system string) {
 	txt := cmn.Trim(logText)
-	if txt == "" {
-		return
-	}
 	ary := cmn.Split(txt, "\n")
 
 	d := new(logdata.LogDataModel)
@@ -72,7 +69,6 @@ func (s *LogDataStorageHandle) AddTextLog(date string, logText string, system st
 // 添加日志（参数LogDataModel）
 func (s *LogDataStorageHandle) AddLogDataModel(data *logdata.LogDataModel) {
 	ary := cmn.Split(data.Text, "\n")
-	data.Text = cmn.Trim(ary[0])
 	if len(ary) > 1 {
 		data.Detail = data.Text
 	}

@@ -152,6 +152,10 @@ func (s *LogDataStorage) readyGo() {
 }
 
 func (s *LogDataStorage) saveLogData(model *LogDataModel) {
+	if model.Text == "" {
+		return // Text没有内容的话就不保存了
+	}
+
 	//store.wg.Done()
 	s.currentCount++                              // ID递增
 	doc := new(LogDataDocument)                   // 文档
@@ -164,7 +168,7 @@ func (s *LogDataStorage) saveLogData(model *LogDataModel) {
 	cmn.Debug("保存日志数据 ", doc.Id)
 }
 
-// 创建日志索引（一次建一条日志的索引）,没有可建索引时返回false
+// 创建日志索引（一次建一条日志的索引）,没有可建索引时返回0
 func (s *LogDataStorage) createInvertedIndex() int {
 
 	// 索引信息和日志数量相互比较，判断是否继续创建索引
@@ -179,11 +183,38 @@ func (s *LogDataStorage) createInvertedIndex() int {
 		return 2
 	}
 
-	// 整理关键词
+	// 整理生成关键词
 	adds := docm.Keywords
 	adds = append(adds, docm.Tags...)
-	adds = append(adds, docm.Client, docm.Server, "~"+docm.System, docm.User)         // 特殊处理system
-	kws := tokenizer.CutForSearchEx(docm.Text+" "+docm.System, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
+	if docm.System != "" {
+		adds = append(adds, "~"+docm.System)
+	}
+	if docm.ServerName != "" {
+		adds = append(adds, "!"+docm.ServerName)
+	}
+	if docm.ServerIp != "" {
+		adds = append(adds, "@"+docm.ServerIp)
+	}
+	if docm.ClientIp != "" {
+		adds = append(adds, "#"+docm.ClientIp)
+	}
+	if docm.TraceId != "" {
+		adds = append(adds, "$"+docm.TraceId)
+	}
+	if docm.LogType != "" {
+		adds = append(adds, "%"+docm.LogType)
+	}
+	if docm.User != "" {
+		adds = append(adds, "^"+docm.User)
+	}
+	if docm.Module != "" {
+		adds = append(adds, "&"+docm.Module)
+	}
+	if docm.Operation != "" {
+		adds = append(adds, "*"+docm.Operation)
+	}
+	kws := tokenizer.CutForSearchEx(docm.Text+" "+docm.System+" "+docm.ServerName+" "+docm.ServerIp+
+		" "+docm.ClientIp+" "+docm.TraceId+" "+docm.User+" "+docm.Module+" "+docm.Operation, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {

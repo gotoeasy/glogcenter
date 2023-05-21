@@ -112,7 +112,7 @@ curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo l
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.9.1</version>
+    <version>0.10.0</version>
 </dependency>
 ```
 
@@ -206,8 +206,14 @@ func main() {
 - [ ] 多语言
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
-- [x] `glc-logback-appender:0.9.1` Java项目日志发送时的特殊字符BUG修复
 
+
+### 版本`0.10.0`
+
+- [x] 页面优化：系统名检索条件可选择输入，可以不用敲打了
+- [x] 页面增加主机名、主机IP展示列，可配置是否显示，适用更多复杂使用场景
+- [x] 同步使用`glc-logback-appender:0.10.0`，即可自动产生主机名、主机IP信息
+- [x] 修复一些小瑕疵
 
 ### 版本`0.9.0`
 

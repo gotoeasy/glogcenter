@@ -24,7 +24,8 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error500(err.Error())
 	}
 
-	addTextLog(md)
+	addDataModelLog(md)
+	// addTextLog(md)
 
 	if conf.IsClusterMode() {
 		go TransferGlc(md.ToJson()) // 转发其他GLC服务
@@ -48,12 +49,20 @@ func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error500(err.Error())
 	}
 
-	addTextLog(md)
+	md.Text = cmn.Trim(md.Text)
+	addDataModelLog(md)
+	// addTextLog(md)
 	return gweb.Ok()
 }
 
+// // 添加日志
+// func addTextLog(md *logdata.LogDataModel) {
+// 	engine := ldb.NewDefaultEngine()
+// 	engine.AddTextLog(md.Date, md.Text, md.System)
+// }
+
 // 添加日志
-func addTextLog(md *logdata.LogDataModel) {
+func addDataModelLog(data *logdata.LogDataModel) {
 	engine := ldb.NewDefaultEngine()
-	engine.AddTextLog(md.Date, md.Text, md.System)
+	engine.AddLogDataModel(data)
 }
