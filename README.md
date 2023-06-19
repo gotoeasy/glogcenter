@@ -84,7 +84,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_LOG_LEVEL`日志级别，可设定值为`debug/info/warn/error`，默认`info`
 - [x] `GLC_GOMAXPROCS`使用最大CPU数量，值不在实际范围内时按最大值看待，默认最大值，常用于`docker`方式
 
-## 命令行启动参数（适用`0.6.*`及以上版本）
+## 命令行启动参数
 - [x] 支持命令行参数`-v`查看版本
 - [x] 在Linux系统下支持命令行参数`-d`以后台方式启动
 - [x] 在Linux系统下支持命令行参数`stop`关闭程序
@@ -95,9 +95,9 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 
 ## 接口
 - [x] `/glc/v1/log/add`日志添加，`POST`，`application/json` <br>
-      字段`system`： 字符串，对应页面的`分类` <br>
+      字段`system`： 字符串，对应页面的`系统名` <br>
       字段`date`： 字符串，对应页面的`日期时间` <br>
-      字段`text`： 字符串，对应页面的`日志内容` <br>
+      字段`text`： 字符串，对应页面的`日志` <br>
 
 ```shell
 # 发送测试数据的参考脚本
