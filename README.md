@@ -19,7 +19,7 @@
 
 <br>
 国外仓库地址： https://github.com/gotoeasy/glogcenter <br>
-国内（仅同步）： https://gitee.com/gotoeasy/glogcenter
+国内(仅同步)： https://gitee.com/gotoeasy/glogcenter
 <br>
 <br>
 
