@@ -10,9 +10,6 @@
 终于，尝试用`go`写个日志中心，结果各种优异表现令人惊艳，故起名`glogcenter`，简称`GLC`，开仓建库<br>
 <br>
 
-国内仓库地址： https://github.com/gotoeasy/glogcenter <br>
-国内仓库（仅同步）： https://gitee.com/gotoeasy/glogcenter
-<br>
 
 [![Golang](https://img.shields.io/badge/golang-1.20-brightgreen.svg)](https://golang.google.cn)
 [![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
@@ -20,6 +17,11 @@
 [![License](https://img.shields.io/github/license/gotoeasy/glogcenter)](https://github.com/gotoeasy/glogcenter/blob/master/LICENSE)
 <br>
 
+<br>
+国内仓库地址： https://github.com/gotoeasy/glogcenter <br>
+国内仓库（仅同步）： https://gitee.com/gotoeasy/glogcenter
+<br>
+<br>
 
 ## 特点
 - [x] 使用`golang`实现，具备`go`的各种特性优势，关键是省资源、性能高
