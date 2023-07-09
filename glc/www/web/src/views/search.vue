@@ -10,7 +10,7 @@
               <div style="display:flex;justify-content:space-between;width:100%">
                 <div>
 
-                  <el-input @keyup.enter="search()" v-model="params.searchKey" placeholder="请输入关键词检索" style="width:600px;">
+                  <el-input @keyup.enter="search()" v-model="params.searchKey" placeholder="请输入关键词检索，支持多关键词" style="width:600px;">
                     <template #append>
                       <el-button type="primary" @click="search" class="x-search">
                         <el-icon>
@@ -51,11 +51,22 @@
                         </el-select>
                       </el-form-item>
                     </el-row>
-                   <el-row>
+                    <el-row>
                       <el-form-item label="系统名">
                         <el-select v-model="params.system" style="width:420px;" :multiple="false" filterable allow-create default-first-option clearable
                            :reserve-keyword="true" placeholder="请输入系统名">
                           <el-option v-for="item in systemOptions" :key="item.value" :label="item.label" :value="item.value"/>
+                        </el-select>
+                      </el-form-item>
+                    </el-row>
+                    <el-row>
+                      <el-form-item label="日志级别">
+                        <el-select v-model="params.loglevel" style="width:420px;" :multiple="false" clearable
+                           :reserve-keyword="true" placeholder="请选择...">
+                           <el-option label="ERROR" value="error"/>
+                           <el-option label="WARN" value="warning"/>
+                           <el-option label="INFO" value="info"/>
+                           <el-option label="DEBUG" value="debug"/>
                         </el-select>
                       </el-form-item>
                     </el-row>
@@ -99,6 +110,8 @@
                         <el-dropdown-item @click="switchVisible('servername')">{{serverNameVisible?'隐藏':'显示'}}主机名</el-dropdown-item>
                         <el-dropdown-item @click="switchVisible('serverip')">{{serverIpVisible?'隐藏':'显示'}}主机IP</el-dropdown-item>
                         <el-dropdown-item @click="switchVisible('date')">{{dateVisible?'隐藏':'显示'}}日期时间</el-dropdown-item>
+                        <el-dropdown-item @click="switchVisible('loglevel')">{{logLevelVisible?'隐藏':'显示'}}Level</el-dropdown-item>
+                        <el-dropdown-item @click="switchVisible('traceid')">{{traceIdVisible?'隐藏':'显示'}}TraceID</el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -125,6 +138,8 @@
             <el-table-column v-if="serverNameVisible" prop="servername" label="主机名" width="180" :show-overflow-tooltip="true"/>
             <el-table-column v-if="serverIpVisible" prop="serverip" label="主机IP" width="130" :show-overflow-tooltip="true"/>
             <el-table-column v-if="dateVisible" prop="date" label="日期时间" width="208" :show-overflow-tooltip="true"/>
+            <el-table-column v-if="logLevelVisible" prop="loglevel" label="Level" width="75" :show-overflow-tooltip="true"/>
+            <el-table-column v-if="traceIdVisible" prop="traceid" label="TraceId" width="300" :show-overflow-tooltip="true"/>
             <el-table-column prop="text" label="日志" :show-overflow-tooltip="true">
               <template #default="scope">
                 <span v-text="scope.row.text"></span>
@@ -155,7 +170,6 @@ import { Search, RefreshLeft, ArrowUp, ArrowDown, Check } from '@element-plus/ic
 const FixHeight = 215  // 177
 
 export default {
-//  name: 'dashboard',
   components: {  },
   data() {
     return {
@@ -164,6 +178,7 @@ export default {
       params: {
         storeName: '',
         searchKey: '',
+        loglevel: '',
         system: '',
         systems: [],
         datetime: null,
@@ -175,6 +190,8 @@ export default {
       systemVisible: true,
       serverNameVisible: false,
       serverIpVisible: false,
+      logLevelVisible: true,
+      traceIdVisible: false,
       dateVisible: true,
       info: '',
       storage: ref(''),
@@ -304,7 +321,7 @@ export default {
   },
   computed:{
     hasMoreCondition(){
-      return !this.params.datetime && !this.storage && !this.params.system;
+      return !this.params.datetime && !this.storage && !this.params.system && !this.params.loglevel;
     }
   },
   methods: {
@@ -312,11 +329,14 @@ export default {
       name == 'system' && (this.systemVisible = !this.systemVisible);
       name == 'servername' && (this.serverNameVisible = !this.serverNameVisible);
       name == 'serverip' && (this.serverIpVisible = !this.serverIpVisible);
+      name == 'loglevel' && (this.logLevelVisible = !this.logLevelVisible);
+      name == 'traceid' && (this.traceIdVisible = !this.traceIdVisible);
       name == 'date' && (this.dateVisible = !this.dateVisible);
     },
     fnResetSearchForm(){
       this.params.searchKey = '';
       this.params.system = '';
+      this.params.loglevel = '';
       this.params.datetime = null;
       this.storage = '';
       this.search();
@@ -365,7 +385,7 @@ export default {
       this.params.currentId = ''
       this.params.datetimeFrom = (this.params.datetime || ['', ''])[0]
       this.params.datetimeTo = (this.params.datetime || ['', ''])[1]
-     // console.info("----------this.params",this.params)
+      // console.info("----------this.params",this.params)
       api.search(this.params).then(rs => {
         let res = rs.data
         if (res.success) {

@@ -213,8 +213,11 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	if docm.Operation != "" {
 		adds = append(adds, "*"+docm.Operation)
 	}
+	if docm.LogLevel != "" {
+		adds = append(adds, "-"+docm.LogLevel)
+	}
 	kws := tokenizer.CutForSearchEx(docm.Text+" "+docm.System+" "+docm.ServerName+" "+docm.ServerIp+
-		" "+docm.ClientIp+" "+docm.TraceId+" "+docm.User+" "+docm.Module+" "+docm.Operation, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
+		" "+docm.ClientIp+" "+docm.TraceId+" "+docm.LogLevel+" "+docm.User+" "+docm.Module+" "+docm.Operation, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {

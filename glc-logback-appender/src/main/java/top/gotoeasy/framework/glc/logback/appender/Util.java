@@ -1,7 +1,6 @@
 package top.gotoeasy.framework.glc.logback.appender;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
@@ -16,7 +15,7 @@ public class Util {
         if ("".equals(serverName)) {
             try {
                 serverName = InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
+            } catch (Exception e) {
                 // ignore
             }
         }
@@ -27,7 +26,7 @@ public class Util {
         if ("".equals(serverIp)) {
             try {
                 serverIp = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
+            } catch (Exception e) {
                 // ignore
             }
         }

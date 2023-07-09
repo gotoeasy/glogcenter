@@ -76,7 +76,7 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
 
         // 异步发送日志
         executor.execute(() -> {
-            sendToRabbitMQ(layout.doLayout(event));
+            sendToRabbitMQ(layout.doLayout(event), event);
         });
     }
 
@@ -85,7 +85,7 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
      * 
      * @param text 日志
      */
-    protected void sendToRabbitMQ(String text) {
+    protected void sendToRabbitMQ(String text, ILoggingEvent event) {
         if (text == null) {
             return; // ignore
         }
@@ -95,11 +95,21 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
                 initConnectionChannel();
             }
 
+            String traceid = MdcUtil.getTraceId();
+            String clientip = MdcUtil.getClientIp();
+
             String body = "{\"text\":" + Util.encodeStr(text.trim());
-            body += ",\"date\":" + Util.encodeStr(Util.getDateString());
+            body += ",\"date\":\"" + Util.getDateString() + "\"";
             body += ",\"system\":" + Util.encodeStr(getSystem());
             body += ",\"servername\":" + Util.encodeStr(Util.getServerName());
             body += ",\"serverip\":" + Util.encodeStr(Util.getServerIp());
+            body += ",\"loglevel\":\"" + event.getLevel().toString() + "\"";
+            if (!"".equals(traceid)) {
+                body += ",\"traceid\":" + Util.encodeStr(traceid);
+            }
+            if (!"".equals(clientip)) {
+                body += ",\"clientip\":" + Util.encodeStr(clientip);
+            }
             body += "}";
 
             channel.basicPublish("", "glc-log-queue", null, body.getBytes("utf-8"));
