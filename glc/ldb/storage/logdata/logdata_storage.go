@@ -189,32 +189,8 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	if docm.System != "" {
 		adds = append(adds, "~"+docm.System)
 	}
-	if docm.ServerName != "" {
-		adds = append(adds, "!"+docm.ServerName)
-	}
-	if docm.ServerIp != "" {
-		adds = append(adds, "@"+docm.ServerIp)
-	}
-	if docm.ClientIp != "" {
-		adds = append(adds, "#"+docm.ClientIp)
-	}
-	if docm.TraceId != "" {
-		adds = append(adds, "$"+docm.TraceId)
-	}
-	if docm.LogType != "" {
-		adds = append(adds, "%"+docm.LogType)
-	}
-	if docm.User != "" {
-		adds = append(adds, "^"+docm.User)
-	}
-	if docm.Module != "" {
-		adds = append(adds, "&"+docm.Module)
-	}
-	if docm.Operation != "" {
-		adds = append(adds, "*"+docm.Operation)
-	}
 	if docm.LogLevel != "" {
-		adds = append(adds, "-"+docm.LogLevel)
+		adds = append(adds, "!"+docm.LogLevel)
 	}
 	kws := tokenizer.CutForSearchEx(docm.Text+" "+docm.System+" "+docm.ServerName+" "+docm.ServerIp+
 		" "+docm.ClientIp+" "+docm.TraceId+" "+docm.LogLevel+" "+docm.User+" "+docm.Module+" "+docm.Operation, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理

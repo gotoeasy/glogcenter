@@ -65,8 +65,8 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
         DataOutputStream dos = null;
         String body = null;
         try {
-            String traceid = MdcUtil.getTraceId();
-            String clientip = MdcUtil.getClientIp();
+            String traceid = event.getMDCPropertyMap().get(MdcUtil.TRACE_ID);
+            String clientip = event.getMDCPropertyMap().get(MdcUtil.CLIENT_IP);
 
             body = "{\"text\":" + Util.encodeStr(text.trim());
             body += ",\"date\":\"" + Util.getDateString() + "\"";
@@ -74,10 +74,10 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
             body += ",\"servername\":" + Util.encodeStr(Util.getServerName());
             body += ",\"serverip\":" + Util.encodeStr(Util.getServerIp());
             body += ",\"loglevel\":\"" + event.getLevel().toString() + "\"";
-            if (!"".equals(traceid)) {
+            if (traceid != null && !"".equals(traceid)) {
                 body += ",\"traceid\":" + Util.encodeStr(traceid);
             }
-            if (!"".equals(clientip)) {
+            if (clientip != null && !"".equals(clientip)) {
                 body += ",\"clientip\":" + Util.encodeStr(clientip);
             }
             body += "}";

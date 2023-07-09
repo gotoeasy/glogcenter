@@ -20,7 +20,7 @@ type LogDataModel struct {
 	System     string   `json:"system,omitempty"`     // 系统名
 	ServerName string   `json:"servername,omitempty"` // 服务器名
 	ServerIp   string   `json:"serverip,omitempty"`   // 服务器IP
-	ClientIp   string   `json:"client,omitempty"`     // 客户端IP
+	ClientIp   string   `json:"clientip,omitempty"`   // 客户端IP
 	TraceId    string   `json:"traceid,omitempty"`    // 跟踪ID
 	LogType    string   `json:"logtype,omitempty"`    // 日志类型（1:登录日志、2:操作日志）
 	LogLevel   string   `json:"loglevel,omitempty"`   // 日志级别（debug、info、error等）

@@ -48,7 +48,7 @@ func (e *Engine) AddLogDataModel(data *logdata.LogDataModel) {
 	e.logStorage.AddLogDataModel(data)
 }
 
-func (e *Engine) Search(searchKey string, system string, minDatetime string, maxDatetime string, loglevel string, traceid string,
+func (e *Engine) Search(searchKey string, system string, minDatetime string, maxDatetime string, loglevel string,
 	pageSize int, currentDocId uint32, forward bool) *search.SearchResult {
 
 	// 检查修正pageSize
@@ -61,7 +61,7 @@ func (e *Engine) Search(searchKey string, system string, minDatetime string, max
 
 	// 分词后检索
 	var adds []string
-	adds = append(adds, system, loglevel, traceid)
+	adds = append(adds, system, loglevel)
 	kws := tokenizer.CutForSearchEx(searchKey, adds, nil) // 检索用关键词处理
 
 	if searchKey == "" {

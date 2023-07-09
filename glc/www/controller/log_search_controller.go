@@ -25,19 +25,15 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	datetimeTo := req.GetFormParameter("datetimeTo")
 	system := req.GetFormParameter("system")
 	loglevel := req.GetFormParameter("loglevel")
-	traceid := req.GetFormParameter("traceid")
 
 	if !cmn.IsBlank(system) {
 		system = "~" + cmn.Trim(system)
 	}
-	if !cmn.IsBlank(traceid) {
-		traceid = "$" + cmn.Trim(traceid)
-	}
 	if !cmn.IsBlank(loglevel) {
-		loglevel = "-" + cmn.Trim(loglevel)
+		loglevel = "!" + cmn.Trim(loglevel)
 	}
 
 	eng := ldb.NewEngine(storeName)
-	rs := eng.Search(searchKey, system, datetimeFrom, datetimeTo, loglevel, traceid, pageSize, currentId, forward)
+	rs := eng.Search(searchKey, system, datetimeFrom, datetimeTo, loglevel, pageSize, currentId, forward)
 	return gweb.Result(rs)
 }

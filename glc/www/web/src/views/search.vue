@@ -109,6 +109,7 @@
                         <el-dropdown-item @click="switchVisible('system')">{{systemVisible?'隐藏':'显示'}}系统名</el-dropdown-item>
                         <el-dropdown-item @click="switchVisible('servername')">{{serverNameVisible?'隐藏':'显示'}}主机名</el-dropdown-item>
                         <el-dropdown-item @click="switchVisible('serverip')">{{serverIpVisible?'隐藏':'显示'}}主机IP</el-dropdown-item>
+                        <el-dropdown-item @click="switchVisible('clientip')">{{clientIpVisible?'隐藏':'显示'}}客户端IP</el-dropdown-item>
                         <el-dropdown-item @click="switchVisible('date')">{{dateVisible?'隐藏':'显示'}}日期时间</el-dropdown-item>
                         <el-dropdown-item @click="switchVisible('loglevel')">{{logLevelVisible?'隐藏':'显示'}}Level</el-dropdown-item>
                         <el-dropdown-item @click="switchVisible('traceid')">{{traceIdVisible?'隐藏':'显示'}}TraceID</el-dropdown-item>
@@ -137,6 +138,7 @@
             <el-table-column v-if="systemVisible" prop="system" label="系统名" width="120" :show-overflow-tooltip="true"/>
             <el-table-column v-if="serverNameVisible" prop="servername" label="主机名" width="180" :show-overflow-tooltip="true"/>
             <el-table-column v-if="serverIpVisible" prop="serverip" label="主机IP" width="130" :show-overflow-tooltip="true"/>
+            <el-table-column v-if="clientIpVisible" prop="clientip" label="客户端IP" width="130" :show-overflow-tooltip="true"/>
             <el-table-column v-if="dateVisible" prop="date" label="日期时间" width="208" :show-overflow-tooltip="true"/>
             <el-table-column v-if="logLevelVisible" prop="loglevel" label="Level" width="75" :show-overflow-tooltip="true"/>
             <el-table-column v-if="traceIdVisible" prop="traceid" label="TraceId" width="300" :show-overflow-tooltip="true"/>
@@ -190,7 +192,8 @@ export default {
       systemVisible: true,
       serverNameVisible: false,
       serverIpVisible: false,
-      logLevelVisible: true,
+      clientIpVisible: false,
+      logLevelVisible: false,
       traceIdVisible: false,
       dateVisible: true,
       info: '',
@@ -329,6 +332,7 @@ export default {
       name == 'system' && (this.systemVisible = !this.systemVisible);
       name == 'servername' && (this.serverNameVisible = !this.serverNameVisible);
       name == 'serverip' && (this.serverIpVisible = !this.serverIpVisible);
+      name == 'clientip' && (this.clientIpVisible = !this.clientIpVisible);
       name == 'loglevel' && (this.logLevelVisible = !this.logLevelVisible);
       name == 'traceid' && (this.traceIdVisible = !this.traceIdVisible);
       name == 'date' && (this.dateVisible = !this.dateVisible);

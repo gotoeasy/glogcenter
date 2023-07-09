@@ -9,16 +9,6 @@ public class MdcUtil {
     public static final String TRACE_ID = "traceid";
     public static final String CLIENT_IP = "clientip";
 
-    public static String getClientIp() {
-        String str = MDC.get(CLIENT_IP);
-        return str == null ? "" : str;
-    }
-
-    public static String getTraceId() {
-        String str = MDC.get(TRACE_ID);
-        return str == null ? "" : str;
-    }
-
     public static void setClientIp(String clientip) {
         MDC.put(CLIENT_IP, clientip);
     }
