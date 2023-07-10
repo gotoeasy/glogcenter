@@ -35,7 +35,7 @@
 - [x] 支持从`RabbitMQ`收取日志信息，满足更多闭环需求
 - [x] 内置提供简洁的`VUE`实现的日志查询管理界面
 - [x] 支持多服务集群模式部署，确保服务及数据的冗余性
-- [x] 系统间的耦合性极低，可以非常方便的接入各系统，上至央企大项目下至个人本地开发，已历经众多案例磨炼，表现稳定出色，达`生产级应用`要求
+- [x] 系统间的耦合性极低，可以非常方便的接入各系统，上至央企大项目下至本地开发调试，已历经众多案例磨炼，表现稳定出色，达`生产级应用`要求
 
 
 <div align=center>
@@ -119,7 +119,7 @@ curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo l
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.10.0</version>
+    <version>0.10.1</version>
 </dependency>
 ```
 
@@ -210,14 +210,17 @@ func main() {
 
 ### 开发版`latest`
 
-- [x] 添加支持`日志级别`展示列及过滤条件，需同步使用`glc-logback-appender:0.10.1`
-- [x] 添加支持`客户端IP`展示列，基于MDC实现，需参考使用MdcUtil类
-- [x] 添加支持`TraceId`展示列，基于MDC实现，需参考使用MdcUtil类
 - [ ] 页面改版优化
 - [ ] 多语言支持
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.10.1`
+
+- [x] 添加支持`日志级别`展示列及过滤条件，需同步使用`glc-logback-appender:0.10.1`
+- [x] 添加支持`客户端IP`展示列，基于MDC实现，Java项目需参考使用MdcUtil类
+- [x] 添加支持`TraceId`展示列，基于MDC实现，Java项目需参考使用MdcUtil类
 
 ### 版本`0.10.0`
 
@@ -230,6 +233,10 @@ func main() {
 
 - [x] 增加分类(系统)检索条件，支持多系统时准确筛选
 - [x] 修复一些小瑕疵
+
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.8.8`
 
@@ -331,3 +338,5 @@ func main() {
 - [x] 提供`java`项目日志收集包，日志都发来发来发来
 - [x] 服务接口`/glc/add`添加日志
 - [x] 服务接口`/glc/search`查询日志
+
+</details>
