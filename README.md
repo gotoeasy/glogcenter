@@ -105,6 +105,11 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
       字段`system`： 字符串，对应页面的`系统名` <br>
       字段`date`： 字符串，对应页面的`日期时间` <br>
       字段`text`： 字符串，对应页面的`日志` <br>
+      字段`servername`： 字符串，对应页面的`主机名` <br>
+      字段`serverip`： 字符串，对应页面的`主机IP` <br>
+      字段`loglevel`： 字符串，对应页面的`Level` <br>
+      字段`traceid`： 字符串，对应页面的`TraceId` <br>
+      字段`clientip`： 字符串，对应页面的`客户端IP` <br>
 
 ```shell
 # 发送测试数据的参考脚本
