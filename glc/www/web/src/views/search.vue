@@ -64,7 +64,7 @@
                         <el-select v-model="params.loglevel" style="width:420px;" :multiple="false" clearable
                            :reserve-keyword="true" placeholder="请选择...">
                            <el-option label="ERROR" value="error"/>
-                           <el-option label="WARN" value="warning"/>
+                           <el-option label="WARN" value="warn"/>
                            <el-option label="INFO" value="info"/>
                            <el-option label="DEBUG" value="debug"/>
                         </el-select>

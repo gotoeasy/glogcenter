@@ -72,7 +72,8 @@ func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 	}
 
 	engine := ldb.NewDefaultEngine()
-	engine.AddTextLog(md.Date, md.Text, md.System)
+	md.Text = cmn.Trim(md.Text)
+	engine.AddLogDataModel(md)
 
 	if conf.IsClusterMode() {
 		go controller.TransferGlc(md.ToJson()) // 转发其他GLC服务

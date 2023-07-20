@@ -221,6 +221,10 @@ func main() {
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
+### 版本`0.10.2`
+
+- [x] 修复`issue #16`的查询BUG
+
 ### 版本`0.10.1`
 
 - [x] 添加支持`日志级别`展示列及过滤条件，需同步使用`glc-logback-appender:0.10.1`
@@ -234,14 +238,14 @@ func main() {
 - [x] 同步使用`glc-logback-appender:0.10.0`，即可自动产生主机名、主机IP信息
 - [x] 修复一些小瑕疵
 
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
+
 ### 版本`0.9.0`
 
 - [x] 增加分类(系统)检索条件，支持多系统时准确筛选
 - [x] 修复一些小瑕疵
-
-
-<details>
-<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.8.8`
 
