@@ -124,7 +124,7 @@ curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo l
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.10.1</version>
+    <version>0.10.2</version>
 </dependency>
 ```
 
