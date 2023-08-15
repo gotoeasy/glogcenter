@@ -60,6 +60,7 @@ require (
 )
 
 require (
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/gzip v0.0.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db // indirect

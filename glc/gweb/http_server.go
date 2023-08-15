@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/gotoeasy/glang/cmn"
@@ -30,15 +31,8 @@ func Run() {
 	ginEngine := gin.Default()
 
 	// 允许跨域
-	if conf.IsEnableCross() {
-		ginEngine.Use(func(c *gin.Context) {
-			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-			c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-			c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token,Authorization,Token,X-GLC-AUTH")
-			c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length,Access-Control-Allow-Origin,Access-Control-Allow-Headers,Content-Type,Token,X-GLC-AUTH")
-			c.Next()
-		})
+	if conf.IsEnableCors() {
+		ginEngine.Use(newCors())
 	}
 
 	// 按配置判断启用GZIP压缩
@@ -139,4 +133,16 @@ func Run() {
 	if err != nil && err != http.ErrServerClosed {
 		cmn.Fatalln(err.Error()) // 启动失败的话打印错误信息后退出
 	}
+}
+
+func newCors() gin.HandlerFunc {
+	return cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"*"},
+		ExposeHeaders:    []string{"Content-Length", "Authorization", "Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	},
+	)
 }

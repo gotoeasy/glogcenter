@@ -44,7 +44,7 @@ var minioPassword string
 var minioBucket string
 var enableUploadMinio bool
 var goMaxProcess int
-var enableCross bool
+var enableCors bool
 
 func init() {
 	cmn.SetLogLevel(cmn.GetEnvStr("GLC_LOG_LEVEL", "INFO")) // 默认INFO级别日志
@@ -91,12 +91,12 @@ func UpdateConfigByEnv() {
 	minioBucket = cmn.GetEnvStr("GLC_MINIO_BUCKET", "")                         // MINIO桶名，默认“”
 	enableUploadMinio = cmn.GetEnvBool("GLC_ENABLE_UPLOAD_MINIO", false)        // 是否开启上传备份至MINIO服务器，默认false
 	goMaxProcess = getGoMaxProcessConf(cmn.GetEnvInt("GLC_GOMAXPROCS", -1))     // 使用的最大CPU数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
-	enableCross = cmn.GetEnvBool("GLC_ENABLE_CROSS", false)                     // 是否允许跨域，默认false
+	enableCors = cmn.GetEnvBool("GLC_ENABLE_CORS", false)                       // 是否允许跨域，默认false
 }
 
 // 取配置： 是否允许跨域，可通过环境变量“GLC_ENABLE_CROSS”设定，默认false
-func IsEnableCross() bool {
-	return enableCross
+func IsEnableCors() bool {
+	return enableCors
 }
 
 // 取配置： 使用的最大CPU数量，可通过环境变量“GLC_GOMAXPROCS”设定，默认最大CPU数量
