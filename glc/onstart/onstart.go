@@ -9,7 +9,6 @@ import (
 	"glc/rabbitmq"
 	"glc/www/cluster"
 	"glc/www/controller"
-	"glc/www/filter"
 	"glc/www/html"
 )
 
@@ -18,9 +17,6 @@ func Run() {
 	http.StartHttpServer(func() {
 
 		contextPath := conf.GetContextPath() // ContextPath
-
-		// 过滤器
-		gweb.RegisterFilter(filter.CrossFilter)
 
 		// Html静态文件
 		gweb.RegisterController(method.GET, contextPath+"/", html.HomeIndexHtmlController) // [响应/glc/]
