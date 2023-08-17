@@ -51,6 +51,11 @@ docker run -d -p 8080:8080 gotoeasy/glc
 
 # 外挂数据目录
 docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
+
+# 【简易用法】
+# 启动成功后即可按 http://ip:port 访问
+# 支持多关键词检索，比如输入【key1、key2、key3】检索出同时满足这3个关键词的结果
+# 每次检索100条，滚动到底部时自动检索后面100条
 ```
 
 ## `docker`集群部署模式简易示例
@@ -103,7 +108,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 ## 接口
 - [x] `/glc/v1/log/add`日志添加，`POST`，`application/json` <br>
       字段`system`： 字符串，对应页面的`系统名` <br>
-      字段`date`： 字符串，对应页面的`日期时间` <br>
+      字段`date`： 字符串，对应页面的`日期时间`，格式`yyyy-MM-dd HH:mm:ss.SSS` <br>
       字段`text`： 字符串，对应页面的`日志` <br>
       字段`servername`： 字符串，对应页面的`主机名` <br>
       字段`serverip`： 字符串，对应页面的`主机IP` <br>
@@ -113,7 +118,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 
 ```shell
 # 发送测试数据的参考脚本
-# 注意时间格式要一直，否则按时间范围检索可能无法得到预想结果
+# 注意时间格式要一致，否则按时间范围检索可能无法得到预想结果
 curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo log text"}' \
      -H "Content-Type:application/json" http://127.0.0.1:8080/glc/v1/log/add
 ```
