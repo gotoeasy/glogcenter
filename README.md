@@ -80,8 +80,8 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_USERNAME`查询界面登录用的用户名，默认`glc`
 - [x] `GLC_PASSWORD`查询界面登录用的密码，默认`GLogCenter100%666`
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
-- [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
-- [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
+- [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`，秘钥的`header`键名为`X-GLC-AUTH`
+- [ ] `GLC_ENABLE_CORS`是否允许跨域，默认`false`
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
@@ -113,7 +113,8 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 
 ```shell
 # 发送测试数据的参考脚本
-curl -X POST -d '{"system":"demo", "date":"20230101 01:02:03.456","text":"demo log text"}' \
+# 注意时间格式要一直，否则按时间范围检索可能无法得到预想结果
+curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo log text"}' \
      -H "Content-Type:application/json" http://127.0.0.1:8080/glc/v1/log/add
 ```
 
