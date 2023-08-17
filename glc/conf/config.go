@@ -24,7 +24,7 @@ var serverPort string
 var contextPath string
 var enableSecurityKey bool
 var securityKey string
-var headerSecurityKey string
+var headerSecurityKey string = "X-GLC-AUTH"
 var enableAmqpConsume bool
 var enableWebGzip bool
 var amqpAddr string
@@ -70,7 +70,6 @@ func UpdateConfigByEnv() {
 	serverPort = cmn.GetEnvStr("GLC_SERVER_PORT", "8080")                       // web服务端口，默认“8080”
 	contextPath = cmn.GetEnvStr("GLC_CONTEXT_PATH", "/glc")                     // web服务contextPath
 	enableSecurityKey = cmn.GetEnvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
-	headerSecurityKey = cmn.GetEnvStr("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")  // web服务API秘钥的header键名
 	securityKey = cmn.GetEnvStr("GLC_SECURITY_KEY", "glogcenter")               // web服务API秘钥
 	enableWebGzip = cmn.GetEnvBool("GLC_ENABLE_WEB_GZIP", false)                // web服务是否开启Gzip
 	enableAmqpConsume = cmn.GetEnvBool("GLC_ENABLE_AMQP_CONSUME", false)        // 是否开启rabbitMq消费者接收日志
