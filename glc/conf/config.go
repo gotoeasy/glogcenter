@@ -45,6 +45,7 @@ var minioBucket string
 var enableUploadMinio bool
 var goMaxProcess int
 var enableCors bool
+var pageSize int
 
 func init() {
 	cmn.SetLogLevel(cmn.GetEnvStr("GLC_LOG_LEVEL", "INFO")) // 默认INFO级别日志
@@ -91,6 +92,20 @@ func UpdateConfigByEnv() {
 	enableUploadMinio = cmn.GetEnvBool("GLC_ENABLE_UPLOAD_MINIO", false)        // 是否开启上传备份至MINIO服务器，默认false
 	goMaxProcess = getGoMaxProcessConf(cmn.GetEnvInt("GLC_GOMAXPROCS", -1))     // 使用的最大CPU数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
 	enableCors = cmn.GetEnvBool("GLC_ENABLE_CORS", false)                       // 是否允许跨域，默认false
+	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))             // 每次检索件数，默认100（有效范围1~1000）
+}
+
+func GetPageSize() int {
+	return pageSize
+}
+func getPageSizeConf(n int) int {
+	if n < 1 {
+		n = 1
+	}
+	if n > 1000 {
+		n = 1000
+	}
+	return n
 }
 
 // 取配置： 是否允许跨域，可通过环境变量“GLC_ENABLE_CROSS”设定，默认false
