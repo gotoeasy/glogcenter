@@ -230,7 +230,6 @@
 <script setup>
 import { useThemeStore, useTokenStore } from '~/pkgs';
 import { config } from '~/config';
-import { $msg } from '~/pkgs/index-pkgs';
 
 const activeNames = '1';
 
@@ -239,7 +238,7 @@ const themeStore = useThemeStore();
 const tokenStore = useTokenStore();
 
 // 布局切换
-const selectLayout = name => (themeStore.layout = name);
+// const selectLayout = name => (themeStore.layout = name);
 
 // 主题色切换
 const selectPrimaryColor = idx => (themeStore.primaryColor = config.primaryColors[idx]);
