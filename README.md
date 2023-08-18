@@ -85,7 +85,8 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_USERNAME`查询界面登录用的用户名，默认`glc`
 - [x] `GLC_PASSWORD`查询界面登录用的密码，默认`GLogCenter100%666`
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
-- [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`，秘钥的`header`键名为`X-GLC-AUTH`
+- [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
+- [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
 - [ ] `GLC_ENABLE_CORS`是否允许跨域，默认`false`
 - [ ] `GLC_PAGE_SIZE`每次检索件数，默认`100`（有效范围`1~1000`）
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
