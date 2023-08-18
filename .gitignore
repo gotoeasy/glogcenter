@@ -23,3 +23,7 @@
 /glc-logback-appender/target/
 /**/.classpath
 /**/.project
+
+
+/glc/www/web/src/pkgs/*/
+/glc/www/web/src/pkgs/index-pkgs.js
