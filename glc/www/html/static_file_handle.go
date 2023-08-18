@@ -33,6 +33,7 @@ func StaticFileController(req *gweb.HttpRequest) *gweb.HttpResult {
 	contentType := getContentType(urlPath)
 	file, err := www.Static.ReadFile(getStaticFilePath(urlPath))
 	if err != nil && os.IsNotExist(err) {
+		cmn.Error("文件找不到", getStaticFilePath(urlPath), err)
 		req.ResponseData(404, contentType, cmn.StringToBytes("not found"))
 	} else {
 		req.ResponseData(200, contentType, file)
