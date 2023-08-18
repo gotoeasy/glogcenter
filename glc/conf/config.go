@@ -20,11 +20,11 @@ var maxIdleTime int
 var storeNameAutoAddDate bool
 var serverUrl string
 var serverIp string
-var serverPort string
+var serverPort string = "8080"
 var contextPath string
 var enableSecurityKey bool
 var securityKey string
-var headerSecurityKey string = "X-GLC-AUTH"
+var headerSecurityKey string
 var enableAmqpConsume bool
 var enableWebGzip bool
 var amqpAddr string
@@ -68,9 +68,9 @@ func UpdateConfigByEnv() {
 	storeNameAutoAddDate = cmn.GetEnvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
 	serverUrl = cmn.GetEnvStr("GLC_SERVER_URL", "")                             // 服务URL，默认“”，集群配置时自动获取地址可能不对，可通过这个设定
 	serverIp = cmn.GetEnvStr("GLC_SERVER_IP", "")                               // 服务IP，默认“”，当“”时会自动获取
-	serverPort = cmn.GetEnvStr("GLC_SERVER_PORT", "8080")                       // web服务端口，默认“8080”
 	contextPath = cmn.GetEnvStr("GLC_CONTEXT_PATH", "/glc")                     // web服务contextPath
 	enableSecurityKey = cmn.GetEnvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
+	headerSecurityKey = cmn.GetEnvStr("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")  // web服务API秘钥的header键名
 	securityKey = cmn.GetEnvStr("GLC_SECURITY_KEY", "glogcenter")               // web服务API秘钥
 	enableWebGzip = cmn.GetEnvBool("GLC_ENABLE_WEB_GZIP", false)                // web服务是否开启Gzip
 	enableAmqpConsume = cmn.GetEnvBool("GLC_ENABLE_AMQP_CONSUME", false)        // 是否开启rabbitMq消费者接收日志
