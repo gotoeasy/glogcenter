@@ -198,7 +198,6 @@ function search() {
   const url = `/v1/log/search`;
   const data = {};
   data.searchKey = formData.value.searchKeys;
-  data.pageSize = 100;
   data.storeName = formData.value.storage;
   data.system = formData.value.system;
   data.loglevel = formData.value.loglevel;
@@ -246,7 +245,6 @@ function searchMore() {
   const url = `/v1/log/search`;
   const data = {};
   data.searchKey = formData.value.searchKeys;
-  data.pageSize = 100;
   data.storeName = formData.value.storage;
   data.system = formData.value.system;
   data.loglevel = formData.value.loglevel;
