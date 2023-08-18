@@ -1,0 +1,497 @@
+html {
+  font-family: 'Helvetica Neue', helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', arial, sans-serif;
+  font-size: 14px;
+
+  // font-family: Arial;
+}
+
+// * 设置 notification/message 层级在 loading 之上
+.el-message,
+.el-notification {
+  z-index: 99999 !important;
+}
+
+// * 设置 el-alert 边框
+.el-alert {
+  border: 1px solid;
+}
+
+// * 当前页面最大化 css
+.main-maximize {
+  .aside-split,
+  .el-aside,
+  .el-header,
+  .el-footer,
+  .tabs-box {
+    display: none !important;
+  }
+}
+
+// * card 卡片样式
+.card {
+  box-sizing: border-box;
+  padding: 20px;
+  overflow-x: hidden;
+  background-color: var(--el-fill-color-blank);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgb(0 0 0 / 5%);
+}
+
+// * 不需要 card 卡片样式（在组件内使用 proTable 会使用到）
+.no-card {
+  .card {
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .table-search {
+    padding: 18px 0 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+// * content-box (常用内容盒子)
+.content-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+
+  .text {
+    margin: 20px 0 30px;
+    font-size: 23px;
+    font-weight: bold;
+    color: var(--el-text-color-regular);
+  }
+
+  .el-descriptions {
+    width: 100%;
+    padding: 40px 0 0;
+
+    .el-descriptions__title {
+      font-size: 18px;
+    }
+
+    .el-descriptions__label {
+      width: 200px;
+    }
+  }
+}
+
+// * main-box (树形表格 treeFilter 页面会使用，左右布局 flex)
+.main-box {
+  display: flex;
+  width: 100%;
+  height: 100%;
+
+  .table-box {
+    width: calc(100% - 230px);
+  }
+}
+
+// // * table-box 表格页面样式
+// .table,
+// .table-box {
+//   display: flex;
+//   flex: 1;
+//   flex-direction: column;
+//   width: 100%;
+//   height: 100%;
+
+//   // table-search 表格搜索样式
+//   .table-search {
+//     padding: 18px 18px 0;
+//     margin-bottom: 10px;
+
+//     .el-form {
+//       .el-form-item__content > * {
+//         width: 100%;
+//       }
+
+//       // 去除时间选择器上下 padding
+//       .el-range-editor.el-input__wrapper {
+//         padding: 0 10px;
+//       }
+//     }
+
+//     .operation {
+//       display: flex;
+//       align-items: center;
+//       justify-content: flex-end;
+//       margin-bottom: 18px;
+//     }
+//   }
+
+// // 表格 header 样式
+// .table-header {
+//   .header-button-lf {
+//     float: left;
+//   }
+
+//   .header-button-ri {
+//     float: right;
+//   }
+
+//   .el-button {
+//     margin-bottom: 15px;
+//   }
+// }
+
+// // el-table 表格样式
+// .el-table {
+//   flex: 1;
+
+//   // 修复 safari 浏览器表格错位 https://github.com/HalseySpicy/Geeker-Admin/issues/83
+//   table {
+//     width: 100%;
+//   }
+
+//   .el-table__header th {
+//     height: 45px;
+//     font-size: 15px;
+//     font-weight: bold;
+//     color: var(--el-text-color-primary);
+//     background: var(--el-fill-color-light);
+//   }
+
+//   .el-table__row {
+//     height: 45px;
+//     font-size: 14px;
+//   }
+
+//   // 设置 el-table 中 header 文字不换行，并省略
+//   .el-table__header .el-table__cell > .cell {
+//     white-space: nowrap;
+//   }
+
+//   // 解决表格数据为空时样式不居中问题(仅在element-plus中)
+//   .el-table__empty-block {
+//     position: absolute;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+
+//     .table-empty {
+//       line-height: 30px;
+//     }
+//   }
+
+//   // table 中 image 图片样式
+//   .table-image {
+//     width: 50px;
+//     height: 50px;
+//     border-radius: 50%;
+//   }
+// }
+
+//   // 表格 pagination 样式
+//   .el-pagination {
+//     display: flex;
+//     justify-content: flex-end;
+//     margin-top: 20px;
+//   }
+// }
+
+// // * el-table 组件大小切换样式
+// .el-table--small {
+//   .el-table__header th {
+//     height: 40px !important;
+//     font-size: 14px !important;
+//   }
+
+//   .el-table__row {
+//     height: 40px !important;
+//     font-size: 13px !important;
+//   }
+// }
+
+// .el-table--large {
+//   .el-table__header th {
+//     height: 50px !important;
+//     font-size: 16px !important;
+//   }
+
+//   .el-table__row {
+//     height: 50px !important;
+//     font-size: 15px !important;
+//   }
+// }
+
+// * el-drawer 样式
+.el-drawer {
+  .el-drawer__header {
+    padding: 12px 20px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--el-border-color);
+
+    span {
+      font-size: 17px;
+      color: var(--el-text-color-primary) !important;
+    }
+  }
+
+  .el-drawer__footer {
+    border-top: 1px solid var(--el-border-color);
+  }
+
+  // drawer select 样式
+  .el-select {
+    width: 100%;
+  }
+
+  // drawer-form 中存在两列 form-item
+  .drawer-multiColumn-form {
+    display: flex;
+    flex-wrap: wrap;
+
+    .el-form-item {
+      width: 47%;
+
+      &:nth-child(2n-1) {
+        margin-right: 5%;
+      }
+    }
+  }
+}
+
+// * el-dialog 样式
+.el-dialog {
+  .el-dialog__header {
+    padding: 15px 20px;
+    margin: 0;
+    border-bottom: 1px solid var(--el-border-color);
+
+    .el-dialog__title {
+      font-size: 17px;
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// 下拉框菜单位置微调
+.el-dropdown__popper,
+.el-popper {
+  margin-top: -5px; // 稍微上移
+
+  // 下拉框的箭头不显示
+  .el-popper__arrow {
+    display: none;
+  }
+}
+
+.el-dropdown-menu.el-dropdown-menu--small {
+  padding: 3px 2px 3px 0; // 右边距加2px
+}
+
+// 表格行高（small）
+.el-table.el-table--small {
+  .el-table__header-wrapper > .el-table__header thead th {
+    height: 30px;
+    font-weight: bold;
+  }
+
+  .el-table__row {
+    height: 30px;
+  }
+
+  .cell,
+  .el-table__cell {
+    padding: 0 2px;
+    line-height: 20px;
+  }
+}
+
+// 表格背景色
+.el-table {
+  // 表格表头背景色
+  .el-table__header-wrapper {
+    tr {
+      th.el-table__cell,
+      th.el-table-fixed-column--left,
+      th.el-table-fixed-column--right {
+        background-color: rgb(250 250 250);
+      }
+    }
+  }
+
+  // // 表格选中行的背景色
+  // .el-table__body tr.current-row > td {
+  //   background-color: rgb(197 213 255);
+  // }
+}
+
+// 表头文字不换行（避免拖动缩小列宽时太难看）
+.el-table .el-table__header .cell {
+  white-space: nowrap;
+}
+
+// 表格选择列
+.el-table .el-table-column--selection .cell {
+  padding: 0;
+}
+
+// tootip最大宽度
+.el-popper {
+  max-width: 600px;
+}
+
+// 增加滚动条宽度
+div.el-scrollbar__bar.is-horizontal {
+  bottom: 0;
+  height: 8px;
+}
+
+div.el-scrollbar__bar.is-vertical {
+  right: 0;
+  width: 8px;
+}
+
+.el-scrollbar .el-scrollbar__thumb:hover {
+  opacity: 1;
+}
+
+// 动作图标
+.action-icon {
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+// 调整表格上面的按钮间距
+.c-btn.el-button,
+.c-btn .left .el-button {
+  min-width: 80px;
+  height: 30px;
+  padding: 5px 7px;
+
+  + .el-button {
+    margin-left: 8px;
+  }
+}
+
+// 调整抽屉页的按钮间距
+.el-drawer__footer .el-button {
+  min-width: 80px;
+  padding: 5px 7px;
+
+  + .el-button {
+    margin-left: 30px;
+  }
+}
+
+// 调整确认框位置
+.el-overlay.is-message-box div.el-overlay-message-box {
+  top: 25%;
+  bottom: auto;
+}
+
+// 调整disabled输入框的背景色和字体颜色
+:root {
+  --el-disabled-bg-color: #fdfdfd;
+}
+
+.el-input.is-disabled input.el-input__inner,
+.el-textarea.is-disabled textarea.el-textarea__inner,
+.el-select span.el-select__tags-text {
+  color: #606266;
+  -webkit-text-fill-color: #606266;
+}
+
+// 修改诡异的按钮点击后样式（非悬停仍旧是悬停效果）
+button.el-button:focus {
+  color: var(--el-button-text-color);
+  background-color: var(--el-button-bg-color);
+  border-color: var(--el-button-border-color);
+}
+
+button.el-button:hover {
+  color: var(--el-button-hover-text-color);
+  background-color: var(--el-button-hover-bg-color);
+  border-color: var(--el-button-hover-border-color);
+}
+
+button.el-button:active {
+  color: var(--el-button-active-text-color);
+  background-color: var(--el-button-active-bg-color);
+  border-color: var(--el-button-active-border-color);
+}
+
+button.el-button.is-link:focus {
+  color: var(--el-button-focus-link-text-color);
+}
+
+button.el-button.is-link:hover {
+  color: var(--el-button-hover-link-text-color);
+}
+
+button.el-button.is-link:active {
+  color: var(--el-button-active-link-text-color);
+}
+
+// 含微章小点点的更多条件按钮的位置微调
+.c-btn-badge.el-badge {
+  max-height: 24px;
+  margin-left: 8px;
+
+  .el-button--small.is-circle {
+    margin-top: -1px;
+  }
+
+  .el-badge__content.is-fixed.is-dot {
+    top: 3px;
+    right: 7px;
+  }
+}
+
+.el-input--small input.el-input__inner {
+  height: 30px;
+}
+
+.c-gx-dialog .el-input--small input.el-input__inner {
+  height: 24px;
+}
+
+.c-gx-dialog * {
+  font-size: 12px;
+}
+
+div.el-range-editor--small.el-input__wrapper {
+  height: 30px;
+}
+
+// el-table setting
+.c-popover-table {
+  .el-input--small .el-input__inner {
+    text-align: center;
+  }
+
+  .c-align button.el-button--small {
+    min-width: 20px;
+    padding: 5px;
+  }
+}
+
+// 表格配置对话框中的横向滚动条不显示
+.c-gx-table-config .el-scrollbar__bar.is-horizontal {
+  display: none;
+}
+
+// 更多检索条件面板
+.c-down-panel {
+  position: absolute;
+  z-index: 100;
+  width: 550px;
+  padding: 20px;
+  margin-top: 10px;
+  margin-left: 400px;
+  background-color: white;
+  box-shadow: 0 2px 12px 0 rgb(0 0 0 / 30%);
+}
+
+// 登录按钮
+button.el-button--large.is-round {
+  border-radius: 10px;
+}

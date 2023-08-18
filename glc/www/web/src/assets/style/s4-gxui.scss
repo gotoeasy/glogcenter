@@ -1,0 +1,52 @@
+.c-gx-move {
+  cursor: move;
+}
+
+.c-gx-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: v-bind('toolbarHeight');
+  max-height: v-bind('toolbarHeight');
+
+  .left {
+    display: flex;
+    align-items: center;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+  }
+}
+
+div.vxe-modal--footer {
+  .el-button {
+    min-width: 80px;
+  }
+}
+
+//////////
+.c-gx-dialog .el-dialog__body {
+  max-height: 768px;
+  padding: 10px 20px;
+}
+
+.c-gx-dialog .el-dialog__footer .el-button {
+  min-width: 80px;
+}
+
+// 可编辑表格
+.c-gx-edittable .el-input-number .el-input__inner {
+  text-align: right;
+}
+
+.c-gx-edittable .el-input-number.is-without-controls .el-input__wrapper {
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+// // 删除行
+// .el-table__row:has(.c-gx--is-deleted) > td {
+//   background: lightgray !important;
+// }

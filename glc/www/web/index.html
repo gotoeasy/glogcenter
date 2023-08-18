@@ -1,68 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <link rel="icon" href="/favicon.ico"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>日志中心GLC</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="pragram" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/app-loading.css" id="app-loading-link" type="text/css" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>日志中心GLC</title>
+  </head>
+  <body>
+    <div id="app-loading" class="loader-wrapper">
+      <div class="loader"></div>
+      <div class="loader-section section-left"></div>
+      <div class="loader-section section-right"></div>
+      <div class="loader-title">加载中 ...</div>
+    </div>
+    <div id="app"></div>
 
-</head>
-<body>
-<style>
-    body, html {
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        height: 100%;
-    }
-    *[v-cloak]{
-        display: none;
-    }
-    #app {
-        width: 100%;
-        height: 100%;
-    }
-    #app .el-container{
-        height: 100%;
-    }
-    #app .el-menu{
-        border-right:none;
-    }
-    .menubar {
-        background-color: #fff;
-        width: auto;
-        height: 100%;
-        transition: width .2s;
-        overflow: hidden;
-        border-right: solid 1px;
-        border-color: lightgray;
-    }
-    .main{
-        background-color:#edf0f3;
-    }
-
-    ul.el-menu--collapse{
-       width: 48px;
-       height: 48px;
-    }
-
-    div.el-card__body{
-        padding-top: 0px;
-        padding-bottom: 10px;
-    }
-    div.el-table td.el-table__cell{
-        padding: 3px 0;
-    }
-
-    main.el-main{
-        overflow: hidden;
-    }
-
-    div.el-table th.el-table__cell{
-        padding: 4px 0;
-    }
-</style>
-<div id="app"></div>
-<script type="module" src="/src/main.js"></script>
-</body>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>
