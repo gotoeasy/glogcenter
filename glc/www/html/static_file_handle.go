@@ -40,9 +40,12 @@ func StaticFileController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return nil
 }
 
-// urlPath如[/glc/assets/index.f0b375ee.js]
+// urlPath如[/glc/assets/index.f0b375ee.js]或[/assets/index.f0b375ee.js]
 func getStaticFilePath(urlPath string) string {
-	path := cmn.SubString(urlPath, len(conf.GetContextPath()), len(urlPath))
+	path := urlPath
+	if conf.GetContextPath() != "" && cmn.Startwiths(urlPath, conf.GetContextPath()) {
+		path = cmn.SubString(urlPath, len(conf.GetContextPath()), len(urlPath))
+	}
 	return "web/dist" + path
 }
 
