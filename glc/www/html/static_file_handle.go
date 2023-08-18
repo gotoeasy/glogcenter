@@ -59,8 +59,18 @@ func getContentType(urlPath string) string {
 		return "application/x-javascript"
 	} else if cmn.Endwiths(urlPath, ".png") {
 		return "image/png"
+	} else if cmn.Endwiths(urlPath, ".jpg") || cmn.Endwiths(urlPath, ".jpeg") {
+		return "image/jpeg"
+	} else if cmn.Endwiths(urlPath, ".gif") {
+		return "image/gif"
 	} else if cmn.Endwiths(urlPath, ".ico") {
 		return "image/x-icon"
+	} else if cmn.Endwiths(urlPath, ".svg") {
+		return "image/svg+xml"
+	} else if cmn.Endwiths(urlPath, ".json") {
+		return "application/json"
+	} else if cmn.Endwiths(urlPath, ".xml") {
+		return "application/xml"
 	} else {
 		cmn.Info("未识别出ContentType，按text/html处理", urlPath)
 		return "text/html"

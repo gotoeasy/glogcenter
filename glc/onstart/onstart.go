@@ -25,6 +25,12 @@ func Run() {
 		gweb.RegisterController(method.GET, "/**/*.js", html.StaticFileController)
 		gweb.RegisterController(method.GET, "/**/*.ico", html.StaticFileController)
 		gweb.RegisterController(method.GET, "/**/*.png", html.StaticFileController)
+		gweb.RegisterController(method.GET, "/**/*.jpg", html.StaticFileController)
+		gweb.RegisterController(method.GET, "/**/*.jpeg", html.StaticFileController)
+		gweb.RegisterController(method.GET, "/**/*.gif", html.StaticFileController)
+		gweb.RegisterController(method.GET, "/**/*.svg", html.StaticFileController)
+		gweb.RegisterController(method.GET, "/**/*.json", html.StaticFileController)
+		gweb.RegisterController(method.GET, "/**/*.xml", html.StaticFileController)
 
 		// 控制器
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/add", controller.JsonLogAddController)                 // 添加日志
