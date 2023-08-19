@@ -93,6 +93,16 @@ func Run() {
 			path = "/**/*.png"
 		} else if cmn.Endwiths(path, ".ico") {
 			path = "/**/*.ico"
+		} else if cmn.Endwiths(path, ".svg") {
+			path = "/**/*.svg"
+		} else if cmn.Endwiths(path, ".jpg") {
+			path = "/**/*.jpg"
+		} else if cmn.Endwiths(path, ".jpeg") {
+			path = "/**/*.jpeg"
+		} else if cmn.Endwiths(path, ".json") {
+			path = "/**/*.json"
+		} else if cmn.Endwiths(path, ".xml") {
+			path = "/**/*.xml"
 		}
 
 		// controller
