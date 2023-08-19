@@ -209,21 +209,19 @@ function search() {
     if (rs.success) {
       const resultData = rs.result.data || [];
       tableData.value.splice(0, tableData.value.length);  // 删除原全部元素，nextTick时再插入新查询结果
-
-      // tableData.value.push(resultData);
       document.querySelector('.c-glc-table .el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
-
-      if (resultData.length < data.pageSize) {
-        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${resultData.length} 条，正展示前 ${resultData.length} 条`
-      } else {
-        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
-      }
 
       nextTick(() => {
         resultData.forEach(item => {
           tableData.value.push(item);
           item.system && !systemSet.has(item.system) && systemSet.add(item.system) && systemOptions.value.push({ value: item.system, label: item.system });
         });
+
+        if (resultData.length < data.pageSize) {
+          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${resultData.length} 条，正展示前 ${resultData.length} 条`
+        } else {
+          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
+        }
       });
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出

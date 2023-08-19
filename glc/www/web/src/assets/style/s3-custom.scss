@@ -454,12 +454,18 @@ button.el-button.is-link:active {
   height: 24px;
 }
 
-.c-gx-dialog * {
-  font-size: 12px;
-}
+// .c-gx-dialog *,
+// .c-popover-table * {
+//   font-size: 14px;
+// }
 
 div.el-range-editor--small.el-input__wrapper {
   height: 30px;
+}
+
+// 表格配置
+.c-popover-table .el-input--small input.el-input__inner {
+  height: 22px;
 }
 
 // el-table setting

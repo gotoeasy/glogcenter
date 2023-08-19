@@ -21,7 +21,7 @@ var storeNameAutoAddDate bool
 var serverUrl string
 var serverIp string
 var serverPort string = "8080"
-var contextPath string
+var contextPath string = "/glc" // web服务contextPath，固定【/glc】
 var enableSecurityKey bool
 var securityKey string
 var headerSecurityKey string
@@ -68,7 +68,6 @@ func UpdateConfigByEnv() {
 	storeNameAutoAddDate = cmn.GetEnvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
 	serverUrl = cmn.GetEnvStr("GLC_SERVER_URL", "")                             // 服务URL，默认“”，集群配置时自动获取地址可能不对，可通过这个设定
 	serverIp = cmn.GetEnvStr("GLC_SERVER_IP", "")                               // 服务IP，默认“”，当“”时会自动获取
-	contextPath = cmn.GetEnvStr("GLC_CONTEXT_PATH", "/glc")                     // web服务contextPath
 	enableSecurityKey = cmn.GetEnvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
 	headerSecurityKey = cmn.GetEnvStr("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")  // web服务API秘钥的header键名
 	securityKey = cmn.GetEnvStr("GLC_SECURITY_KEY", "glogcenter")               // web服务API秘钥
@@ -93,6 +92,7 @@ func UpdateConfigByEnv() {
 	goMaxProcess = getGoMaxProcessConf(cmn.GetEnvInt("GLC_GOMAXPROCS", -1))     // 使用的最大CPU数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
 	enableCors = cmn.GetEnvBool("GLC_ENABLE_CORS", false)                       // 是否允许跨域，默认false
 	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))             // 每次检索件数，默认100（有效范围1~1000）
+	// contextPath = cmn.GetEnvStr("GLC_CONTEXT_PATH", "/glc")                     // web服务contextPath
 }
 
 func GetPageSize() int {
