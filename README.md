@@ -24,17 +24,17 @@
 <br>
 
 ## 特点
-- [x] 使用`golang`实现，具备`go`的各种特性优势，关键是省资源、性能高
+- [x] 使用`golang`实现，具备`go`的各种特性优势，特别是性能高、节省资源
 - [x] 借助`goleveldb`做数据保存，结合日志写多读少特点稍加设计，真是快
-- [x] 关键词全文检索，支持中文分词（使用`jiebago`进行分词），毫秒级响应，自然流畅
-- [x] 日志吞食量每秒近万条，闲时建索引速度每秒数千条，基本能满足大多项目需要
+- [x] 日志吞食量每秒近万条，闲时建索引速度每秒数千条，能满足大多项目需要
+- [x] 支持多关键词全文检索，支持中文分词，毫秒级查询响应，无感般的流畅
+- [x] 内置提供`VUE`实现的日志查询管理界面，页面简洁大方，操作习惯自然
 - [x] 支持个性化环境变量开关控制，支持日志仓自动化维护，灵活省心
 - [x] 提供`docker`镜像，支持容器化部署，方便之极
 - [x] 提供`java`项目日志收集包，`java`项目闭环支持
 - [x] 提供`golang`项目日志收集包，`golang`项目闭环支持
 - [x] 支持从`RabbitMQ`收取日志信息，满足更多闭环需求
-- [x] 内置提供简洁的`VUE`实现的日志查询管理界面
-- [x] 支持多服务集群模式部署，确保服务及数据的冗余性
+- [x] 支持多服务集群模式部署，提供服务高可用性保障、数据冗余性保障
 - [x] 系统间的耦合性极低，可以非常方便的接入各系统，上至央企大项目下至本地开发调试，已历经众多案例磨炼，表现稳定出色，达`生产级应用`要求
 
 
@@ -87,8 +87,8 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
 - [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
 - [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
-- [ ] `GLC_ENABLE_CORS`是否允许跨域，默认`false`
-- [ ] `GLC_PAGE_SIZE`每次检索件数，默认`100`（有效范围`1~1000`）
+- [x] `GLC_ENABLE_CORS`是否允许跨域，默认`false`
+- [x] `GLC_PAGE_SIZE`每次检索件数，默认`100`（有效范围`1~1000`）
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
@@ -132,7 +132,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.10.2</version>
+    <version>0.11.0</version>
 </dependency>
 ```
 
@@ -141,9 +141,9 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
     <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
     <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!-- 可通过环境变量 GLC_API_KEY 设定 -->
-    <system>Demo</system>                                       <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
+    <system>demo</system>                                       <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
-        <pattern><![CDATA[%p %m %n]]></pattern>
+        <pattern><![CDATA[%m %n]]></pattern>
     </layout>
 </appender>
 ```
@@ -157,7 +157,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
     <amqpPassword>rabbitmqPassword</amqpPassword> <!-- 可通过环境变量 GLC_AMQP_PASSWORD 设定 -->
     <system>Demo</system>                         <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
-        <pattern><![CDATA[%p %m %n]]></pattern>
+        <pattern><![CDATA[%m %n]]></pattern>
     </layout>
 </appender>
 ```
@@ -178,7 +178,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
         <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl>
         <system>demo</system>
         <layout>
-            <pattern><![CDATA[%p %m %n]]></pattern>
+            <pattern><![CDATA[%m %n]]></pattern>
         </layout>
     </appender>
 
@@ -223,11 +223,16 @@ func main() {
 
 ### 开发版`latest`
 
-- [ ] 页面改版优化
 - [ ] 多语言支持
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.11.0`
+
+- [x] 前端全面重构改良，支持表格列宽、位置、显示隐藏等各种个性化设定
+- [x] 新增`GLC_ENABLE_CORS`参数配置是否允许跨域，方便系统间对接
+- [x] 新增`GLC_PAGE_SIZE`参数配置每次检索件数，默认`100`（有效范围`1~1000`）
 
 ### 版本`0.10.2`
 
