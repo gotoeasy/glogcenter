@@ -55,7 +55,7 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 # 【简易用法】
 # 启动成功后即可按 http://ip:port 访问
 # 支持多关键词检索，比如输入【key1、key2、key3】检索出同时满足这3个关键词的结果
-# 每次检索100条，滚动到底部时自动检索后面100条
+# 默认每次检索100条，滚动到底部时自动检索后面100条
 ```
 
 ## `docker`集群部署模式简易示例
@@ -103,7 +103,6 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] 在Linux系统下支持命令行参数`-d`以后台方式启动
 - [x] 在Linux系统下支持命令行参数`stop`关闭程序
 - [x] 在Linux系统下支持命令行参数`restart`重启程序
-- [x] 服务端口可通过环境变量`GLC_SERVER_PORT`设定，默认`8080`
 - [x] 其他环境变量同以上`docker`启动环境变量
 
 
@@ -114,8 +113,8 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
       字段`text`： 字符串，对应页面的`日志` <br>
       字段`servername`： 字符串，对应页面的`主机名` <br>
       字段`serverip`： 字符串，对应页面的`主机IP` <br>
-      字段`loglevel`： 字符串，对应页面的`Level` <br>
-      字段`traceid`： 字符串，对应页面的`TraceId` <br>
+      字段`loglevel`： 字符串，对应页面的`日志级别` <br>
+      字段`traceid`： 字符串，对应页面的`追踪ID` <br>
       字段`clientip`： 字符串，对应页面的`客户端IP` <br>
 
 ```shell
@@ -223,7 +222,6 @@ func main() {
 
 ### 开发版`latest`
 
-- [ ] 多语言支持
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
