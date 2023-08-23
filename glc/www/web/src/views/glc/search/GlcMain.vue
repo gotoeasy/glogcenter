@@ -208,6 +208,7 @@ function search() {
     console.log(rs)
     if (rs.success) {
       const resultData = rs.result.data || [];
+      const pagesize =  rs.result.pagesize - 0;
       tableData.value.splice(0, tableData.value.length);  // 删除原全部元素，nextTick时再插入新查询结果
       document.querySelector('.c-glc-table .el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
 
@@ -217,7 +218,11 @@ function search() {
           item.system && !systemSet.has(item.system) && systemSet.add(item.system) && systemOptions.value.push({ value: item.system, label: item.system });
         });
 
-        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
+        if (resultData.length < pagesize) {
+          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${tableData.value.length} 条，正展示前 ${tableData.value.length} 条`
+        } else {
+          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
+        }
       });
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
@@ -251,9 +256,10 @@ function searchMore() {
     console.log(rs)
     if (rs.success) {
       const resultData = rs.result.data || [];
+      const pagesize =  rs.result.pagesize - 0;
       tableData.value.push(...resultData)
 
-      if (resultData.length < rs.result.pagesize) {
+      if (resultData.length < pagesize) {
         info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${tableData.value.length} 条，正展示前 ${tableData.value.length} 条`
       } else {
         info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
