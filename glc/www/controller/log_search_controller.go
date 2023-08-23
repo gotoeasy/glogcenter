@@ -33,5 +33,16 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	eng := ldb.NewEngine(storeName)
 	rs := eng.Search(searchKey, system, datetimeFrom, datetimeTo, loglevel, currentId, forward)
+
+	// 检索结果后处理
+	rs.PageSize = cmn.IntToString(conf.GetPageSize())
+	if !forward {
+		// 修复最多匹配件数：检索（非检索更多）数据量少于1页时，最多匹配件数=检索结果件数，避免个别特殊场景下两者不一致
+		size := len(rs.Data)
+		if size < conf.GetPageSize() {
+			rs.Count = cmn.IntToString(size)
+		}
+	}
+
 	return gweb.Result(rs)
 }

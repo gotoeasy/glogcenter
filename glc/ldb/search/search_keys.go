@@ -18,9 +18,10 @@ import (
 )
 
 type SearchResult struct {
-	Total string                  `json:"total,omitempty"` // 日志总量件数（用10进制字符串形式以避免出现科学计数法）
-	Count string                  `json:"count,omitempty"` // 当前条件最多匹配件数（用10进制字符串形式以避免出现科学计数法）
-	Data  []*logdata.LogDataModel `json:"data,omitempty"`  // 检索结果数据（日志文档数组）
+	Total    string                  `json:"total,omitempty"`    // 日志总量件数（用10进制字符串形式以避免出现科学计数法）
+	Count    string                  `json:"count,omitempty"`    // 当前条件最多匹配件数（用10进制字符串形式以避免出现科学计数法）
+	PageSize string                  `json:"pagesize,omitempty"` // 每次检索件数
+	Data     []*logdata.LogDataModel `json:"data,omitempty"`     // 检索结果数据（日志文档数组）
 }
 
 type WidxStorage struct {

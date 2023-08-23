@@ -2,7 +2,6 @@ package ldb
 
 import (
 	"glc/com"
-	"glc/conf"
 	"glc/ldb/search"
 	"glc/ldb/storage"
 	"glc/ldb/storage/indexword"
@@ -75,24 +74,13 @@ func (e *Engine) Search(searchKey string, system string, minDatetime string, max
 		}
 	}
 
-	var rs *search.SearchResult
 	if len(kws) == 0 {
 		// 无条件浏览模式
-		rs = search.SearchLogData(e.storeName, currentDocId, forward, minDatetime, maxDatetime)
-	} else {
-		// 多关键词查询模式
-		rs = search.SearchWordIndex(e.storeName, kws, currentDocId, forward, minDatetime, maxDatetime)
+		return search.SearchLogData(e.storeName, currentDocId, forward, minDatetime, maxDatetime)
 	}
 
-	if !forward {
-		// 修复最多匹配件数：检索（非检索更多）数据量少于1页时，最多匹配件数=检索结果件数，避免个别特殊场景下两者不一致
-		size := len(rs.Data)
-		if size < conf.GetPageSize() {
-			rs.Count = cmn.IntToString(size)
-		}
-	}
-
-	return rs
+	// 多关键词查询模式
+	return search.SearchWordIndex(e.storeName, kws, currentDocId, forward, minDatetime, maxDatetime)
 }
 
 // 添加日志
