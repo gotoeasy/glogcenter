@@ -217,11 +217,7 @@ function search() {
           item.system && !systemSet.has(item.system) && systemSet.add(item.system) && systemOptions.value.push({ value: item.system, label: item.system });
         });
 
-        if (resultData.length < data.pageSize) {
-          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${resultData.length} 条，正展示前 ${resultData.length} 条`
-        } else {
-          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
-        }
+        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
       });
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
@@ -257,7 +253,7 @@ function searchMore() {
       const resultData = rs.result.data || [];
       tableData.value.push(...resultData)
 
-      if (resultData.length < data.pageSize) {
+      if (resultData.length < rs.result.pagesize) {
         info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${tableData.value.length} 条，正展示前 ${tableData.value.length} 条`
       } else {
         info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
