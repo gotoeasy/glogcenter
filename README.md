@@ -11,7 +11,7 @@
 <br>
 
 
-[![Golang](https://img.shields.io/badge/golang-1.20-brightgreen.svg)](https://golang.google.cn)
+[![Golang](https://img.shields.io/badge/golang-1.21.0-brightgreen.svg)](https://golang.google.cn)
 [![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
 [![GitHub release](https://img.shields.io/github/release/gotoeasy/glogcenter.svg)](https://github.com/gotoeasy/glogcenter/releases/latest)
 [![License](https://img.shields.io/github/license/gotoeasy/glogcenter)](https://github.com/gotoeasy/glogcenter/blob/master/LICENSE)
@@ -131,7 +131,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.11.0</version>
+    <version>0.11.1</version>
 </dependency>
 ```
 
@@ -226,11 +226,20 @@ func main() {
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
+### 版本`0.11.1`
+
+- [x] 升级使用`Go1.21.0`
+- [x] 运行时基础镜像`alpine`升级至`3.18`
+- [x] 页面检索件数提示信息改善
+
 ### 版本`0.11.0`
 
 - [x] 前端全面重构改良，支持表格列宽、位置、显示隐藏等各种个性化设定
 - [x] 新增`GLC_ENABLE_CORS`参数配置是否允许跨域，方便系统间对接
 - [x] 新增`GLC_PAGE_SIZE`参数配置每次检索件数，默认`100`（有效范围`1~1000`）
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.10.2`
 
@@ -248,10 +257,6 @@ func main() {
 - [x] 页面增加主机名、主机IP展示列，可配置是否显示，适用更多复杂使用场景
 - [x] 同步使用`glc-logback-appender:0.10.0`，即可自动产生主机名、主机IP信息
 - [x] 修复一些小瑕疵
-
-
-<details>
-<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.9.0`
 
