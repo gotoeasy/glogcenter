@@ -21,6 +21,8 @@
 国外仓库地址： https://github.com/gotoeasy/glogcenter <br>
 国内(仅同步)： https://gitee.com/gotoeasy/glogcenter
 <br>
+演示地址： https://glc.gotoeasy.top
+<br>
 <br>
 
 ## 特点
