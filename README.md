@@ -22,7 +22,7 @@
 国内(仅同步)： https://gitee.com/gotoeasy/glogcenter
 <br>
 <br>
-演示地址(访问可能不稳定)： https://glc.gotoeasy.top
+演示地址(网络可能不稳定)： https://glc.gotoeasy.top
 <br>
 <br>
 
@@ -231,7 +231,7 @@ func main() {
 ### 版本`0.11.0`
 
 - [x] 前端全面重构改良，支持表格列宽、位置、显示隐藏等各种个性化设定
-- [x] 新增`GLC_ENABLE_CORS`参数配置是否允许跨域，方便系统间对接
+- [x] 新增`GLC_ENABLE_CORS`参数配置是否允许跨域，默认`false`，方便系统间对接
 - [x] 新增`GLC_PAGE_SIZE`参数配置每次检索件数，默认`100`（有效范围`1~1000`）
 
 <details>
