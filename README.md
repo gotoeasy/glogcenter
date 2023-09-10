@@ -361,3 +361,7 @@ func main() {
 - [x] 服务接口`/glc/search`查询日志
 
 </details>
+
+## Star历史
+
+![Star History Chart](https://api.star-history.com/svg?repos=gotoeasy/glogcenter&type=Date)
