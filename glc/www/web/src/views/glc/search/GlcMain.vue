@@ -300,7 +300,7 @@ function fnDownload() {
   const blob = new Blob([fileContent], { type: 'text/plain' });  // 创建Blob对象
   const downloadLink = document.createElement('a');
   downloadLink.href = URL.createObjectURL(blob);
-  downloadLink.download = 'example.txt'; // 文件名
+  downloadLink.download = 'logfile.txt'; // 文件名
   downloadLink.click(); // 模拟点击下载链接
 }
 </script>
