@@ -40,6 +40,11 @@
             <SvgIcon name="zoom" />
           </el-button>
         </el-tooltip>
+        <el-tooltip content="下载当前检索结果" placement="top">
+          <el-button circle @click="fnDownload">
+            <SvgIcon name="download" />
+          </el-button>
+        </el-tooltip>
         <GxPageTableConfig :tid="tid" :page-config="pageSettingStore" />
       </template>
     </GxToolbar>
@@ -208,7 +213,7 @@ function search() {
     console.log(rs)
     if (rs.success) {
       const resultData = rs.result.data || [];
-      const pagesize =  rs.result.pagesize - 0;
+      const pagesize = rs.result.pagesize - 0;
       tableData.value.splice(0, tableData.value.length);  // 删除原全部元素，nextTick时再插入新查询结果
       document.querySelector('.c-glc-table .el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
 
@@ -256,7 +261,7 @@ function searchMore() {
     console.log(rs)
     if (rs.success) {
       const resultData = rs.result.data || [];
-      const pagesize =  rs.result.pagesize - 0;
+      const pagesize = rs.result.pagesize - 0;
       tableData.value.push(...resultData)
 
       if (resultData.length < pagesize) {
@@ -276,6 +281,28 @@ function searchMore() {
   })
 }
 
+// 下载当前检索结果
+function fnDownload() {
+  let fileContent = '';
+  const tableConfigStore = $emitter.emit('$table:config', { id: tid.value })
+  tableData.value.forEach(item => {
+    let flg = false;
+    tableConfigStore.columns.forEach(oCol => {
+      if (!oCol.hidden && !oCol.editType.startsWith('$')) {
+        flg && (fileContent += ', ');
+        oCol.field == 'text' ? (fileContent += item.detail) : (fileContent += item[oCol.field]);
+        flg = true;
+      }
+    })
+    fileContent += '\r\n';
+  })
+
+  const blob = new Blob([fileContent], { type: 'text/plain' });  // 创建Blob对象
+  const downloadLink = document.createElement('a');
+  downloadLink.href = URL.createObjectURL(blob);
+  downloadLink.download = 'example.txt'; // 文件名
+  downloadLink.click(); // 模拟点击下载链接
+}
 </script>
 
 <style>
