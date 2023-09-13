@@ -288,12 +288,14 @@ function fnDownload() {
   tableData.value.forEach(item => {
     let flg = false;
     tableConfigStore.columns.forEach(oCol => {
-      if (!oCol.hidden && !oCol.editType.startsWith('$')) {
-        flg && (fileContent += ', ');
-        fileContent += item.detail || item[oCol.field];
+      if (!oCol.hidden && !oCol.editType.startsWith('$') && oCol.editType != 'text') {
+        flg && (fileContent += ',');
+        fileContent += item[oCol.field];
         flg = true;
       }
     })
+    fileContent += ',';
+    fileContent += (item.detail || item.text);
     fileContent += '\r\n';
   })
 
