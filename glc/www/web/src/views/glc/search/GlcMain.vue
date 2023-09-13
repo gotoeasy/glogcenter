@@ -290,7 +290,7 @@ function fnDownload() {
     tableConfigStore.columns.forEach(oCol => {
       if (!oCol.hidden && !oCol.editType.startsWith('$')) {
         flg && (fileContent += ', ');
-        oCol.field == 'text' ? (fileContent += item.detail) : (fileContent += item[oCol.field]);
+        fileContent += item.detail || item[oCol.field];
         flg = true;
       }
     })
