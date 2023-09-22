@@ -12,13 +12,14 @@
 当下，架库之作已可窥见，与君共享。<br>
 <br>
 
+<p align="center">
+    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.0-brightgreen.svg"></a>
+    <a href="https://hub.docker.com/r/gotoeasy/glc"><img src="https://img.shields.io/docker/pulls/gotoeasy/glc"></a>
+    <a href="https://github.com/gotoeasy/glogcenter/releases/latest"><img src="https://img.shields.io/github/release/gotoeasy/glogcenter.svg"></a>
+    <a href="https://github.com/gotoeasy/glogcenter/blob/master/LICENSE"><img src="https://img.shields.io/github/license/gotoeasy/glogcenter"></a>
+<p>
 
-[![Golang](https://img.shields.io/badge/golang-1.21.0-brightgreen.svg)](https://golang.google.cn)
-[![Docker Pulls](https://img.shields.io/docker/pulls/gotoeasy/glc)](https://hub.docker.com/r/gotoeasy/glc)
-[![GitHub release](https://img.shields.io/github/release/gotoeasy/glogcenter.svg)](https://github.com/gotoeasy/glogcenter/releases/latest)
-[![License](https://img.shields.io/github/license/gotoeasy/glogcenter)](https://github.com/gotoeasy/glogcenter/blob/master/LICENSE)
 <br>
-
 <br>
 国外仓库地址： https://github.com/gotoeasy/glogcenter <br>
 国内(仅同步)： https://gitee.com/gotoeasy/glogcenter
@@ -224,6 +225,11 @@ func main() {
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.11.4`
+
+- [x] 支持日志级别多选条件，想排除某种级别进行日志检索时会很实用
+- [x] 进一步提高使用体验，如左上角图标鼠标悬停时提示版本号
 
 ### 版本`0.11.3`
 
