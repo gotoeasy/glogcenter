@@ -169,6 +169,8 @@ const shortcuts = ref([
 // 初期默认检索
 onMounted(() => {
   showTableLoadding.value = true;
+  const configStore = $emitter.emit('$table:config', { id: tid.value });
+  !configStore.columns.length && $emitter.emit('$table:config', { id: tid.value, update: true }); // 首次使用开启默认布局
   // 日志仓列表查询
   const url = `/v1/store/names`;
   $post(url, {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {

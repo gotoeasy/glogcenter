@@ -61,6 +61,8 @@ const info = ref(''); // 底部提示信息
 
 // 初期默认检索
 onMounted(() => {
+  const configStore = $emitter.emit('$table:config', { id: tid.value });
+  !configStore.columns.length && $emitter.emit('$table:config', { id: tid.value, update: true }); // 首次使用开启默认布局
   search()
 });
 
