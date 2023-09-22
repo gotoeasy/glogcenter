@@ -46,7 +46,7 @@ export const getUserMenu = async () => {
   const menus = [];
   menus.push({
     path: '/glc/search',
-    title: '日志检索',
+    title: '检索',
     icon: 'search',
     component: '/glc/search/GlcMain',
     openInner: true,

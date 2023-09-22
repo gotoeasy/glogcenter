@@ -2,7 +2,7 @@
   <GxToolbar :height="themeStore.headerHeight">
     <template #left>
       <div style="display:flex;align-items:center;margin-left:8px;line-height: 30px;">
-        <div style="width: 34px;color:white;text-align:center;cursor:pointer;" @click="clickLogo">
+        <div :title="VITE_GLC_INFO" style="width: 34px;color:white;text-align:center;cursor:pointer;" @click="clickLogo">
           <img src="/image/glc.png" style="width:34px;margin-top:9px;" />
         </div>
         <div style="text-align:center;">
@@ -21,6 +21,8 @@
 <script setup>
 import { gxUtil, useThemeStore, useTokenStore } from '~/pkgs';
 import { userLogout } from '~/api';
+
+const { VITE_GLC_INFO } = import.meta.env;
 
 const router = useRouter();
 
@@ -69,7 +71,7 @@ async function logout() {
 }
 
 const clickLogo = () => {
-  window.open('https://github.com/gotoeasy/glogcenter', 'glc');
+  window.open('https://github.com/gotoeasy/glogcenter', '_blank');
 };
 
 </script>

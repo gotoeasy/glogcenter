@@ -13,12 +13,10 @@
     </el-sub-menu>
 
     <!-- 一级页面菜单 -->
-    <el-menu-item v-if="item.openInner" :key="item.id" :index="item.path"
-      :class="themeStore.menuCollapse ? 'menu-collapse-page' : ''">
+    <el-menu-item v-if="item.openInner" :key="item.id" :index="item.path" :title="item.title" class="menu-collapse-page">
       <svg-icon :name="item.icon || 'item'" class="menu-page-icon" />
       <span>{{ item.title }}</span></el-menu-item>
-    <el-menu-item v-if="item.openWindow" :key="item.id" :class="themeStore.menuCollapse ? 'menu-collapse-page' : ''"
-      @click="fnClick(item)">
+    <el-menu-item v-if="item.openWindow" :key="item.id" class="menu-collapse-page" @click="fnClick(item)">
       <svg-icon :name="item.icon || 'item'" class="menu-page-icon" />
       <span>{{ item.title }}</span></el-menu-item>
   </template>
