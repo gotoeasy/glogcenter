@@ -48,7 +48,7 @@ func (e *Engine) AddLogDataModel(data *logdata.LogDataModel) {
 	e.logStorage.AddLogDataModel(data)
 }
 
-func (e *Engine) Search(searchKey string, system string, minDatetime string, maxDatetime string, loglevel string,
+func (e *Engine) Search(searchKey string, system string, minDatetime string, maxDatetime string, loglevel string, loglevels []string,
 	currentDocId uint32, forward bool) *search.SearchResult {
 
 	// 分词后检索
@@ -80,7 +80,7 @@ func (e *Engine) Search(searchKey string, system string, minDatetime string, max
 	}
 
 	// 多关键词查询模式
-	return search.SearchWordIndex(e.storeName, kws, currentDocId, forward, minDatetime, maxDatetime)
+	return search.SearchWordIndex(e.storeName, kws, loglevels, currentDocId, forward, minDatetime, maxDatetime)
 }
 
 // 添加日志

@@ -17,8 +17,8 @@
               </el-select>
             </el-form-item>
             <el-form-item label="日志级别">
-              <el-select v-model="formData.loglevel" :multiple="false" clearable :reserve-keyword="true"
-                style="width:420px;" placeholder="请选择...">
+              <el-select v-model="formData.loglevel" multiple clearable :reserve-keyword="true" style="width:420px;"
+                placeholder="请选择...">
                 <el-option label="ERROR" value="error" />
                 <el-option label="WARN" value="warn" />
                 <el-option label="INFO" value="info" />
@@ -205,7 +205,7 @@ function search() {
   data.searchKey = formData.value.searchKeys;
   data.storeName = formData.value.storage;
   data.system = formData.value.system;
-  data.loglevel = formData.value.loglevel;
+  data.loglevel = formData.value.loglevel.join(',');
   data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
   data.datetimeTo = (formData.value.datetime || ['', ''])[1];
 
@@ -251,7 +251,7 @@ function searchMore() {
   data.searchKey = formData.value.searchKeys;
   data.storeName = formData.value.storage;
   data.system = formData.value.system;
-  data.loglevel = formData.value.loglevel;
+  data.loglevel = formData.value.loglevel.join(',');
   data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
   data.datetimeTo = (formData.value.datetime || ['', ''])[1];
   data.forward = true

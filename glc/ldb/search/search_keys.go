@@ -31,7 +31,7 @@ type WidxStorage struct {
 }
 
 // 多关键词时计算关键词索引交集
-func SearchWordIndex(storeName string, kws []string, currentDocId uint32, forward bool, minDatetime string, maxDatetime string) *SearchResult {
+func SearchWordIndex(storeName string, kws []string, loglevels []string, currentDocId uint32, forward bool, minDatetime string, maxDatetime string) *SearchResult {
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 
 	// 时间条件范围判断，默认全部，有检索条件时调整范围
@@ -75,7 +75,7 @@ func SearchWordIndex(storeName string, kws []string, currentDocId uint32, forwar
 		}
 		widxs = append(widxs, widxStorage)
 	}
-	return findSame(currentDocId, forward, minDocumentId, maxDocumentId, storeLogData, widxs...)
+	return findSame(currentDocId, loglevels, forward, minDocumentId, maxDocumentId, storeLogData, widxs...)
 }
 
 // 无关键词时走全量检索
@@ -205,8 +205,9 @@ func SearchLogData(storeName string, currentDocId uint32, forward bool, minDatet
 }
 
 // 参数widxs长度要求大于1，currentDocId不传就是查第一页
-func findSame(currentDocId uint32, forward bool, minDocumentId uint32, maxDocumentId uint32, storeLogData *storage.LogDataStorageHandle, widxs ...*WidxStorage) *SearchResult {
+func findSame(currentDocId uint32, loglevels []string, forward bool, minDocumentId uint32, maxDocumentId uint32, storeLogData *storage.LogDataStorageHandle, widxs ...*WidxStorage) *SearchResult {
 
+	allloglevels := cmn.Join(loglevels, ",")
 	var rs = new(SearchResult)
 	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount()) // 日志总量件数
 
@@ -275,8 +276,19 @@ func findSame(currentDocId uint32, forward bool, minDocumentId uint32, maxDocume
 				}
 				// 找到则加入结果
 				if flg {
-					rsCnt++
-					rs.Data = append(rs.Data, storeLogData.GetLogDataModel(docId))
+					md := storeLogData.GetLogDataModel(docId)
+					if len(loglevels) > 0 {
+						// 多选条件时做匹配判断
+						if cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
+							rsCnt++
+							rs.Data = append(rs.Data, md)
+						}
+					} else {
+						// 单选或全选时找到的都是匹配的
+						rsCnt++
+						rs.Data = append(rs.Data, md)
+					}
+
 					if rsCnt >= conf.GetPageSize() {
 						break // 最多找一页
 					}
@@ -288,7 +300,7 @@ func findSame(currentDocId uint32, forward bool, minDocumentId uint32, maxDocume
 			tmpMinPos--        // 当前最短索引可能不变，得正常减1，若变化则会被覆盖没有关系
 		}
 	} else {
-		// 有相对文档ID且是前一页方向
+		// 有相对文档ID且是前一页方向（注：暂未使用，未经测试）
 		pos++
 		var ary []*logdata.LogDataModel
 		for i := pos; i <= totalCount; i++ {
