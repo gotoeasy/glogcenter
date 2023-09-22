@@ -31,7 +31,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	if !cmn.IsBlank(system) {
 		system = "~" + cmn.Trim(system)
 	}
-	if !cmn.IsBlank(loglevel) && len(loglevels) == 0 {
+	if !cmn.IsBlank(loglevel) && !cmn.Contains(loglevel, ",") {
 		loglevel = "!" + cmn.Trim(loglevel) // 单个条件时作为索引条件
 	} else {
 		loglevel = "" // 多选条件时不使用，改用loglevels

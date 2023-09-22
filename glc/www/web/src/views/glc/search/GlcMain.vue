@@ -205,7 +205,7 @@ function search() {
   data.searchKey = formData.value.searchKeys;
   data.storeName = formData.value.storage;
   data.system = formData.value.system;
-  data.loglevel = formData.value.loglevel.join(',');
+  data.loglevel = (formData.value.loglevel || []).join(',');
   data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
   data.datetimeTo = (formData.value.datetime || ['', ''])[1];
 
@@ -251,7 +251,7 @@ function searchMore() {
   data.searchKey = formData.value.searchKeys;
   data.storeName = formData.value.storage;
   data.system = formData.value.system;
-  data.loglevel = formData.value.loglevel.join(',');
+  data.loglevel = (formData.value.loglevel || []).join(',');
   data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
   data.datetimeTo = (formData.value.datetime || ['', ''])[1];
   data.forward = true

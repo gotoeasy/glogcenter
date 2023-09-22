@@ -79,13 +79,15 @@ func SearchWordIndex(storeName string, kws []string, loglevels []string, current
 }
 
 // 无关键词时走全量检索
-func SearchLogData(storeName string, currentDocId uint32, forward bool, minDatetime string, maxDatetime string) *SearchResult {
-
+func SearchLogData(storeName string, loglevels []string, currentDocId uint32, forward bool, minDatetime string, maxDatetime string) *SearchResult {
+	allloglevels := cmn.Join(loglevels, ",")                   // 合并多选的级别条件
+	noLogLevels := cmn.IsBlank(allloglevels)                   // 无多选条件
 	var rs = new(SearchResult)                                 // 检索结果
 	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
 	totalCount := storeLogData.TotalCount()                    // 总件数
 	rs.Total = cmn.Uint32ToString(totalCount)                  // 返回的日志总量件数，用10进制字符串形式以避免出现科学计数法
 	rs.Count = cmn.Uint32ToString(totalCount)                  // 当前条件最多匹配件数
+	rsCnt := 0                                                 // 已查到的件数
 
 	if totalCount == 0 {
 		return rs
@@ -135,18 +137,19 @@ func SearchLogData(storeName string, currentDocId uint32, forward bool, minDatet
 			max = maxDocumentId // 最大不超出时间范围限制内的最大文档ID
 		}
 
-		if max > uint32(conf.GetPageSize()) {
-			min = max - uint32(conf.GetPageSize()) + 1
-		} else {
-			min = 1
-		}
-
 		if min < minDocumentId {
 			min = minDocumentId // 最小不超出时间范围限制内的最小文档ID
 		}
 
 		for i := max; i >= min; i-- {
-			rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i).ToLogDataModel()) // 件数等同日志文档ID
+			md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
+			if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
+				rs.Data = append(rs.Data, md)
+				rsCnt++
+				if rsCnt >= conf.GetPageSize() {
+					break
+				}
+			}
 		}
 	} else if forward {
 		// 后一页
@@ -162,18 +165,19 @@ func SearchLogData(storeName string, currentDocId uint32, forward bool, minDatet
 				max = maxDocumentId // 最大不超出时间范围限制内的最大文档ID
 			}
 
-			if max > uint32(conf.GetPageSize()) {
-				min = max - uint32(conf.GetPageSize()) + 1
-			} else {
-				min = 1
-			}
-
 			if min < minDocumentId {
 				min = minDocumentId // 最小不超出时间范围限制内的最小文档ID
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i).ToLogDataModel())
+				md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
+				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
+					rs.Data = append(rs.Data, md)
+					rsCnt++
+					if rsCnt >= conf.GetPageSize() {
+						break
+					}
+				}
 			}
 		}
 	} else {
@@ -186,17 +190,20 @@ func SearchLogData(storeName string, currentDocId uint32, forward bool, minDatet
 				min = minDocumentId // 最小不超出时间范围限制内的最小文档ID
 			}
 
-			max = min + uint32(conf.GetPageSize()) - 1
-			if max > totalCount {
-				max = totalCount
-			}
-
 			if max > maxDocumentId {
 				max = maxDocumentId // 最大不超出时间范围限制内的最大文档ID
 			}
 
 			for i := max; i >= min; i-- {
-				rs.Data = append(rs.Data, storeLogData.GetLogDataDocument(i).ToLogDataModel())
+				md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
+				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
+					rs.Data = append(rs.Data, md)
+					rsCnt++
+					if rsCnt >= conf.GetPageSize() {
+						break
+					}
+				}
+
 			}
 		}
 	}
@@ -206,9 +213,9 @@ func SearchLogData(storeName string, currentDocId uint32, forward bool, minDatet
 
 // 参数widxs长度要求大于1，currentDocId不传就是查第一页
 func findSame(currentDocId uint32, loglevels []string, forward bool, minDocumentId uint32, maxDocumentId uint32, storeLogData *storage.LogDataStorageHandle, widxs ...*WidxStorage) *SearchResult {
-
-	allloglevels := cmn.Join(loglevels, ",")
-	var rs = new(SearchResult)
+	allloglevels := cmn.Join(loglevels, ",")                 // 合并多选的级别条件
+	noLogLevels := cmn.IsBlank(allloglevels)                 // 无多选条件
+	var rs = new(SearchResult)                               // 查询结果
 	rs.Total = cmn.Uint32ToString(storeLogData.TotalCount()) // 日志总量件数
 
 	// 选个最短的索引
@@ -277,20 +284,12 @@ func findSame(currentDocId uint32, loglevels []string, forward bool, minDocument
 				// 找到则加入结果
 				if flg {
 					md := storeLogData.GetLogDataModel(docId)
-					if len(loglevels) > 0 {
-						// 多选条件时做匹配判断
-						if cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
-							rsCnt++
-							rs.Data = append(rs.Data, md)
-						}
-					} else {
-						// 单选或全选时找到的都是匹配的
+					if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 						rsCnt++
 						rs.Data = append(rs.Data, md)
-					}
-
-					if rsCnt >= conf.GetPageSize() {
-						break // 最多找一页
+						if rsCnt >= conf.GetPageSize() {
+							break // 最多找一页
+						}
 					}
 				}
 			}
@@ -324,10 +323,13 @@ func findSame(currentDocId uint32, loglevels []string, forward bool, minDocument
 			}
 			// 找到则加入结果
 			if flg {
-				rsCnt++
-				ary = append(ary, storeLogData.GetLogDataModel(docId))
-				if rsCnt >= conf.GetPageSize() {
-					break // 最多找一页
+				md := storeLogData.GetLogDataModel(docId)
+				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
+					rsCnt++
+					ary = append(ary, md)
+					if rsCnt >= conf.GetPageSize() {
+						break // 最多找一页
+					}
 				}
 			}
 		}

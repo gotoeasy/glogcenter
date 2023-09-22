@@ -56,12 +56,6 @@ func (e *Engine) Search(searchKey string, system string, minDatetime string, max
 	adds = append(adds, system, loglevel)
 	kws := tokenizer.CutForSearchEx(searchKey, adds, nil) // 检索用关键词处理
 
-	if searchKey == "" {
-		cmn.Debug("无条件查询", "currentDocId =", currentDocId)
-	} else {
-		cmn.Debug("查询", searchKey, "，分词后检索", kws, "currentDocId =", currentDocId)
-	}
-
 	// 简单检查，存在无索引数据的关键词时，直接返回
 	for _, word := range kws {
 		idxw := indexword.NewWordIndexStorage(e.storeName)
@@ -75,8 +69,8 @@ func (e *Engine) Search(searchKey string, system string, minDatetime string, max
 	}
 
 	if len(kws) == 0 {
-		// 无条件浏览模式
-		return search.SearchLogData(e.storeName, currentDocId, forward, minDatetime, maxDatetime)
+		// 无条件浏览模式（可能含多选条件）
+		return search.SearchLogData(e.storeName, loglevels, currentDocId, forward, minDatetime, maxDatetime)
 	}
 
 	// 多关键词查询模式

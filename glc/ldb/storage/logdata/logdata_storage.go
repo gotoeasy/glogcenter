@@ -200,7 +200,7 @@ func (s *LogDataStorage) createInvertedIndex() int {
 		idxw := indexword.NewWordIndexStorage(s.StoreName())
 		idxw.Add(word, cmn.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
-	cmn.Debug("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
+	// cmn.Debug("创建日志索引：", cmn.StringToUint32(docm.Id, 0))
 
 	return 1
 }

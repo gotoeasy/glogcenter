@@ -168,7 +168,7 @@ func (s *WordIndexStorage) Add(word string, docId uint32) error {
 		cmn.Error("保存关键词反向索引件数失败", err)
 		return err // 忽略事务问题，可下回重建
 	}
-	cmn.Debug("创建日志索引：", docId, "，关键词：", word)
+	// cmn.Debug("创建日志索引：", docId, "，关键词：", word)
 	return nil
 }
 

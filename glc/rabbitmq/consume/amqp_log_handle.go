@@ -60,7 +60,7 @@ func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 		return false
 	}
 
-	cmn.Debug("接收到rabbitmq的日志", jsonLog)
+	// cmn.Debug("接收到rabbitmq的日志", jsonLog)
 
 	md := &logdata.LogDataModel{}
 	if conf.IsAmqpJsonFormat() {
