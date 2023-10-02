@@ -49,8 +49,9 @@
       </template>
     </GxToolbar>
 
-    <GxTable ref="table" v-loading="showTableLoadding" :enable-header-contextmenu="false" :enable-first-expand="true"
-      stripe :tid="tid" :data="tableData" :height="tableHeight" class="c-gx-table c-glc-table" row-key="id">
+    <GxTable ref="table" v-loading="showTableLoadding" scrollbar-always-on :enable-header-contextmenu="false"
+      :enable-first-expand="true" stripe :tid="tid" :data="tableData" :height="tableHeight" class="c-gx-table c-glc-table"
+      row-key="id">
     </GxTable>
 
     <div>

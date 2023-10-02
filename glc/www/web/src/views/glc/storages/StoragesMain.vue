@@ -25,8 +25,8 @@
       </template>
     </GxToolbar>
 
-    <GxTable ref="table" v-loading="showTableLoadding" stripe :enable-header-contextmenu="false" :tid="tid"
-      :data="tableData" :height="tableHeight" class="c-gx-table c-glc-table" row-key="id">
+    <GxTable ref="table" v-loading="showTableLoadding" scrollbar-always-on stripe :enable-header-contextmenu="false"
+      :tid="tid" :data="tableData" :height="tableHeight" class="c-gx-table c-glc-table" row-key="id">
       <template #$operation="{ row }">
         <el-button size="small" type="warning" @click="remove(row)">删除</el-button>
       </template>

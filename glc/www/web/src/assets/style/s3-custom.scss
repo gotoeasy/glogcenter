@@ -497,6 +497,11 @@ div.el-range-editor--small.el-input__wrapper {
   box-shadow: 0 2px 12px 0 rgb(0 0 0 / 30%);
 }
 
+// 多选下拉框
+.c-down-panel .el-input.el-input--small.el-input--suffix {
+  height: 32px;
+}
+
 // 登录按钮
 button.el-button--large.is-round {
   border-radius: 10px;
