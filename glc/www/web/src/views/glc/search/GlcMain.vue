@@ -78,7 +78,7 @@ const opt = {
 const { formData, visible, tableData, tableHeight, pageSettingStore, showTableLoadding } = usePageMainHooks(opt);
 
 const table = ref(); // 表格实例
-const tid = ref('glcMain'); // 表格ID
+const tid = ref('glcSearchMain'); // 表格ID
 const info = ref(''); // 底部提示信息
 const storageOptions = ref([]) // 日志仓
 const systemSet = new Set();

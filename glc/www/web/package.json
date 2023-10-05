@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
-    "@gotoeasy/glcui": "^0.1.1",
+    "@gotoeasy/glcui": "^0.1.2",
     "@imengyu/vue3-context-menu": "^1.3.0",
     "@vueuse/core": "^10.2.1",
     "axios": "^1.4.0",
