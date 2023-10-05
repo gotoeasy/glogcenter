@@ -13,7 +13,7 @@
 <br>
 
 <p align="center">
-    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.0-brightgreen.svg"></a>
+    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.1-brightgreen.svg"></a>
     <a href="https://hub.docker.com/r/gotoeasy/glc"><img src="https://img.shields.io/docker/pulls/gotoeasy/glc"></a>
     <a href="https://github.com/gotoeasy/glogcenter/releases/latest"><img src="https://img.shields.io/github/release/gotoeasy/glogcenter.svg"></a>
     <a href="https://github.com/gotoeasy/glogcenter/blob/master/LICENSE"><img src="https://img.shields.io/github/license/gotoeasy/glogcenter"></a>
@@ -226,10 +226,16 @@ func main() {
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
+### 版本`0.11.5`
+
+- [x] 升级使用`Go1.21.1`
+- [x] 更新升级依赖包，避免潜在问题
+- [x] 前端页面细节改善
+
 ### 版本`0.11.4`
 
 - [x] 支持日志级别多选条件，想排除某种级别进行检索时会很实用
-- [x] 进一步提高使用体验，如左上角图标鼠标悬停时提示版本号
+- [x] 改善前端进一步提高使用体验
 
 ### 版本`0.11.3`
 
