@@ -93,6 +93,7 @@ function remove(row) {
     console.log(rs)
     if (rs.success) {
       $msg.info(`已删除日志仓 ${row.name}`);
+      search();
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
       router.push('/login');
