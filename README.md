@@ -13,7 +13,7 @@
 <br>
 
 <p align="center">
-    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.1-brightgreen.svg"></a>
+    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.3-brightgreen.svg"></a>
     <a href="https://hub.docker.com/r/gotoeasy/glc"><img src="https://img.shields.io/docker/pulls/gotoeasy/glc"></a>
     <a href="https://github.com/gotoeasy/glogcenter/releases/latest"><img src="https://img.shields.io/github/release/gotoeasy/glogcenter.svg"></a>
     <a href="https://github.com/gotoeasy/glogcenter/blob/master/LICENSE"><img src="https://img.shields.io/github/license/gotoeasy/glogcenter"></a>
@@ -225,6 +225,12 @@ func main() {
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.11.6`
+
+- [x] 升级使用`Go1.21.3`，一波安全更新
+- [x] 增加`robots.txt`，拒绝爬虫爬取内容
+- [x] 其他一些细节改善
 
 ### 版本`0.11.5`
 
