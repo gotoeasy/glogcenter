@@ -89,6 +89,8 @@ func Run() {
 			path = "/**/*.css"
 		} else if cmn.Endwiths(path, ".js") {
 			path = "/**/*.js"
+		} else if cmn.Endwiths(path, ".txt") {
+			path = "/**/*.txt"
 		} else if cmn.Endwiths(path, ".png") {
 			path = "/**/*.png"
 		} else if cmn.Endwiths(path, ".ico") {
