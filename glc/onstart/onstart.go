@@ -23,6 +23,7 @@ func Run() {
 		gweb.RegisterController(method.GET, "/**/*.html", html.StaticFileController)
 		gweb.RegisterController(method.GET, "/**/*.css", html.StaticFileController)
 		gweb.RegisterController(method.GET, "/**/*.js", html.StaticFileController)
+		gweb.RegisterController(method.GET, "/**/*.txt", html.StaticFileController)
 		gweb.RegisterController(method.GET, "/**/*.ico", html.StaticFileController)
 		gweb.RegisterController(method.GET, "/**/*.png", html.StaticFileController)
 		gweb.RegisterController(method.GET, "/**/*.jpg", html.StaticFileController)
