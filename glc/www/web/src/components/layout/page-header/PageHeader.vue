@@ -2,7 +2,7 @@
   <GxToolbar :height="themeStore.headerHeight">
     <template #left>
       <div style="display:flex;align-items:center;margin-left:8px;line-height: 30px;">
-        <div :title="VITE_GLC_INFO" style="width: 34px;color:white;text-align:center;cursor:pointer;" @click="clickLogo">
+        <div :title="verInfo" style="width: 34px;color:white;text-align:center;cursor:pointer;" @click="clickLogo">
           <img src="/image/glc.png" style="width:34px;margin-top:9px;" />
         </div>
         <div style="text-align:center;">
@@ -25,7 +25,7 @@ import { userLogout } from '~/api';
 const { VITE_GLC_INFO } = import.meta.env;
 
 const router = useRouter();
-
+const verInfo = ref(VITE_GLC_INFO);
 const tokenStore = useTokenStore();
 const themeStore = useThemeStore();
 const headerHeight = computed(() => `${themeStore.headerHeight}px`);
@@ -63,6 +63,10 @@ const svgLogoColor = computed(() => {
   return '#eeeeee';
 });
 
+onMounted(() => {
+  checkVersion();
+});
+
 async function logout() {
   if (await $msg.confirm('确定要退出系统吗？')) {
     userLogout();
@@ -73,6 +77,18 @@ async function logout() {
 const clickLogo = () => {
   window.open('https://github.com/gotoeasy/glogcenter', '_blank');
 };
+
+function checkVersion() {
+  !window.$checkVersionDone && (window.$checkVersionDone = 1) && fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${VITE_GLC_INFO}`)
+    .then(response => response.text())
+    .then(data => {
+      const rs = JSON.parse(data)
+      if (rs.version && VITE_GLC_INFO < rs.version) {
+        verInfo.value = `当前版本 ${VITE_GLC_INFO} ，有新版本 ${rs.version} 可更新`
+      }
+    })
+    .catch(e => console.log(e));
+}
 
 </script>
 
