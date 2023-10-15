@@ -84,14 +84,6 @@ func GetDirInfo(path string) (uint32, int64, error) {
 	return count, size, err
 }
 
-// 按M或G单位显示
-func GetSizeInfo(size uint64) string {
-	if size > 1024*1024*1024 {
-		return fmt.Sprintf("%.1fG", float64(size)/1024/1024/1024)
-	}
-	return fmt.Sprintf("%.1fM", float64(size)/1024/1024)
-}
-
 // 当前日期加减天数后的yyyymmdd格式
 func GetYyyymmdd(days int) string {
 	return time.Now().AddDate(0, 0, days).Format("20060102")

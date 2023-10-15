@@ -44,12 +44,12 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 		if conf.GetSaveDays() > 0 {
 			ymd := cmn.Right(name, 8)
 			if cmn.Len(ymd) == 8 && cmn.Startwiths(ymd, "20") {
-				msg := fmt.Sprintf("当前是日志仓自动维护模式，最多保存 %d 天，不能手动删除", conf.GetSaveDays())
+				msg := fmt.Sprintf("当前是日志仓自动维护模式，最多保存 %d 天，不支持手动删除", conf.GetSaveDays())
 				return gweb.Error500(msg)
 			}
 		}
 	} else if name == "logdata" {
-		return gweb.Error500("不能删除当前使用的唯一日志仓 " + "logdata")
+		return gweb.Error500("日志仓 " + name + " 正在使用，不能删除")
 	}
 
 	if status.IsStorageOpening(name) {

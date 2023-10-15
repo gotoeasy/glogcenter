@@ -13,17 +13,17 @@ import (
 
 func Test_CutWords(t *testing.T) {
 	ws := tokenizer.CutForSearch("小明硕士毕业于中国科学院计算所，后在日本京都大学深造，Java和Go都学得不错，Java和Go都不错的")
-	cmn.Println(ws)
+	cmn.Debug(ws)
 }
 
 func Test_GetIP(t *testing.T) {
-	cmn.Println(com.GetLocalIp())
+	cmn.Debug(com.GetLocalIp())
 }
 func Test_GetSubDirs(t *testing.T) {
 	rs := sysmnt.GetStorageList()
 
 	for i := 0; i < len(rs.Data); i++ {
-		cmn.Println(rs.Data[i])
+		cmn.Debug(rs.Data[i])
 	}
 
 }
@@ -47,9 +47,9 @@ func Test_all(t *testing.T) {
 	// time.Sleep(time.Duration(5) * time.Second)
 
 	rs := engine.Search(`              them java     `, "", "", "", "", make([]string, 0), 0, true)
-	cmn.Println("共查到", rs.Total, "件")
+	cmn.Debug("共查到", rs.Total, "件")
 	for _, v := range rs.Data {
-		cmn.Println(v.Id, v.Text)
+		cmn.Debug(v.Id, v.Text)
 	}
 
 }

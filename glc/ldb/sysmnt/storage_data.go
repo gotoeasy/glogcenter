@@ -53,7 +53,7 @@ func GetStorageList() *StorageResult {
 		}
 
 		cnt, size, _ := com.GetDirInfo(conf.GetStorageRoot() + cmn.PathSeparator() + name)
-		d.TotalSize = com.GetSizeInfo(uint64(size))
+		d.TotalSize = cmn.GetSizeInfo(uint64(size))
 		d.FileCount = cnt
 
 		sum += size
@@ -73,7 +73,7 @@ func GetStorageList() *StorageResult {
 	stat, _ := disk.Usage(conf.GetStorageRoot())
 
 	rs := &StorageResult{
-		Info: fmt.Sprintf("共占用空间 " + com.GetSizeInfo(uint64(sum)) + "，剩余空间 " + com.GetSizeInfo(stat.Free)),
+		Info: fmt.Sprintf("共占用空间 " + cmn.GetSizeInfo(uint64(sum)) + "，剩余空间 " + cmn.GetSizeInfo(stat.Free)),
 		Data: datas,
 	}
 	return rs
