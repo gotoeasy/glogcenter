@@ -191,30 +191,31 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 
 ## 使用`golang`语言的项目，提供工具包，开箱即用
 ```shell
-# 引入工具包
-go get github.com/gotoeasy/glang
-
-# 按需设定环境变量
+# 方式1）通过环境变量自动配置，程序直接使用cmn.Debug(...)写日志即可
+export GLC_ENABLE=true # 此配置默认false，要生效必须配置为true
 export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add'
 export GLC_API_KEY='X-GLC-AUTH:glogcenter'
 export GLC_SYSTEM=demo
-export GLC_ENABLE=true
-export GLC_LOG_LEVEL=debug # 日志级别（trace/debug/info/warn/error/fatal）
+export GLC_LOG_LEVEL=debug # 日志级别（debug/info/warn/error）
 ```
 
 ```golang
-// 方式1： 通过 cmn.Debug(...)、cmn.Info(...)等方式，打印日志的同时发送至日志中心
-// 方式2： 通过 cmn.NewGLogCenterClient()创建客户端对象后使用
-//        更多内容详见文档 https://pkg.go.dev/github.com/gotoeasy/glang
-
+// 方式2） 使用前通过程序cmn.SetGlcClient(...)手动配置初始化
 import "github.com/gotoeasy/glang/cmn"
 
 func main() {
-    cmn.Info("启动WEB服务")
-    err := cmn.NewFasthttpServer().Start()
-    if err != nil {
-        cmn.Fatalln("启动失败", err)
-    }
+    // 这里用手动初始化替代环境变量自动配置方式，更多选项详见GlcOptions字段说明
+    cmn.SetGlcClient(cmn.NewGlcClient(&cmn.GlcOptions{
+        ApiUrl:      "http://ip:port/glc/v1/log/add",
+        Enable:      true,
+    }))
+
+    cmn.Debug("这是Debug级别日志")
+    cmn.Info("这是Info级别日志", "多个参数", "会被拼接")
+    gd := &cmn.GlcData{TraceId: "1234567890"} // 跟踪码相同的日志，传入该参数即可
+    cmn.Warn("这里的GlcData类型参数都不会打印", "gd只起传值作用", gd)
+    cmn.Error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了特殊的判断处理")
+    cmn.WaitGlcFinish() // 停止接收新日志，等待日志都发送完成，常在退出前调用
 }
 ```
 
