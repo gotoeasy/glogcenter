@@ -35,6 +35,12 @@
       </template>
 
       <template #right>
+        <el-tooltip :content="autoSearchMode ? '停止自动查询' : '开始自动查询'" placement="top">
+          <el-button circle @click="switchAutoSearchMode">
+            <SvgIcon v-if="!autoSearchMode" name="play" />
+            <SvgIcon v-if="autoSearchMode" name="stop" />
+          </el-button>
+        </el-tooltip>
         <el-tooltip content="缩放" placement="top">
           <el-button circle @click="emitter.emit('main:switchMaximizePage')">
             <SvgIcon name="zoom" />
@@ -77,6 +83,7 @@ const opt = {
 };
 const { formData, visible, tableData, tableHeight, pageSettingStore, showTableLoadding } = usePageMainHooks(opt);
 
+const autoSearchMode = ref(false); // 自动查询
 const table = ref(); // 表格实例
 const tid = ref('glcSearchMain'); // 表格ID
 const info = ref(''); // 底部提示信息
@@ -169,7 +176,6 @@ const shortcuts = ref([
 
 // 初期默认检索
 onMounted(() => {
-  showTableLoadding.value = true;
   const configStore = $emitter.emit('$table:config', { id: tid.value });
   !configStore.columns.length && $emitter.emit('$table:config', { id: tid.value, update: true }); // 首次使用开启默认布局
   // 日志仓列表查询
@@ -201,8 +207,22 @@ onMounted(() => {
   search();
 });
 
+function isAutoSearchMode() {
+  return autoSearchMode.value
+}
+
+function switchAutoSearchMode(changMode = true) {
+  changMode && (autoSearchMode.value = !autoSearchMode.value);
+  if (autoSearchMode.value) {
+    search();
+    setTimeout(() => {
+      isAutoSearchMode() && switchAutoSearchMode(false);
+    }, 5000);
+  }
+}
+
 function search() {
-  showTableLoadding.value = true;
+  autoSearchMode.value ? (showTableLoadding.value = false) : (showTableLoadding.value = true);
   const url = `/v1/log/search`;
   const data = {};
   data.searchKey = formData.value.searchKeys;
@@ -232,6 +252,7 @@ function search() {
           info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
         }
       });
+
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
       router.push('/login');
