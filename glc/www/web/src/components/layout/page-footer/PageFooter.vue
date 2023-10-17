@@ -1,5 +1,5 @@
 <template>
-  <div class="copyright">Copyright © 2023 gotoeasy.top</div>
+  <div class="copyright">Copyright © 2022-Present gotoeasy.top</div>
 </template>
 
 <script setup>

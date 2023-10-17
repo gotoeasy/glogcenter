@@ -23,7 +23,7 @@
                 <PageMain />
               </div>
               <div class="footer">
-                <PageFooter v-if="!themeState.tabsMaximize && !themeState.pageMaximize && themeStore.showFooter" />
+                <PageFooter v-show="!themeState.tabsMaximize && !themeState.pageMaximize && themeStore.showFooter" />
               </div>
             </div>
           </el-main>

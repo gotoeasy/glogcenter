@@ -86,24 +86,25 @@ function search() {
   });
 }
 
-function remove(row) {
+async function remove(row) {
   // 日志仓删除
-  const url = `/v1/store/delete`;
-  $post(url, { storeName: row.name }, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
-    console.log(rs)
-    if (rs.success) {
-      $msg.info(`已删除日志仓 ${row.name}`);
-      search();
-    } else if (rs.code == 403) {
-      userLogout(); // 403 时登出
-      router.push('/login');
-    } else {
-      $msg.error(rs.message);
-    }
-  }).finally(() => {
-    showTableLoadding.value = false;
-  });
-
+  if (await $msg.confirm(`确定要删除日志仓 ${row.name} 吗？`)) {
+    const url = `/v1/store/delete`;
+    $post(url, { storeName: row.name }, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
+      console.log(rs)
+      if (rs.success) {
+        $msg.info(`已删除日志仓 ${row.name}`);
+        search();
+      } else if (rs.code == 403) {
+        userLogout(); // 403 时登出
+        router.push('/login');
+      } else {
+        $msg.error(rs.message);
+      }
+    }).finally(() => {
+      showTableLoadding.value = false;
+    });
+  }
 }
 
 </script>
