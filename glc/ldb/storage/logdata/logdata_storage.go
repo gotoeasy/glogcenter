@@ -192,8 +192,13 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	if docm.LogLevel != "" {
 		adds = append(adds, "!"+docm.LogLevel)
 	}
-	kws := tokenizer.CutForSearchEx(docm.Text+" "+docm.System+" "+docm.ServerName+" "+docm.ServerIp+
-		" "+docm.ClientIp+" "+docm.TraceId+" "+docm.LogLevel+" "+docm.User+" "+docm.Module+" "+docm.Operation, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
+
+	tgtStr := docm.Text + " " + docm.System + " " + docm.ServerName + " " + docm.ServerIp +
+		" " + docm.ClientIp + " " + docm.TraceId + " " + docm.LogLevel + " " + docm.User + " " + docm.Module + " " + docm.Operation
+	if docm.Detail != "" && conf.IsMulitLineSearch() {
+		tgtStr = tgtStr + " " + docm.Detail // 支持日志列全部行作为索引检索对象
+	}
+	kws := tokenizer.CutForSearchEx(tgtStr, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {

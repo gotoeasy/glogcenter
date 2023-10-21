@@ -46,6 +46,7 @@ var enableUploadMinio bool
 var goMaxProcess int
 var enableCors bool
 var pageSize int
+var mulitLineSearch bool
 
 func init() {
 	UpdateConfigByEnv()
@@ -91,9 +92,15 @@ func UpdateConfigByEnv() {
 	goMaxProcess = getGoMaxProcessConf(cmn.GetEnvInt("GLC_GOMAXPROCS", -1))     // 使用的最大CPU数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
 	enableCors = cmn.GetEnvBool("GLC_ENABLE_CORS", false)                       // 是否允许跨域，默认false
 	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))             // 每次检索件数，默认100（有效范围1~1000）
-	// contextPath = cmn.GetEnvStr("GLC_CONTEXT_PATH", "/glc")                     // web服务contextPath
+	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)            // 是否检索日志的全部行，默认false仅第一行
 }
 
+// 取配置： 是否检索日志的全部行，可通过环境变量“GLC_SEARCH_MULIT_LINE”设定，默认false
+func IsMulitLineSearch() bool {
+	return mulitLineSearch
+}
+
+// 取配置： 每次检索件数，可通过环境变量“GLC_PAGE_SIZE”设定，默认100（有效范围1~1000）
 func GetPageSize() int {
 	return pageSize
 }
