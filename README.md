@@ -89,6 +89,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 ## `docker`启动环境变量
 - [x] `GLC_STORE_NAME_AUTO_ADD_DATE`日志仓是否自动按日存储，默认`true`
 - [x] `GLC_SAVE_DAYS`日志仓按日存储自动维护时的保留天数(`0~180`)，`0`表示不自动删除，默认`180`天
+- [x] `GLC_SEARCH_MULIT_LINE`，是否对日志列的全部行进行索引检索，默认`false`
 - [x] `GLC_ENABLE_LOGIN`是否开启用户密码登录功能，默认`false`
 - [x] `GLC_USERNAME`查询界面登录用的用户名，默认`glc`
 - [x] `GLC_PASSWORD`查询界面登录用的密码，默认`GLogCenter100%666`
@@ -228,6 +229,13 @@ func main() {
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
+### 版本`0.12.0`
+
+- [x] 增加配置开关`GLC_SEARCH_MULIT_LINE`，设定为`true`时，支持对日志列的全部行进行索引和检索，默认`false`。注意：不会对历史数据进行重新索引，也就是说，设定为`true`时，新加入的日志会做多行索引，但历史数据如果没有多行索引的仍旧没法进行多行检索
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
+
 ### 版本`0.11.7`
 
 - [x] 增加支持开始/停止自动查询，观察实时日志时实用
@@ -268,9 +276,6 @@ func main() {
 - [x] 前端全面重构改良，支持表格列宽、位置、显示隐藏等各种个性化设定
 - [x] 新增`GLC_ENABLE_CORS`参数配置是否允许跨域，默认`false`，方便系统间对接
 - [x] 新增`GLC_PAGE_SIZE`参数配置每次检索件数，默认`100`（有效范围`1~1000`）
-
-<details>
-<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.10.2`
 
