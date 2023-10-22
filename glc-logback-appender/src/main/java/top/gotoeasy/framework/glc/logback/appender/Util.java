@@ -1,5 +1,6 @@
 package top.gotoeasy.framework.glc.logback.appender;
 
+import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
@@ -97,6 +98,15 @@ public class Util {
             buf.append(hex[digit]);
             n <<= 4;
         }
+    }
+
+    public static String hash(String str) {
+        int rs = 53653;
+        int i = (str == null ? 0 : str.length());
+        while (i > 0) {
+            rs = (rs * 33) ^ str.charAt(--i);
+        }
+        return new BigDecimal(Long.valueOf(rs & 0x0FFFFFFFFL)).toPlainString();
     }
 
 }

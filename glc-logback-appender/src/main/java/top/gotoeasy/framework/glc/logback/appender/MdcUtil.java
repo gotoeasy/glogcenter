@@ -30,7 +30,7 @@ public class MdcUtil {
     }
 
     public static String generateTraceId() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return Util.hash(UUID.randomUUID().toString());
     }
 
 }
