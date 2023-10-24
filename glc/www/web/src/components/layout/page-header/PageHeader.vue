@@ -77,25 +77,22 @@ const clickLogo = () => {
 };
 
 function checkVersion() {
-
   if (!window.$checkVersionDone) {
     window.$checkVersionDone = true;
-    fetch('/v1/version/info', { method: 'POST' })
-      .then(response => response.json())
-      .then(data1 => { // 从后端查询当前版本，避免多处维护版本号
-        verInfo.value = data1.version
-        fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${data1.version}`)
-          .then(response => response.json())
-          .then(data2 => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
-            if (data2.version && data1.version < data2.version) {
-              verInfo.value = `当前版本 ${data1.version} ，有新版本 ${data2.version} 可更新`
-            }
-          })
-          .catch(e => console.log(e));
-      })
-      .catch(e => console.log(e));
+    // 从后台服务读取当前运行版本，避免多处维护版本号
+    $post('/v1/version/info', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
+      if (rs.success) {
+        verInfo.value = rs.result.version
+        // 有新版本时，左上角图标鼠标悬停显示提示（注：最新版本号的查询服务并不保证随时可用）
+        $get(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${verInfo.value}`).then(rs => {
+          console.log(rs) // 结果类似 {version: 'v0.12.0'}
+          if (rs.version && verInfo.value <= rs.version) {
+            verInfo.value = `当前版本 ${verInfo.value} ，有新版本 ${rs.version} 可更新`
+          }
+        });
+      }
+    });
   }
-
 }
 
 </script>
