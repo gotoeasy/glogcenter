@@ -41,6 +41,7 @@ func Run() {
 		gweb.RegisterController(method.POST, contextPath+"/v1/store/names", controller.StorageNamesController)           // 查询日志仓名称列表
 		gweb.RegisterController(method.POST, contextPath+"/v1/store/list", controller.StorageListController)             // 查询日志仓信息列表
 		gweb.RegisterController(method.POST, contextPath+"/v1/store/delete", controller.StorageDeleteController)         // 删除日志仓
+		gweb.RegisterController(method.POST, contextPath+"/v1/store/mode", controller.TestModeController)                // 查询是否测试模式
 		gweb.RegisterController(method.POST, contextPath+"/v1/user/enableLogin", controller.IsEnableLoginController)     // 查询是否开启用户密码登录功能
 		gweb.RegisterController(method.POST, contextPath+"/v1/user/login", controller.LoginController)                   // Login
 		gweb.RegisterController(method.POST, contextPath+"/v1/version/info", controller.VersionController)               // 查询版本信息

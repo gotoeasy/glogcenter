@@ -12,7 +12,7 @@ import (
 func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	if !conf.IsTestMode() {
-		return gweb.Ok() // 非测试模式时忽略
+		return gweb.Error500("当前不是测试模式，不支持生成测试数据") // 非测试模式时忽略
 	}
 
 	cnt := 0
@@ -36,7 +36,7 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 		}
 
 		md2 := &logdata.LogDataModel{
-			Text:       "几个随机字符串供查询试验：" + cmn.RandomString(1) + "," + cmn.RandomString(2) + "," + cmn.RandomString(3) + "," + cmn.RandomString(4) + "," + cmn.RandomString(5),
+			Text:       "几个随机字符串供查询试验：" + cmn.RandomString(1) + "，" + cmn.Right(cmn.ULID(), 2) + "，" + cmn.RandomString(3) + "，" + cmn.Right(cmn.ULID(), 4) + "，" + cmn.Right(cmn.ULID(), 5),
 			Date:       cmn.Now(),
 			System:     "demo",
 			ServerName: "default",

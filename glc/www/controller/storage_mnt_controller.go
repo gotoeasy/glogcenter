@@ -13,6 +13,11 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
+// 查询是否测试模式
+func TestModeController(req *gweb.HttpRequest) *gweb.HttpResult {
+	return gweb.Result(conf.IsTestMode())
+}
+
 // 查询版本信息
 func VersionController(req *gweb.HttpRequest) *gweb.HttpResult {
 	rs := cmn.OfMap("version", ver.VERSION, "latest", getLatestVersion()) // version当前版本号，latest最新版本号
@@ -75,7 +80,7 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 // 尝试查询最新版本号（注：这里不能保证服务一定可用），查不到返回空串
 func getLatestVersion() string {
 	// {"version":"v0.12.0"}
-	bts, err := cmn.HttpGetJson("https://glc.gotoeasy.top/glogcenter/current/version.json?v=" + ver.VERSION) // 取最新版本号
+	bts, err := cmn.HttpGetJson("https://glc.gotoeasy.top/glogcenter/current/version.json?v="+ver.VERSION, "Auth:glc") // 取最新版本号
 	if err != nil {
 		return ""
 	}
