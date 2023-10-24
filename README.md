@@ -106,6 +106,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_CLUSTER_URLS`集群模式时的关联节点服务地址，多个时`;`分隔，默认空白
 - [x] `GLC_LOG_LEVEL`日志级别，可设定值为`debug/info/warn/error`，默认`info`
 - [x] `GLC_GOMAXPROCS`使用最大CPU数量，值不在实际范围内时按最大值看待，默认最大值，常用于`docker`方式
+- [x] `GLC_TEST_MODE`是否开启测试模式，开启时显示生成测试数据的按钮，供测试或快速体验用，默认`false`
 
 
 ## 接口
@@ -228,6 +229,11 @@ func main() {
 - [ ] 日志审计
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.12.1`
+
+- [x] 新增`GLC_TEST_MODE`是否开启测试模式的开关，开启后显示生成测试数据的按钮，供测试或快速体验用，默认`false`
+- [x] 优化改善
 
 ### 版本`0.12.0`
 
