@@ -35,6 +35,11 @@
       </template>
 
       <template #right>
+        <el-tooltip v-if="showTestBtn" content="生成测试数据" placement="top">
+          <el-button circle @click="genTestData">
+            <SvgIcon name="quick" />
+          </el-button>
+        </el-tooltip>
         <el-tooltip :content="autoSearchMode ? '停止自动查询' : '开始自动查询'" placement="top">
           <el-button circle @click="switchAutoSearchMode">
             <SvgIcon v-if="!autoSearchMode" name="play" />
@@ -83,6 +88,7 @@ const opt = {
 };
 const { formData, visible, tableData, tableHeight, pageSettingStore, showTableLoadding } = usePageMainHooks(opt);
 
+const showTestBtn = ref(false); // 是否显示生成测试数据按钮
 const autoSearchMode = ref(false); // 自动查询
 const table = ref(); // 表格实例
 const tid = ref('glcSearchMain'); // 表格ID
@@ -193,6 +199,11 @@ onMounted(() => {
     }
   });
 
+  // 查询是否测试模式
+  $post('/v1/store/mode', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
+    showTestBtn.value = rs.success && rs.result
+  });
+
   // 滚动底部触发检索更多
   const scrollWrap = document.querySelector('.c-glc-table .el-scrollbar__wrap')
   scrollWrap.addEventListener('scroll', (e) => {
@@ -206,6 +217,13 @@ onMounted(() => {
   // 默认检索
   search();
 });
+
+// 生成测试数据
+function genTestData() {
+  $post('/v1/log/addTestData', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
+    $msg.info(rs.message);
+  });
+}
 
 function isAutoSearchMode() {
   return autoSearchMode.value
