@@ -84,12 +84,14 @@ function checkVersion() {
       if (rs.success) {
         verInfo.value = rs.result.version
         // 有新版本时，左上角图标鼠标悬停显示提示（注：最新版本号的查询服务并不保证随时可用）
-        $get(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${verInfo.value}`).then(rs => {
-          console.log(rs) // 结果类似 {version: 'v0.12.0'}
-          if (rs.version && verInfo.value <= rs.version) {
-            verInfo.value = `当前版本 ${verInfo.value} ，有新版本 ${rs.version} 可更新`
-          }
-        });
+        fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${verInfo.value}`)
+          .then(response => response.json())
+          .then(data => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
+            if (data.version && verInfo.value < data.version) {
+              verInfo.value = `当前版本 ${verInfo.value} ，有新版本 ${data.version} 可更新`
+            }
+          })
+          .catch(e => console.log(e));
       }
     });
   }
