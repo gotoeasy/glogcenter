@@ -22,10 +22,8 @@
 import { gxUtil, useThemeStore, useTokenStore } from '~/pkgs';
 import { userLogout } from '~/api';
 
-const { VITE_GLC_INFO } = import.meta.env;
-
 const router = useRouter();
-const verInfo = ref(VITE_GLC_INFO);
+const verInfo = ref('');
 const tokenStore = useTokenStore();
 const themeStore = useThemeStore();
 const headerHeight = computed(() => `${themeStore.headerHeight}px`);
@@ -79,15 +77,25 @@ const clickLogo = () => {
 };
 
 function checkVersion() {
-  !window.$checkVersionDone && (window.$checkVersionDone = 1) && fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${VITE_GLC_INFO}`)
-    .then(response => response.text())
-    .then(data => {
-      const rs = JSON.parse(data)
-      if (rs.version && VITE_GLC_INFO < rs.version) {
-        verInfo.value = `当前版本 ${VITE_GLC_INFO} ，有新版本 ${rs.version} 可更新`
-      }
-    })
-    .catch(e => console.log(e));
+
+  if (!window.$checkVersionDone) {
+    window.$checkVersionDone = true;
+    fetch('/v1/version/info', { method: 'POST' })
+      .then(response => response.json())
+      .then(data1 => { // 从后端查询当前版本，避免多处维护版本号
+        verInfo.value = data1.version
+        fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${data1.version}`)
+          .then(response => response.json())
+          .then(data2 => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
+            if (data2.version && data1.version < data2.version) {
+              verInfo.value = `当前版本 ${data1.version} ，有新版本 ${data2.version} 可更新`
+            }
+          })
+          .catch(e => console.log(e));
+      })
+      .catch(e => console.log(e));
+  }
+
 }
 
 </script>

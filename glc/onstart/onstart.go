@@ -42,6 +42,7 @@ func Run() {
 		gweb.RegisterController(method.POST, contextPath+"/v1/store/delete", controller.StorageDeleteController)         // 删除日志仓
 		gweb.RegisterController(method.POST, contextPath+"/v1/user/enableLogin", controller.IsEnableLoginController)     // 查询是否开启用户密码登录功能
 		gweb.RegisterController(method.POST, contextPath+"/v1/user/login", controller.LoginController)                   // Login
+		gweb.RegisterController(method.POST, contextPath+"/v1/version/info", controller.VersionController)               // 查询版本信息
 
 		// 集群操作接口
 		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/info", controller.ClusterGetClusterInfoController)   // 获取集群信息

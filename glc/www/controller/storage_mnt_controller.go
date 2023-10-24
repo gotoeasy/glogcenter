@@ -1,15 +1,23 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"glc/com"
 	"glc/conf"
 	"glc/gweb"
 	"glc/ldb/status"
 	"glc/ldb/sysmnt"
+	"glc/ver"
 
 	"github.com/gotoeasy/glang/cmn"
 )
+
+// 查询版本信息
+func VersionController(req *gweb.HttpRequest) *gweb.HttpResult {
+	rs := cmn.OfMap("version", ver.VERSION, "latest", getLatestVersion()) // version当前版本号，latest最新版本号
+	return gweb.Result(rs)
+}
 
 // 查询日志仓名称列表
 func StorageNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
@@ -62,4 +70,21 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error500("日志仓 " + name + " 正在使用，不能删除")
 	}
 	return gweb.Ok()
+}
+
+// 尝试查询最新版本号（注：这里不能保证服务一定可用），查不到返回空串
+func getLatestVersion() string {
+	// {"version":"v0.12.0"}
+	bts, err := cmn.HttpGetJson("https://glc.gotoeasy.top/glogcenter/current/version.json?v=" + ver.VERSION) // 取最新版本号
+	if err != nil {
+		return ""
+	}
+
+	var data struct {
+		Version string `json:"version,omitempty"`
+	}
+	if err := json.Unmarshal(bts, &data); err != nil {
+		return ""
+	}
+	return data.Version
 }

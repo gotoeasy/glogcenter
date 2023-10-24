@@ -3,6 +3,7 @@ package onstart
 import (
 	"fmt"
 	"glc/conf"
+	"glc/ver"
 	"os"
 	"os/exec"
 	"os/user"
@@ -43,7 +44,7 @@ func init() {
 	}
 	// 查看版本
 	if version {
-		fmt.Printf("%s\n", VERSION)
+		fmt.Printf("%s\n", "glogcenter "+ver.VERSION)
 		os.Exit(0)
 	}
 
