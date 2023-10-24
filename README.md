@@ -133,7 +133,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.11.1</version>
+    <version>0.12.0</version>
 </dependency>
 ```
 
@@ -232,6 +232,7 @@ func main() {
 ### 版本`0.12.0`
 
 - [x] 增加配置开关`GLC_SEARCH_MULIT_LINE`，设定为`true`时，支持对日志列的全部行进行索引和检索，默认`false`。注意：不会对历史数据进行重新索引，也就是说，设定为`true`时，新加入的日志会做多行索引，但历史数据如果没有多行索引的仍旧没法进行多行检索
+- [x] 同步升级`glc-logback-appender`，增加过滤器类`GlcFilter`用以生成客户端IP和跟踪码，可按需配置使用
 
 <details>
 <summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
