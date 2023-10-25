@@ -99,7 +99,10 @@ func checkAndCopyDataFromRemote() {
 			}
 
 			// 解压
-			cmn.UnTar(tarfile, conf.GetStorageRoot())
+			storeName := cmn.Split(cmn.FileName(tarfile), ".")[1] // download.logdata-20221030.1491888244752784461.tar => logdata-20221030
+			distDir := filepath.Join(conf.GetStorageRoot(), storeName)
+			cmn.MkdirAll(distDir)
+			cmn.UnTar(tarfile, distDir)
 
 			// 保存信息
 			sysdb := sysmnt.NewSysmntStorage()
@@ -141,7 +144,10 @@ func checkAndCopyDataFromRemote() {
 		}
 
 		// 解压
-		cmn.UnTar(tarfile, conf.GetStorageRoot())
+		storeName := cmn.Split(cmn.FileName(tarfile), ".")[1] // download.logdata-20221030.1491888244752784461.tar => logdata-20221030
+		distDir := filepath.Join(conf.GetStorageRoot(), storeName)
+		cmn.MkdirAll(distDir)
+		cmn.UnTar(tarfile, distDir)
 
 		// 保存信息
 		sysdb := sysmnt.NewSysmntStorage()
