@@ -48,17 +48,10 @@ var enableCors bool
 var pageSize int
 var mulitLineSearch bool
 var testMode bool
+var tokenSalt string
 
 func init() {
 	UpdateConfigByEnv()
-
-	// 在这个地方建目录，如果创建失败就比较难看，比如仅命令行查看版本的情景
-	// // 自动判断创建目录
-	// _, err := os.Stat(storeRoot)
-	// if err != nil && os.IsNotExist(err) {
-	// 	os.MkdirAll(storeRoot, 0766)
-	// }
-
 }
 
 func UpdateConfigByEnv() {
@@ -80,6 +73,7 @@ func UpdateConfigByEnv() {
 	enableLogin = cmn.GetEnvBool("GLC_ENABLE_LOGIN", false)                     // 是否开启用户密码登录，默认“false”
 	username = cmn.GetEnvStr("GLC_USERNAME", "glc")                             // 登录用户名，默认“glc”
 	password = cmn.GetEnvStr("GLC_PASSWORD", "GLogCenter100%666")               // 登录密码，默认“GLogCenter100%666”
+	tokenSalt = cmn.GetEnvStr("GLC_TOKEN_SALT", "")                             // 令牌盐，默认“”
 	clusterMode = cmn.GetEnvBool("GLC_CLUSTER_MODE", false)                     // 是否开启集群模式，默认false
 	splitUrls(cmn.GetEnvStr("GLC_CLUSTER_URLS", ""))                            // 从服务器地址，多个时逗号分开，默认“”
 	enableBackup = cmn.GetEnvBool("GLC_ENABLE_BACKUP", false)                   // 是否开启备份，默认false
@@ -94,6 +88,11 @@ func UpdateConfigByEnv() {
 	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))             // 每次检索件数，默认100（有效范围1~1000）
 	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)            // 是否检索日志的全部行（日志可能有换行），默认false仅第一行
 	testMode = cmn.GetEnvBool("GLC_TEST_MODE", false)                           // 是否测试模式，默认false
+}
+
+// 取配置： 令牌盐，可通过环境变量“GLC_TOKEN_SALT”设定，默认“”
+func GetTokenSalt() string {
+	return tokenSalt
 }
 
 // 取配置： 是否测试模式，可通过环境变量“GLC_TEST_MODE”设定，默认false
