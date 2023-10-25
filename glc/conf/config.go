@@ -14,14 +14,14 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
-var storeRoot string
+var storeRoot string = "/glogcenter" // 【固定】容器化缘故，不适合修改
+var serverPort string = "8080"       // 【固定】容器化缘故，不适合修改
+var contextPath string = "/glc"      // 【固定】容器化缘故，不适合修改
 var storeChanLength int
 var maxIdleTime int
 var storeNameAutoAddDate bool
 var serverUrl string
 var serverIp string
-var serverPort string = "8080"
-var contextPath string = "/glc" // web服务contextPath，固定【/glc】
 var enableSecurityKey bool
 var securityKey string
 var headerSecurityKey string
@@ -63,7 +63,6 @@ func init() {
 
 func UpdateConfigByEnv() {
 	// 读取环境变量初始化配置，各配置都有默认值
-	storeRoot = cmn.GetEnvStr("GLC_STORE_ROOT", "/glogcenter")                  // 【X】存储根目录
 	storeChanLength = cmn.GetEnvInt("GLC_STORE_CHAN_LENGTH", 64)                // 【X】存储通道长度
 	maxIdleTime = cmn.GetEnvInt("GLC_MAX_IDLE_TIME", 180)                       // 【X】最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
 	storeNameAutoAddDate = cmn.GetEnvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
