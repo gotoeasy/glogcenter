@@ -77,7 +77,7 @@ func UpdateConfigByEnv() {
 	amqpAddr = cmn.GetEnvStr("GLC_AMQP_ADDR", "")                               // rabbitMq连接地址，例："amqp://user:password@ip:port/"
 	amqpQueueName = cmn.GetEnvStr("GLC_AMQP_QUEUE_NAME", "glc-log-queue")       // rabbitMq队列名
 	amqpJsonFormat = cmn.GetEnvBool("GLC_AMQP_JSON_FORMAT", true)               // rabbitMq消息文本是否为json格式，默认true
-	saveDays = cmn.GetEnvInt("GLC_SAVE_DAYS", 180)                              // 日志分仓时的保留天数(0~180)，0表示不自动删除，默认180天
+	saveDays = cmn.GetEnvInt("GLC_SAVE_DAYS", 180)                              // 日志分仓时的保留天数(0~1200)，0表示不自动删除，默认180天
 	enableLogin = cmn.GetEnvBool("GLC_ENABLE_LOGIN", false)                     // 是否开启用户密码登录，默认“false”
 	username = cmn.GetEnvStr("GLC_USERNAME", "glc")                             // 登录用户名，默认“glc”
 	password = cmn.GetEnvStr("GLC_PASSWORD", "GLogCenter100%666")               // 登录密码，默认“GLogCenter100%666”
@@ -220,6 +220,12 @@ func GetPassword() string {
 
 // 取配置： 日志分仓时的保留天数(0~180)，0表示不自动删除，可通过环境变量“GLC_SAVE_DAYS”设定，默认180天
 func GetSaveDays() int {
+	if saveDays < 0 {
+		saveDays = 0
+	}
+	if saveDays > 1200 {
+		saveDays = 1200
+	}
 	return saveDays
 }
 
