@@ -63,12 +63,12 @@ func init() {
 
 func UpdateConfigByEnv() {
 	// 读取环境变量初始化配置，各配置都有默认值
-	storeRoot = cmn.GetEnvStr("GLC_STORE_ROOT", "/glogcenter")                  // 存储根目录
-	storeChanLength = cmn.GetEnvInt("GLC_STORE_CHAN_LENGTH", 64)                // 存储通道长度
-	maxIdleTime = cmn.GetEnvInt("GLC_MAX_IDLE_TIME", 180)                       // 最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
+	storeRoot = cmn.GetEnvStr("GLC_STORE_ROOT", "/glogcenter")                  // 【X】存储根目录
+	storeChanLength = cmn.GetEnvInt("GLC_STORE_CHAN_LENGTH", 64)                // 【X】存储通道长度
+	maxIdleTime = cmn.GetEnvInt("GLC_MAX_IDLE_TIME", 180)                       // 【X】最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
 	storeNameAutoAddDate = cmn.GetEnvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
 	serverUrl = cmn.GetEnvStr("GLC_SERVER_URL", "")                             // 服务URL，默认“”，集群配置时自动获取地址可能不对，可通过这个设定
-	serverIp = cmn.GetEnvStr("GLC_SERVER_IP", "")                               // 服务IP，默认“”，当“”时会自动获取
+	serverIp = cmn.GetEnvStr("GLC_SERVER_IP", "")                               // 【X】服务IP，默认“”，当“”时会自动获取
 	enableSecurityKey = cmn.GetEnvBool("GLC_ENABLE_SECURITY_KEY", false)        // web服务是否开启API秘钥校验，默认false
 	headerSecurityKey = cmn.GetEnvStr("GLC_HEADER_SECURITY_KEY", "X-GLC-AUTH")  // web服务API秘钥的header键名
 	securityKey = cmn.GetEnvStr("GLC_SECURITY_KEY", "glogcenter")               // web服务API秘钥
@@ -84,16 +84,16 @@ func UpdateConfigByEnv() {
 	clusterMode = cmn.GetEnvBool("GLC_CLUSTER_MODE", false)                     // 是否开启集群模式，默认false
 	splitUrls(cmn.GetEnvStr("GLC_CLUSTER_URLS", ""))                            // 从服务器地址，多个时逗号分开，默认“”
 	enableBackup = cmn.GetEnvBool("GLC_ENABLE_BACKUP", false)                   // 是否开启备份，默认false
-	glcGroup = cmn.GetEnvStr("GLC_GROUP", "default")                            // 日志中心分组名，默认“default”
-	minioUrl = cmn.GetEnvStr("GLC_MINIO_URL", "")                               // MINIO地址，默认“”
-	minioUser = cmn.GetEnvStr("GLC_MINIO_USER", "")                             // MINIO用户名，默认“”
-	minioPassword = cmn.GetEnvStr("GLC_MINIO_PASS", "")                         // MINIO密码，默认“”
-	minioBucket = cmn.GetEnvStr("GLC_MINIO_BUCKET", "")                         // MINIO桶名，默认“”
-	enableUploadMinio = cmn.GetEnvBool("GLC_ENABLE_UPLOAD_MINIO", false)        // 是否开启上传备份至MINIO服务器，默认false
+	glcGroup = cmn.GetEnvStr("GLC_GROUP", "default")                            // 【X】日志中心分组名，默认“default”
+	minioUrl = cmn.GetEnvStr("GLC_MINIO_URL", "")                               // 【X】MINIO地址，默认“”
+	minioUser = cmn.GetEnvStr("GLC_MINIO_USER", "")                             // 【X】MINIO用户名，默认“”
+	minioPassword = cmn.GetEnvStr("GLC_MINIO_PASS", "")                         // 【X】MINIO密码，默认“”
+	minioBucket = cmn.GetEnvStr("GLC_MINIO_BUCKET", "")                         // 【X】MINIO桶名，默认“”
+	enableUploadMinio = cmn.GetEnvBool("GLC_ENABLE_UPLOAD_MINIO", false)        // 【X】是否开启上传备份至MINIO服务器，默认false
 	goMaxProcess = getGoMaxProcessConf(cmn.GetEnvInt("GLC_GOMAXPROCS", -1))     // 使用的最大CPU数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
 	enableCors = cmn.GetEnvBool("GLC_ENABLE_CORS", false)                       // 是否允许跨域，默认false
 	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))             // 每次检索件数，默认100（有效范围1~1000）
-	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)            // 是否检索日志的全部行，默认false仅第一行
+	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)            // 是否检索日志的全部行（日志可能有换行），默认false仅第一行
 	testMode = cmn.GetEnvBool("GLC_TEST_MODE", false)                           // 是否测试模式，默认false
 }
 
