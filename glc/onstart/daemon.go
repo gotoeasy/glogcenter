@@ -62,6 +62,12 @@ func init() {
 		return
 	}
 
+	// 端口冲突时退出
+	if cmn.IsPortOpening("8080") {
+		fmt.Printf("%s\n", "port 8080 conflict, startup failed.")
+		os.Exit(0)
+	}
+
 	// 自动判断创建目录
 	_, err := os.Stat(conf.GetStorageRoot())
 	if err != nil && os.IsNotExist(err) {
