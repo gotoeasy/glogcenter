@@ -9,9 +9,12 @@ import (
 	"glc/ldb/status"
 	"glc/ldb/sysmnt"
 	"glc/ver"
+	"time"
 
 	"github.com/gotoeasy/glang/cmn"
 )
+
+var glcLatest string = ver.VERSION
 
 // 查询是否测试模式
 func TestModeController(req *gweb.HttpRequest) *gweb.HttpResult {
@@ -20,7 +23,7 @@ func TestModeController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // 查询版本信息
 func VersionController(req *gweb.HttpRequest) *gweb.HttpResult {
-	rs := cmn.OfMap("version", ver.VERSION, "latest", getLatestVersion()) // version当前版本号，latest最新版本号
+	rs := cmn.OfMap("version", ver.VERSION, "latest", glcLatest) // version当前版本号，latest最新版本号
 	return gweb.Result(rs)
 }
 
@@ -77,19 +80,25 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return gweb.Ok()
 }
 
-// 尝试查询最新版本号（注：这里不能保证服务一定可用），查不到返回空串
-func getLatestVersion() string {
-	// {"version":"v0.12.0"}
+// 尝试查询最新版本号（注：服务不一定总是可用，每小时查取一次）
+func init() {
+	go func() {
+		getLatestVersion()
+		ticker := time.NewTicker(time.Hour)
+		for range ticker.C {
+			getLatestVersion()
+		}
+	}()
+}
+func getLatestVersion() {
+	// 返回样例 {"version":"v0.12.0"}
 	bts, err := cmn.HttpGetJson("https://glc.gotoeasy.top/glogcenter/current/version.json?v="+ver.VERSION, "Auth:glc") // 取最新版本号
-	if err != nil {
-		return ""
+	if err == nil {
+		var data struct {
+			Version string `json:"version,omitempty"`
+		}
+		if err := json.Unmarshal(bts, &data); err == nil {
+			glcLatest = data.Version
+		}
 	}
-
-	var data struct {
-		Version string `json:"version,omitempty"`
-	}
-	if err := json.Unmarshal(bts, &data); err != nil {
-		return ""
-	}
-	return data.Version
 }
