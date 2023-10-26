@@ -93,6 +93,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_ENABLE_LOGIN`是否开启用户密码登录功能，默认`false`
 - [x] `GLC_USERNAME`查询界面登录用的用户名，默认`glc`
 - [x] `GLC_PASSWORD`查询界面登录用的密码，默认`GLogCenter100%666`
+- [x] `GLC_TOKEN_SALT`用以生成令牌的字符串令牌盐，开启登录功能时建议设定提高安全性，默认空白
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
 - [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
 - [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
@@ -232,7 +233,8 @@ func main() {
 
 ### 版本`0.12.1`
 
-- [x] 新增`GLC_TEST_MODE`是否开启测试模式的开关，开启后显示生成测试数据的按钮，供测试或快速体验用，默认`false`
+- [x] 新增`GLC_TOKEN_SALT`令牌盐环境变量，默认空串。如果日志内容比较敏感，应该修改用户密码开启登录功能，同时建议设定令牌盐，提高系统安全性
+- [x] 新增`GLC_TEST_MODE`是否开启测试模式的开关，开启后将显示生成测试数据用的按钮，供测试或快速体验用，默认`false`
 - [x] 优化改善
 
 ### 版本`0.12.0`
