@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"fmt"
 	"glc/com"
 	"glc/conf"
@@ -83,22 +82,13 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 // 尝试查询最新版本号（注：服务不一定总是可用，每小时查取一次）
 func init() {
 	go func() {
-		getLatestVersion()
+		url := "https://glc.gotoeasy.top/glogcenter/current/version.json?v=" + ver.VERSION
+		v := cmn.GetGlcLatestVersion(url)
+		glcLatest = cmn.IifStr(v != "", v, glcLatest)
 		ticker := time.NewTicker(time.Hour)
 		for range ticker.C {
-			getLatestVersion()
+			v = cmn.GetGlcLatestVersion(url)
+			glcLatest = cmn.IifStr(v != "", v, glcLatest)
 		}
 	}()
-}
-func getLatestVersion() {
-	// 返回样例 {"version":"v0.12.0"}
-	bts, err := cmn.HttpGetJson("https://glc.gotoeasy.top/glogcenter/current/version.json?v="+ver.VERSION, "Auth:glc") // 取最新版本号
-	if err == nil {
-		var data struct {
-			Version string `json:"version,omitempty"`
-		}
-		if err := json.Unmarshal(bts, &data); err == nil {
-			glcLatest = data.Version
-		}
-	}
 }

@@ -42,8 +42,8 @@ func IsEnableLoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 func createSessionid() string {
 	ymd := cmn.Today()
 	by1 := md5.Sum(cmn.StringToBytes(conf.GetUsername() + ymd))
-	by2 := md5.Sum(cmn.StringToBytes(ymd + conf.GetPassword() + conf.GetTokenSalt()))
-	by3 := md5.Sum(cmn.StringToBytes(ymd + "添油" + conf.GetUsername() + "加醋" + conf.GetPassword()))
+	by2 := md5.Sum(cmn.StringToBytes(ymd + conf.GetPassword()))
+	by3 := md5.Sum(cmn.StringToBytes(ymd + "添油" + conf.GetUsername() + "加醋" + conf.GetPassword() + conf.GetTokenSalt())) // 增加配置的令牌盐
 	str1 := hex.EncodeToString(by1[:])
 	str2 := hex.EncodeToString(by2[:])
 	str3 := hex.EncodeToString(by3[:])
