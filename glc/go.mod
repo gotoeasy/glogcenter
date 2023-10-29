@@ -6,7 +6,7 @@ require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-gonic/gin v1.9.1
-	github.com/gotoeasy/glang v0.10.17
+	github.com/gotoeasy/glang v0.10.18
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/streadway/amqp v1.1.0
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
