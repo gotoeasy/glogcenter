@@ -28,6 +28,11 @@ func init() {
 }
 
 func LoginController(req *gweb.HttpRequest) *gweb.HttpResult {
+
+	if !InWhiteList(req) && InBlackList(req) {
+		return gweb.Error403() // 黑名单，访问受限
+	}
+
 	username := req.GetFormParameter("username")
 	password := req.GetFormParameter("password")
 	key := getClientHash(req)
@@ -85,4 +90,46 @@ func getClientHash(req *gweb.HttpRequest) string {
 	ary = append(ary, req.GetHeader("Referer"))
 	ary = append(ary, req.GinCtx.ClientIP())
 	return cmn.HashString(cmn.Join(ary, ","))
+}
+
+// 客户端IP是否在白名单中（内网地址总是在白名单中）
+func InWhiteList(req *gweb.HttpRequest) bool {
+	cityIp := cmn.GetCityIp(req.GinCtx.ClientIP())
+	if cmn.Contains(cityIp, "内网") {
+		return true
+	}
+	for i := 0; i < len(conf.GetWhiteList()); i++ {
+		item := conf.GetWhiteList()[i]
+		if item == "" {
+			continue
+		}
+		if cmn.Endwiths(item, ".*") {
+			item = cmn.ReplaceAll(item, "*", "") // 支持IP的最后一段使用通配符*
+		}
+		if cmn.Contains(cityIp, item) {
+			return true
+		}
+	}
+	return false
+}
+
+// 客户端IP是否在黑名单中（内网地址总是在白名单中）
+func InBlackList(req *gweb.HttpRequest) bool {
+	cityIp := cmn.GetCityIp(req.GinCtx.ClientIP())
+	for i := 0; i < len(conf.GetBlackList()); i++ {
+		item := conf.GetBlackList()[i]
+		if item == "" {
+			continue
+		}
+		if item == "*" {
+			return true
+		}
+		if cmn.Endwiths(item, ".*") {
+			item = cmn.ReplaceAll(item, "*", "") // 支持IP的最后一段使用通配符*
+		}
+		if cmn.Contains(cityIp, item) {
+			return true
+		}
+	}
+	return false
 }

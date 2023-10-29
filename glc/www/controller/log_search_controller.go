@@ -11,6 +11,9 @@ import (
 // 日志检索（表单提交方式）
 func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 
+	if !InWhiteList(req) && InBlackList(req) {
+		return gweb.Error403() // 黑名单，访问受限
+	}
 	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
 		return gweb.Error403() // 登录检查
 	}

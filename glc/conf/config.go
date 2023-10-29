@@ -49,6 +49,8 @@ var pageSize int
 var mulitLineSearch bool
 var testMode bool
 var tokenSalt string
+var aryWhite []string
+var aryBlack []string
 
 func init() {
 	UpdateConfigByEnv()
@@ -74,6 +76,8 @@ func UpdateConfigByEnv() {
 	username = cmn.GetEnvStr("GLC_USERNAME", "glc")                             // 登录用户名，默认“glc”
 	password = cmn.GetEnvStr("GLC_PASSWORD", "GLogCenter100%666")               // 登录密码，默认“GLogCenter100%666”
 	tokenSalt = cmn.GetEnvStr("GLC_TOKEN_SALT", "")                             // 令牌盐，默认“”
+	aryWhite = cmn.Split(cmn.GetEnvStr("GLC_WHITE_LIST", ""), ",")              // IP或区域白名单，逗号分隔，默认“”
+	aryBlack = cmn.Split(cmn.GetEnvStr("GLC_BLACK_LIST", ""), ",")              // IP或区域黑名单，逗号分隔，单个*代表全部，内网地址不受限制，默认“”
 	clusterMode = cmn.GetEnvBool("GLC_CLUSTER_MODE", false)                     // 是否开启集群模式，默认false
 	splitUrls(cmn.GetEnvStr("GLC_CLUSTER_URLS", ""))                            // 从服务器地址，多个时逗号分开，默认“”
 	enableBackup = cmn.GetEnvBool("GLC_ENABLE_BACKUP", false)                   // 是否开启备份，默认false
@@ -88,6 +92,16 @@ func UpdateConfigByEnv() {
 	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))             // 每次检索件数，默认100（有效范围1~1000）
 	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)            // 是否检索日志的全部行（日志可能有换行），默认false仅第一行
 	testMode = cmn.GetEnvBool("GLC_TEST_MODE", false)                           // 是否测试模式，默认false
+}
+
+// 取配置： 白名单，可通过环境变量“GLC_WHITE_LIST”设定，默认“”
+func GetWhiteList() []string {
+	return aryWhite
+}
+
+// 取配置： 黑名单，可通过环境变量“GLC_BLACK_LIST”设定，默认“”
+func GetBlackList() []string {
+	return aryBlack
 }
 
 // 取配置： 令牌盐，可通过环境变量“GLC_TOKEN_SALT”设定，默认“”
