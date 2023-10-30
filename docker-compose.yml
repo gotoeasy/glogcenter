@@ -25,7 +25,7 @@ services:
       GLC_ENABLE_SECURITY_KEY: 'true'
       GLC_HEADER_SECURITY_KEY: 'X-Glc-Auth'
       GLC_SECURITY_KEY: 'YourSecurityKey'
-      # 【例】想快速体验，开启测试模式，可在页面上点击生成测试数据
+      # 【例】想快速体验时开启测试模式，可在页面上点击生成测试数据
       GLC_TEST_MODE: 'true'
     volumes:
       - /volumes/glc:/glogcenter
