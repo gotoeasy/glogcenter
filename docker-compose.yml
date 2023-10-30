@@ -1,0 +1,31 @@
+version: '3'
+services:
+  glc:
+    image: 'gotoeasy/glc'
+    pull: always
+    container_name: glc
+    ports:
+      - '8080:8080'
+    environment:
+      # 【例】每天一个日志仓，自动维护保留90天
+      GLC_STORE_NAME_AUTO_ADD_DATE: 'true'
+      GLC_SAVE_DAYS: '90'
+      # 【例】开启登录，设定好用户名密码、令牌盐、黑白名单组合控制仅内网及指定的IP允许访问
+      GLC_ENABLE_LOGIN: 'true'
+      GLC_USERNAME: 'admin'
+      GLC_PASSWORD: 'YourPassword'
+      GLC_TOKEN_SALT: 'YourTokenSalt'
+      GLC_WHITE_LIST: '100.101.102.103'
+      GLC_BLACK_LIST: '*'
+      # 【例】每次查询50条日志，日志全部行都要索引检索（多行时默认只是第一行），开启GZIP压缩
+      GLC_PAGE_SIZE: '50'
+      GLC_SEARCH_MULIT_LINE: 'true'
+      GLC_ENABLE_WEB_GZIP: 'true'
+      # 【例】开启秘钥，添加日志数据等操作要校验秘钥
+      GLC_ENABLE_SECURITY_KEY: 'true'
+      GLC_HEADER_SECURITY_KEY: 'X-Glc-Auth'
+      GLC_SECURITY_KEY: 'YourSecurityKey'
+      # 【例】想快速体验，开启测试模式，可在页面上点击生成测试数据
+      GLC_TEST_MODE: 'true'
+    volumes:
+      - /volumes/glc:/glogcenter
