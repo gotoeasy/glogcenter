@@ -99,6 +99,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_SECURITY_KEY`API秘钥，默认`glogcenter`
 - [x] `GLC_ENABLE_CORS`是否允许跨域，默认`false`
 - [x] `GLC_PAGE_SIZE`每次检索件数，默认`100`（有效范围`1~1000`）
+- [x] `GLC_ENABLE_WEB_GZIP`网页服务是否开启压缩，默认`false`
 - [x] `GLC_ENABLE_AMQP_CONSUME`是否开启`rabbitMq`消费者接收日志，默认`false`
 - [x] `GLC_AMQP_ADDR`消息队列`rabbitMq`连接地址，例：`amqp://user:password@ip:port/`，默认空白
 - [x] `GLC_AMQP_JSON_FORMAT`消息队列`rabbitMq`消息文本是否为`json`格式，默认`true`
@@ -229,7 +230,9 @@ func main() {
 
 ### 开发版`latest`
 
-- [ ] 日志审计
+- [ ] 日志审计、告警
+- [ ] 跨日志仓查询
+- [ ] 多用户及日志仓权限管理
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
