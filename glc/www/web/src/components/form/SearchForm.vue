@@ -74,6 +74,8 @@ const formRules = ref(props.rules);
 const form = ref();
 const moreVisible = ref(false);
 
+$emitter.on("defaultStorageCondtion", v => defaultData.value.storage = v);
+
 const emit = defineEmits(['search']);
 
 const fnSearch = () => {
@@ -105,7 +107,15 @@ const fnReset = () => {
 const noMoreSearchCondition = computed(() => {
   for (const [key, value] of Object.entries(formData.value)) {
     if (key == 'searchKeys') {
-      continue;
+      continue; // 忽略不提示小蓝点
+    }
+    if (key == 'storage') {
+      if (!defaultData.value.storage) {
+        continue; // 初始化时日志仓还没拿到，忽略不提示小蓝点
+      } else if (defaultData.value.storage == value) {
+        continue; // 和默认的日志仓条件一样，忽略不提示小蓝点
+      }
+      if (!value) return false; // 日志仓条件清空时，显示小蓝点
     }
     if (value) {
       if (Array.isArray(value)) {

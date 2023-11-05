@@ -1,12 +1,25 @@
 package controller
 
 import (
+	"glc/com"
 	"glc/conf"
 	"glc/gweb"
 	"glc/ldb"
+	"glc/ldb/search"
+	"glc/ldb/sysmnt"
+	"time"
 
 	"github.com/gotoeasy/glang/cmn"
 )
+
+type storageItem struct {
+	storeName     string // 日志仓
+	total         uint32 // 日志件数
+	isSearchRange bool   // 是否条件范围的日志仓
+}
+
+var cacheStoreNames []string // 所有的日志仓（避免每次读磁盘，适当使用缓存）
+var cacheTime time.Time      // 最近一次读日志仓目录的时间点
 
 // 日志检索（表单提交方式）
 func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
@@ -18,32 +31,122 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error403() // 登录检查
 	}
 
-	storeName := req.GetFormParameter("storeName")
-	searchKey := req.GetFormParameter("searchKey")
-	currentId := cmn.StringToUint32(req.GetFormParameter("currentId"), 0)
-	forward := cmn.StringToBool(req.GetFormParameter("forward"), true)
-	datetimeFrom := req.GetFormParameter("datetimeFrom")
-	datetimeTo := req.GetFormParameter("datetimeTo")
-	system := req.GetFormParameter("system")
-	loglevel := req.GetFormParameter("loglevel") // 单选条件
-	loglevels := cmn.Split(loglevel, ",")        // 多选条件
-	if len(loglevels) <= 1 || len(loglevels) >= 4 {
-		loglevels = make([]string, 0) // 多选的单选或全选，都清空（单选走loglevel索引，全选等于没选）
+	startTime := time.Now()
+	cond := &search.SearchCondition{SearchSize: conf.GetPageSize()}
+	cond.StoreName = req.GetFormParameter("storeName")                        // 日志仓条件
+	cond.SearchKey = req.GetFormParameter("searchKey")                        // 输入的查询关键词
+	cond.CurrentStoreName = req.GetFormParameter("currentStoreName")          // 滚动查询时定位用日志仓
+	cond.CurrentId = cmn.StringToUint32(req.GetFormParameter("currentId"), 0) // 滚动查询时定位用ID
+	cond.Forward = cmn.StringToBool(req.GetFormParameter("forward"), true)    // 是否向下滚动查询
+	cond.DatetimeFrom = req.GetFormParameter("datetimeFrom")                  // 日期范围（From）
+	cond.DatetimeTo = req.GetFormParameter("datetimeTo")                      // 日期范围（To）
+	cond.System = req.GetFormParameter("system")                              // 系统
+	cond.Loglevel = req.GetFormParameter("loglevel")                          // 单选条件
+	cond.Loglevels = cmn.Split(cond.Loglevel, ",")                            // 多选条件
+	if len(cond.Loglevels) <= 1 || len(cond.Loglevels) >= 4 {
+		cond.Loglevels = make([]string, 0) // 多选的单选或全选，都清空（单选走loglevel索引，全选等于没选）
 	}
-
-	if !cmn.IsBlank(system) {
-		system = "~" + cmn.Trim(system)
+	if !cmn.IsBlank(cond.System) {
+		cond.System = "~" + cmn.Trim(cond.System) // 编辑系统条件，以便精确匹配
 	}
-	if !cmn.IsBlank(loglevel) && !cmn.Contains(loglevel, ",") {
-		loglevel = "!" + cmn.Trim(loglevel) // 单个条件时作为索引条件
+	if !cmn.IsBlank(cond.Loglevel) && !cmn.Contains(cond.Loglevel, ",") {
+		cond.Loglevel = "!" + cmn.Trim(cond.Loglevel) // 编辑日志级别单选条件，以便精确匹配
 	} else {
-		loglevel = "" // 多选条件时不使用，改用loglevels
+		cond.Loglevel = "" // 清空日志级别单选条件，以便多选配配（改用loglevels）
 	}
 
-	eng := ldb.NewEngine(storeName)
-	rs := eng.Search(searchKey, system, datetimeFrom, datetimeTo, loglevel, loglevels, currentId, forward)
+	// 范围内的日志仓都查一遍
+	// 注1）日志不断新增时，总件数可能会因为时间点原因不适最新，从而变现出点点小误差【完全可接受】
+	// 注2）跨仓检索时，非本次检索的目标仓的话，只查取相关件数不做真正筛选计数以提高性能，醉打匹配件数有时可能出现较大误差【折中可接受】
+	result := &search.SearchResult{PageSize: cmn.IntToString(conf.GetPageSize())}
+	var total uint32
+	var count uint32
+	storeItems := getStoreItems(cond.StoreName, cond.DatetimeFrom, cond.DatetimeTo)
+	sysmntStore := sysmnt.NewSysmntStorage()
+	for i, max := 0, len(storeItems); i < max; i++ {
+		item := storeItems[i]
+		if !item.isSearchRange {
+			// 不需要查数据，只查关联件数
+			total += sysmntStore.GetStorageDataCount(item.storeName) // 累加总件数
+			continue
+		}
 
-	// 检索结果后处理
-	rs.PageSize = cmn.IntToString(conf.GetPageSize())
-	return gweb.Result(rs)
+		cond.SearchSize = conf.GetPageSize() - len(result.Data) // 本次需要查多少件
+		if cond.CurrentStoreName != "" && item.storeName > cond.CurrentStoreName {
+			cond.SearchSize = 0 // 是范围内的日志仓，但不是本次要查的，设为0不查数据，只查关联件数
+		}
+
+		eng := ldb.NewEngine(item.storeName)     // 遍历日志仓检索
+		rs := eng.Search(cond)                   // 按动态的要求件数检索
+		total += cmn.StringToUint32(rs.Total, 0) // 累加总件数
+		count += cmn.StringToUint32(rs.Count, 0) // 累加最大匹配件数
+		if len(rs.Data) > 0 {
+			result.Data = append(result.Data, rs.Data...) // 累加查询结果
+			result.LastStoreName = item.storeName         // 设定检索结果最后一条（最久远）日志所在的日志仓，页面向下滚动继续检索时定位用
+		}
+
+		if !(cond.CurrentStoreName != "" && item.storeName > cond.CurrentStoreName) {
+			// 仅针对更久远的日志仓
+			if len(result.Data) < conf.GetPageSize() && i < max-1 {
+				// 数据没查够，且后面还有日志仓待查询，准备好跨仓查询条件
+				cond.CurrentId = 0         // 下一日志仓从头开始查
+				cond.CurrentStoreName = "" // 从头开始所以这个条件不再适用，清空
+			}
+		}
+
+	}
+
+	result.Total = cmn.Uint32ToString(total)                                          // 总件数
+	result.Count = cmn.Uint32ToString(count)                                          // 最大匹配检索（笼统，在最大查取件数（5000件）内查完时，前端会改成精确的和结果一样的件数）
+	result.TimeMessage = "耗时" + cmn.GetTimeInfo(time.Since(startTime).Milliseconds()) // 查询耗时
+	return gweb.Result(result)
+}
+
+// 筛选出日志仓检索范围
+func getStoreItems(storeName string, datetimeFrom string, datetimeTo string) []*storageItem {
+	sysmntStore := sysmnt.NewSysmntStorage()
+	var items []*storageItem
+	if !conf.IsStoreNameAutoAddDate() {
+		// 单日志仓
+		name := com.GeyStoreNameByDate("")
+		items = append(items, &storageItem{storeName: name, total: sysmntStore.GetStorageDataCount(name), isSearchRange: true})
+		return items
+	}
+
+	// 遍历日志仓，比较日期范围筛选日志仓
+	hasDateCond := (datetimeFrom != "" && datetimeTo != "")     // 是否有日期范围条件
+	from := cmn.ReplaceAll(cmn.Left(datetimeFrom, 10), "-", "") // yyyymmdd或“”
+	to := cmn.ReplaceAll(cmn.Left(datetimeTo, 10), "-", "")     // yyyymmdd或“”
+	if time.Since(cacheTime) >= time.Second*10 {
+		cacheStoreNames = com.GetStorageNames(conf.GetStorageRoot(), ".sysmnt") // 所有的日志仓，结果已排序，缓存10秒避免频繁读盘
+		cacheTime = time.Now()
+	}
+	for i, max := 0, len(cacheStoreNames); i < max; i++ {
+		name := cacheStoreNames[i]
+		item := &storageItem{storeName: name, total: sysmntStore.GetStorageDataCount(name)}
+		date := cmn.Right(name, 8) // yyyymmdd
+		if storeName == "" {
+			// 日志仓条件空白
+			if hasDateCond {
+				if date >= from && date <= to {
+					item.isSearchRange = true // 日期范围内的日志仓都是条件范围
+				}
+			} else {
+				item.isSearchRange = true // 无日志仓条件、且无日期条件，全部都是条件范围了
+			}
+		} else {
+			// 有日志仓条件
+			if hasDateCond {
+				if storeName == name && date >= from && date <= to {
+					item.isSearchRange = true // 有日期条件，得满足日期条件，该日志仓才是条件范围
+				}
+			} else {
+				if storeName == name {
+					item.isSearchRange = true // 没日期条件，仅该日志仓是条件范围
+				}
+			}
+		}
+		items = append(items, item)
+	}
+	return items
 }

@@ -45,6 +45,7 @@ func GetStorageList() *StorageResult {
 
 	var datas []*StorageModel
 	var sum int64
+	var total int64
 	names := com.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	for _, name := range names {
 		d := &StorageModel{
@@ -65,6 +66,7 @@ func GetStorageList() *StorageResult {
 			sysmntStore := NewSysmntStorage()
 			d.LogCount = sysmntStore.GetStorageDataCount(name)
 			d.IndexCount = sysmntStore.GetStorageIndexCount(name)
+			total += int64(d.LogCount)
 		}
 
 		datas = append(datas, d)
@@ -73,7 +75,7 @@ func GetStorageList() *StorageResult {
 	stat, _ := disk.Usage(conf.GetStorageRoot())
 
 	rs := &StorageResult{
-		Info: fmt.Sprintf("共占用空间 " + cmn.GetSizeInfo(uint64(sum)) + "，剩余空间 " + cmn.GetSizeInfo(stat.Free)),
+		Info: fmt.Sprintf("日志总量 " + cmn.Int64ToString(total) + " 条，共占用空间 " + cmn.GetSizeInfo(uint64(sum)) + "，剩余空间 " + cmn.GetSizeInfo(stat.Free)),
 		Data: datas,
 	}
 	return rs

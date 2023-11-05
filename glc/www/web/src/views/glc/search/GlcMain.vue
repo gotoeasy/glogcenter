@@ -6,7 +6,8 @@
         <SearchForm :data="formData" class="c-search-form" @search="search">
           <el-row>
             <el-form-item label="选择日志仓">
-              <el-select v-model="formData.storage" filterable placeholder="请选择" style="width:420px;">
+              <el-select v-model="formData.storage" clearable filterable placeholder="请选择" style="width:420px;"
+                @clear="reGetStorageOptions">
                 <el-option v-for="item in storageOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
@@ -77,6 +78,7 @@
 <script setup>
 import { useEmitter, usePageMainHooks, useTabsState } from "~/pkgs";
 import { userLogout } from "~/api";
+import { $msg } from "~/pkgs/index-pkgs";
 
 const tabsState = useTabsState();
 const emitter = useEmitter(tabsState.activePath);
@@ -96,6 +98,9 @@ const info = ref(''); // 底部提示信息
 const storageOptions = ref([]) // 日志仓
 const systemSet = new Set();
 const systemOptions = ref([]) // 系统名
+const lastStoreName = ref('') // 检索结果中最久远的一条日志所属的日志仓名称
+const maxMatchCount = ref('0') // 最大匹配件数(字符串)
+const moreConditon = ref(null)
 const shortcuts = ref([
   {
     text: '近5分钟',
@@ -193,6 +198,14 @@ onMounted(() => {
       for (let i = 0; i < names.length; i++) {
         storageOptions.value.push({ value: names[i], label: `日志仓：${names[i]}` })
       }
+      if (names[0]) {
+        $emitter.emit("defaultStorageCondtion", names[0]); // 小蓝点提示判断用
+        formData.value.storage = names[0]; // 选中第一个日志仓作为默认条件
+      }
+
+      // 默认检索（查取好日志仓后再做检索）
+      search();
+
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
       router.push('/login');
@@ -214,9 +227,27 @@ onMounted(() => {
     }
   });
 
-  // 默认检索
-  search();
 });
+
+// 清除日志仓条件时，重新拉取最新日志仓列表
+function reGetStorageOptions() {
+  const url = `/v1/store/names`;
+  $post(url, {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
+    console.log(rs)
+    if (rs.success) {
+      const names = rs.result || [];
+      if (names.length) {
+        storageOptions.value.splice(0, storageOptions.value.length)
+        for (let i = 0; i < names.length; i++) {
+          storageOptions.value.push({ value: names[i], label: `日志仓：${names[i]}` })
+        }
+      }
+      if (names[0]) {
+        $emitter.emit("defaultStorageCondtion", names[0]); // 小蓝点提示判断用
+      }
+    }
+  });
+}
 
 // 生成测试数据
 function genTestData() {
@@ -228,7 +259,6 @@ function genTestData() {
 function isAutoSearchMode() {
   return autoSearchMode.value
 }
-
 function switchAutoSearchMode(changMode = true) {
   changMode && (autoSearchMode.value = !autoSearchMode.value);
   if (autoSearchMode.value) {
@@ -242,6 +272,8 @@ function switchAutoSearchMode(changMode = true) {
 function search() {
   autoSearchMode.value ? (showTableLoadding.value = false) : (showTableLoadding.value = true);
   const url = `/v1/log/search`;
+
+  // 检索条件
   const data = {};
   data.searchKey = formData.value.searchKeys;
   data.storeName = formData.value.storage;
@@ -250,6 +282,9 @@ function search() {
   data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
   data.datetimeTo = (formData.value.datetime || ['', ''])[1];
 
+  // 保存好滚动检索的输入条件，保持和检索时一致，避免修改输入再滚动查询而出现矛盾结果
+  moreConditon.value = data;
+
   $post(url, data, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
     console.log(rs)
     if (rs.success) {
@@ -257,6 +292,8 @@ function search() {
       const pagesize = rs.result.pagesize - 0;
       tableData.value.splice(0, tableData.value.length);  // 删除原全部元素，nextTick时再插入新查询结果
       document.querySelector('.c-glc-table .el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
+      rs.result.laststorename && (lastStoreName.value = rs.result.laststorename); // 查到有结果时，更新
+      maxMatchCount.value = rs.result.count; // 最大匹配件数
 
       nextTick(() => {
         resultData.forEach(item => {
@@ -265,9 +302,9 @@ function search() {
         });
 
         if (resultData.length < pagesize) {
-          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${tableData.value.length} 条，正展示前 ${tableData.value.length} 条`
+          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${tableData.value.length} 条，正展示前 ${tableData.value.length} 条，查询${rs.result.timemessage}`
         } else {
-          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
+          info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${maxMatchCount.value} 条，正展示前 ${tableData.value.length} 条，查询${rs.result.timemessage}`
         }
       });
 
@@ -289,27 +326,23 @@ function searchMore() {
   }
 
   const url = `/v1/log/search`;
-  const data = {};
-  data.searchKey = formData.value.searchKeys;
-  data.storeName = formData.value.storage;
-  data.system = formData.value.system;
-  data.loglevel = (formData.value.loglevel || []).join(',');
-  data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
-  data.datetimeTo = (formData.value.datetime || ['', ''])[1];
-  data.forward = true
-  data.currentId = tableData.value[tableData.value.length - 1].id; // 相对最后条id，继续找后面的日志
+  moreConditon.value.forward = true
+  moreConditon.value.currentId = tableData.value[tableData.value.length - 1].id; // 相对最后条id，继续找后面的日志
+  moreConditon.value.currentStoreName = lastStoreName.value;  // 相对最后条id的所属日志仓
 
-  $post(url, data, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
+  $post(url, moreConditon.value, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
     console.log(rs)
     if (rs.success) {
       const resultData = rs.result.data || [];
       const pagesize = rs.result.pagesize - 0;
       tableData.value.push(...resultData)
+      rs.result.laststorename && (lastStoreName.value = rs.result.laststorename); // 查到有结果时，更新
 
       if (resultData.length < pagesize) {
-        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${tableData.value.length} 条，正展示前 ${tableData.value.length} 条`
+        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${tableData.value.length} 条，正展示前 ${tableData.value.length} 条，查询${rs.result.timemessage}`
       } else {
-        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${rs.result.count} 条，正展示前 ${tableData.value.length} 条`
+        (rs.result.count - 0 < maxMatchCount.value - 0) && (maxMatchCount.value = rs.result.count) // 控制maxMatchCount只会更小以减少误差
+        info.value = `日志总量 ${rs.result.total} 条，当前条件最多匹配 ${maxMatchCount.value} 条，正展示前 ${tableData.value.length} 条，查询${rs.result.timemessage}`
       }
 
       nextTick(() => {

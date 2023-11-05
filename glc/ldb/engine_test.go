@@ -36,20 +36,4 @@ func Test_all(t *testing.T) {
 	}
 	time.Sleep(time.Duration(10) * time.Second)
 
-	// for i := 1; i <= 10000; i++ {
-	// 	engine.AddTextLog(`   java.sql.SQLException:   them aalav`)
-	// }
-	// time.Sleep(time.Duration(5) * time.Second)
-
-	// for i := 1; i <= 10000; i++ {
-	// 	engine.AddTextLog(`  java.sql.SQLException: them`)
-	// }
-	// time.Sleep(time.Duration(5) * time.Second)
-
-	rs := engine.Search(`              them java     `, "", "", "", "", make([]string, 0), 0, true)
-	cmn.Debug("共查到", rs.Total, "件")
-	for _, v := range rs.Data {
-		cmn.Debug(v.Id, v.Text)
-	}
-
 }

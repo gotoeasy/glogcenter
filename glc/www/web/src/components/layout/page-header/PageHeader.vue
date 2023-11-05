@@ -83,18 +83,27 @@ function checkVersion() {
     $post('/v1/version/info', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
       if (rs.success) {
         verInfo.value = rs.result.version
+        if (rs.result.latest && normalizeVer(rs.result.version) < normalizeVer(rs.result.latest)) {
+          verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${rs.result.latest} 可更新`
+        }
         // 有新版本时，左上角图标鼠标悬停显示提示（注：最新版本号的查询服务并不保证随时可用）
         fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${verInfo.value}`)
           .then(response => response.json())
           .then(data => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
-            if (data.version && verInfo.value < data.version) {
-              verInfo.value = `当前版本 ${verInfo.value} ，有新版本 ${data.version} 可更新`
+            if (data.version && normalizeVer(rs.result.version) < normalizeVer(data.version)) {
+              verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${data.version} 可更新`
             }
           })
           .catch(e => console.log(e));
       }
     });
   }
+}
+
+// 0.1.2 => v100.1001.1002
+function normalizeVer(ver) {
+  const ary = ver.replace("v", "").split(".")
+  return `v${100 + (ary[0] - 0)}.${1000 + (ary[1] - 0)}.${1000 + (ary[2] - 0)}`
 }
 
 </script>

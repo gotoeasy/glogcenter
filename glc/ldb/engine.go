@@ -48,13 +48,12 @@ func (e *Engine) AddLogDataModel(data *logdata.LogDataModel) {
 	e.logStorage.AddLogDataModel(data)
 }
 
-func (e *Engine) Search(searchKey string, system string, minDatetime string, maxDatetime string, loglevel string, loglevels []string,
-	currentDocId uint32, forward bool) *search.SearchResult {
+func (e *Engine) Search(cond *search.SearchCondition) *search.SearchResult {
 
 	// 分词后检索
 	var adds []string
-	adds = append(adds, system, loglevel)
-	kws := tokenizer.CutForSearchEx(searchKey, adds, nil) // 检索用关键词处理
+	adds = append(adds, cond.System, cond.Loglevel)
+	kws := tokenizer.CutForSearchEx(cond.SearchKey, adds, nil) // 检索用关键词处理
 
 	// 简单检查，存在无索引数据的关键词时，直接返回
 	for _, word := range kws {
@@ -67,14 +66,14 @@ func (e *Engine) Search(searchKey string, system string, minDatetime string, max
 			return rs
 		}
 	}
-
-	if len(kws) == 0 {
+	cond.Kws = kws
+	if len(cond.Kws) == 0 {
 		// 无条件浏览模式（可能含多选条件）
-		return search.SearchLogData(e.storeName, loglevels, currentDocId, forward, minDatetime, maxDatetime)
+		return search.SearchLogData(e.storeName, cond)
 	}
 
 	// 多关键词查询模式
-	return search.SearchWordIndex(e.storeName, kws, loglevels, currentDocId, forward, minDatetime, maxDatetime)
+	return search.SearchWordIndex(e.storeName, cond)
 }
 
 // 添加日志
