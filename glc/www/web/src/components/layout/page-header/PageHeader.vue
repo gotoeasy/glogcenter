@@ -19,6 +19,7 @@
 </template>
 
 <script setup>
+import { ElNotification } from 'element-plus';
 import { gxUtil, useThemeStore, useTokenStore } from '~/pkgs';
 import { userLogout } from '~/api';
 
@@ -91,7 +92,8 @@ function checkVersion() {
           .then(response => response.json())
           .then(data => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
             if (data.version && normalizeVer(rs.result.version) < normalizeVer(data.version)) {
-              verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${data.version} 可更新`
+              verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${data.version} 可更新`;
+              notifyUpdate(data.version);
             }
           })
           .catch(e => console.log(e));
@@ -104,6 +106,15 @@ function checkVersion() {
 function normalizeVer(ver) {
   const ary = ver.replace("v", "").split(".")
   return `v${100 + (ary[0] - 0)}.${1000 + (ary[1] - 0)}.${1000 + (ary[2] - 0)}`
+}
+
+function notifyUpdate(ver) {
+  if (localStorage.getItem('NotNotify')) return;
+  let message = `有新版本 ${ver} 可以更新`;
+  message += `，<span style="color:blue" class="hand" onclick="window.open('https://github.com/gotoeasy/glogcenter', '_blank')">点击查看</span>`
+  message += `<br><br>`
+  message += `<input class="hand" type="checkbox" id="ccvvuu" onclick="localStorage.setItem('NotNotify', this.checked?'1':'')"><label class="hand" for="ccvvuu"> 不再提醒</label>`
+  ElNotification({ title: "提示", message, type: "info", position: 'bottom-right', dangerouslyUseHTMLString: true });
 }
 
 </script>
