@@ -78,7 +78,6 @@
 <script setup>
 import { useEmitter, usePageMainHooks, useTabsState } from "~/pkgs";
 import { userLogout } from "~/api";
-import { $msg } from "~/pkgs/index-pkgs";
 
 const tabsState = useTabsState();
 const emitter = useEmitter(tabsState.activePath);
