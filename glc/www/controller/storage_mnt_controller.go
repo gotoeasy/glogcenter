@@ -85,6 +85,9 @@ func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
 		cmn.Error("日志仓", name, "删除失败", err)
 		return gweb.Error500("日志仓 " + name + " 正在使用，不能删除")
 	}
+
+	cacheTime = time.Now().Add(-1 * time.Hour) // 让检索时不用缓存名，避免查询不存在的日志仓
+
 	return gweb.Ok()
 }
 
