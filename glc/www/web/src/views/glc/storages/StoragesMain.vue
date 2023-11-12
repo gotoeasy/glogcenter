@@ -1,18 +1,15 @@
 <template>
   <div v-show="visible">
+    <el-row style="align-items: center;height:26px;">
+      <SvgIcon name="detail" height="16" width="16" style="margin: 0 6px 0 0;color:var(--el-color-primary)" />
+      <span style="font-size:16px">日志仓信息列表</span>
+    </el-row>
 
-    <GxToolbar style="margin-bottom: 13px" class="c-btn">
+    <el-divider style="margin: 0 0 8px" />
+
+    <GxToolbar style="margin-bottom: 8px" class="c-btn">
       <template #left>
-        <div class="header">
-          <div style="display:flex;justify-content:space-between;">
-            <div>
-              日志仓信息列表 <el-button type="primary" style="height:30px;color: white; background-color:#0081dd"
-                @click="search">
-                <SvgIcon name="refresh-right" style="margin:0 5px 0 0" /><span>刷新</span>
-              </el-button>
-            </div>
-          </div>
-        </div>
+        <GxButton icon="refresh-right" @click="search">刷 新</GxButton>
       </template>
 
       <template #right>
@@ -26,7 +23,8 @@
     </GxToolbar>
 
     <GxTable ref="table" v-loading="showTableLoadding" scrollbar-always-on stripe :enable-header-contextmenu="false"
-      :tid="tid" :data="tableData" :height="tableHeight" class="c-gx-table c-glc-table" row-key="id">
+      :tid="tid" :data="tableData" :max-height="tableHeight" :height="tableHeight" class="c-gx-table c-glc-table"
+      row-key="id">
       <template #$operation="{ row }">
         <el-button size="small" type="warning" @click="remove(row)">删除</el-button>
       </template>
@@ -53,11 +51,13 @@ const opt = {
   emitter,
   withoutSearchForm: true,
 };
-const { visible, tableData, tableHeight, pageSettingStore, showTableLoadding } = usePageMainHooks(opt);
+const { visible, tableData, getTableHeight, pageSettingStore, showTableLoadding } = usePageMainHooks(opt);
 
 const table = ref(); // 表格实例
 const tid = ref('storagesMain'); // 表格ID
 const info = ref(''); // 底部提示信息
+
+const tableHeight = computed(() => getTableHeight(false, true, 19)); // 表格高度
 
 // 初期默认检索
 onMounted(() => {

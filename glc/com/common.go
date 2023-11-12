@@ -39,6 +39,7 @@ func JoinBytes(bts ...[]byte) []byte {
 	return bytes.Join(bts, []byte(""))
 }
 
+// 取日志仓名列表，以“.”开头的默认忽略
 func GetStorageNames(path string, excludes ...string) []string {
 	fileinf, err := os.ReadDir(path)
 	if err != nil {
@@ -48,15 +49,13 @@ func GetStorageNames(path string, excludes ...string) []string {
 
 	mapDir := make(map[string]string)
 	for _, v := range fileinf {
-		if v.IsDir() {
+		if v.IsDir() && !cmn.Startwiths(v.Name(), ".") {
 			mapDir[v.Name()] = ""
 		}
 	}
 	for i := 0; i < len(excludes); i++ {
 		delete(mapDir, excludes[i])
 	}
-
-	delete(mapDir, ".tmp")
 
 	var rs []string
 	for k := range mapDir {

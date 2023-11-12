@@ -76,7 +76,7 @@ func fnAmqpJsonLogHandle(jsonLog string, err error) bool {
 	engine.AddLogDataModel(md)
 
 	if conf.IsClusterMode() {
-		go controller.TransferGlc(md.ToJson()) // 转发其他GLC服务
+		go controller.TransferGlc(conf.LogTransferAdd, md.ToJson()) // 转发其他GLC服务
 	}
 
 	return true

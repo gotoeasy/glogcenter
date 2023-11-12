@@ -28,24 +28,60 @@ func VersionController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // 查询日志仓名称列表
 func StorageNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
-	if !InWhiteList(req) && InBlackList(req) {
-		return gweb.Error403() // 黑名单，访问受限
-	}
-	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
-		return gweb.Error403() // 登录检查
+	if (!InWhiteList(req) && InBlackList(req)) || (conf.IsEnableLogin() && GetUsernameByToken(req.GetToken()) == "") {
+		return gweb.Error403() // 黑名单检查、登录检查
 	}
 
 	rs := com.GetStorageNames(conf.GetStorageRoot(), ".sysmnt")
 	return gweb.Result(rs)
 }
 
+// 查询系统名称列表
+func SystemNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
+	if (!InWhiteList(req) && InBlackList(req)) || (conf.IsEnableLogin() && GetUsernameByToken(req.GetToken()) == "") {
+		return gweb.Error403() // 黑名单检查、登录检查
+	}
+
+	if conf.IsEnableLogin() {
+		username := GetUsernameByToken(req.GetToken())
+		mnt := sysmnt.NewSysmntStorage()
+		if username == conf.GetUsername() {
+			names := mnt.GetSysUsernames()
+			var all []string
+			var m map[string]bool = make(map[string]bool)
+			for i := 0; i < len(names); i++ {
+				user := mnt.GetSysUser(names[i])
+				if user != nil && user.Systems != "*" {
+					ary := cmn.Split(user.Systems, ",")
+					for j := 0; j < len(ary); j++ {
+						if !m[cmn.ToLower(ary[j])] {
+							m[cmn.ToLower(ary[j])] = true
+							all = append(all, ary[j])
+						}
+					}
+				}
+			}
+			return gweb.Result(all)
+		} else {
+			user := mnt.GetSysUser(username)
+			if user != nil && user.Systems != "*" {
+				return gweb.Result(cmn.Split(user.Systems, ",")) // 管理员及全部权限的用户以外，按设定的系统返回
+			}
+		}
+	}
+
+	var ary []string
+	return gweb.Result(ary)
+}
+
 // 查询日志仓信息列表
 func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
-	if !InWhiteList(req) && InBlackList(req) {
-		return gweb.Error403() // 黑名单，访问受限
+	token := req.GetToken()
+	if (!InWhiteList(req) && InBlackList(req)) || (conf.IsEnableLogin() && GetUsernameByToken(token) == "") {
+		return gweb.Error403() // 黑名单检查、登录检查
 	}
-	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
-		return gweb.Error403() // 登录检查
+	if conf.IsEnableLogin() {
+		catchSession.Set(token, GetUsernameByToken(token)) // 会话重新计时
 	}
 
 	rs := sysmnt.GetStorageList()
@@ -54,11 +90,8 @@ func StorageListController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // 删除指定日志仓
 func StorageDeleteController(req *gweb.HttpRequest) *gweb.HttpResult {
-	if !InWhiteList(req) && InBlackList(req) {
-		return gweb.Error403() // 黑名单，访问受限
-	}
-	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
-		return gweb.Error403() // 登录检查
+	if (!InWhiteList(req) && InBlackList(req)) || (conf.IsEnableLogin() && GetUsernameByToken(req.GetToken()) == "") {
+		return gweb.Error403() // 黑名单检查、登录检查
 	}
 
 	name := req.GetFormParameter("storeName")

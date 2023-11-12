@@ -24,14 +24,19 @@ var cacheTime time.Time      // 最近一次读日志仓目录的时间点
 // 日志检索（表单提交方式）
 func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 
-	if !InWhiteList(req) && InBlackList(req) {
-		return gweb.Error403() // 黑名单，访问受限
+	token := req.GetToken()
+	username := ""
+	if (!InWhiteList(req) && InBlackList(req)) || (conf.IsEnableLogin() && GetUsernameByToken(token) == "") {
+		return gweb.Error403() // 黑名单检查、登录检查
 	}
-	if conf.IsEnableLogin() && req.GetFormParameter("token") != GetSessionid() {
-		return gweb.Error403() // 登录检查
+	if conf.IsEnableLogin() {
+		username = GetUsernameByToken(token)
+		catchSession.Set(token, username) // 会话重新计时
 	}
 
+	// 准备好各种场景的检索条件
 	startTime := time.Now()
+	mnt := sysmnt.NewSysmntStorage()
 	cond := &search.SearchCondition{SearchSize: conf.GetPageSize()}
 	cond.StoreName = req.GetFormParameter("storeName")                        // 日志仓条件
 	cond.SearchKey = req.GetFormParameter("searchKey")                        // 输入的查询关键词
@@ -40,19 +45,61 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	cond.Forward = cmn.StringToBool(req.GetFormParameter("forward"), true)    // 是否向下滚动查询
 	cond.DatetimeFrom = req.GetFormParameter("datetimeFrom")                  // 日期范围（From）
 	cond.DatetimeTo = req.GetFormParameter("datetimeTo")                      // 日期范围（To）
-	cond.System = req.GetFormParameter("system")                              // 系统
+	cond.OrgSystem = cmn.Trim(req.GetFormParameter("system"))                 // 系统
 	cond.Loglevel = req.GetFormParameter("loglevel")                          // 单选条件
 	cond.Loglevels = cmn.Split(cond.Loglevel, ",")                            // 多选条件
 	if len(cond.Loglevels) <= 1 || len(cond.Loglevels) >= 4 {
 		cond.Loglevels = make([]string, 0) // 多选的单选或全选，都清空（单选走loglevel索引，全选等于没选）
 	}
-	if !cmn.IsBlank(cond.System) {
-		cond.System = "~" + cmn.Trim(cond.System) // 编辑系统条件，以便精确匹配
-	}
 	if !cmn.IsBlank(cond.Loglevel) && !cmn.Contains(cond.Loglevel, ",") {
 		cond.Loglevel = "!" + cmn.Trim(cond.Loglevel) // 编辑日志级别单选条件，以便精确匹配
 	} else {
 		cond.Loglevel = "" // 清空日志级别单选条件，以便多选配配（改用loglevels）
+	}
+	if !conf.IsEnableLogin() {
+		cond.OrgSystems = append(cond.OrgSystems, "*") // 不需登录时全部系统都有访问权限
+		if cond.OrgSystem != "" {
+			cond.OrgSystem = "~" + cond.OrgSystem // 多个系统权限，按输入的系统作条件
+		}
+	} else {
+		if username == conf.GetUsername() {
+			// 管理员，不限系统
+			cond.OrgSystems = append(cond.OrgSystems, "*")
+			if cond.OrgSystem != "" {
+				cond.OrgSystem = "~" + cond.OrgSystem // 多个系统权限，按输入的系统作条件
+			}
+		} else {
+			// 一般用户，按设定权限
+			user := mnt.GetSysUser(username)
+			if user == nil {
+				return gweb.Error500("") // 不应该出现，保险起见防意外
+			}
+			if user.Systems == "*" {
+				cond.OrgSystems = append(cond.OrgSystems, "*") // 全部系统都有访问权限
+				if cond.OrgSystem != "" {
+					cond.OrgSystem = "~" + cond.OrgSystem // 多个系统权限，按输入的系统作条件
+				}
+			} else {
+				ary := cmn.Split(user.Systems, ",")
+				okSystem := false
+				for i := 0; i < len(ary); i++ {
+					cond.OrgSystems = append(cond.OrgSystems, "~"+ary[i]) // 仅设定的系统有访问权限
+					if cond.OrgSystem == "" || cmn.EqualsIngoreCase(cond.OrgSystem, ary[i]) {
+						okSystem = true
+					}
+				}
+
+				if !okSystem {
+					cond.OrgSystem = "-" // 输入的是没权限的系统时，写个不存在的条件用于快速返回
+				} else {
+					if len(ary) == 1 {
+						cond.OrgSystem = "~" + ary[0] // 一共就一个系统权限，直接作为条件即可
+					} else if cond.OrgSystem != "" {
+						cond.OrgSystem = "~" + cond.OrgSystem // 多个系统权限，按输入的系统作条件
+					}
+				}
+			}
+		}
 	}
 
 	// 范围内的日志仓都查一遍
@@ -62,12 +109,11 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	var total uint32
 	var count uint32
 	storeItems := getStoreItems(cond.StoreName, cond.DatetimeFrom, cond.DatetimeTo)
-	sysmntStore := sysmnt.NewSysmntStorage()
 	for i, max := 0, len(storeItems); i < max; i++ {
 		item := storeItems[i]
 		if !item.isSearchRange {
 			// 不需要查数据，只查关联件数
-			total += sysmntStore.GetStorageDataCount(item.storeName) // 累加总件数
+			total += mnt.GetStorageDataCount(item.storeName) // 累加总件数
 			continue
 		}
 
@@ -77,7 +123,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 		}
 
 		eng := ldb.NewEngine(item.storeName)     // 遍历日志仓检索
-		rs := eng.Search(cond)                   // 按动态的要求件数检索
+		rs := eng.Search(cond)                   // 【检索】按动态的要求件数检索
 		total += cmn.StringToUint32(rs.Total, 0) // 累加总件数
 		count += cmn.StringToUint32(rs.Count, 0) // 累加最大匹配件数
 		if len(rs.Data) > 0 {
@@ -93,9 +139,9 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 				cond.CurrentStoreName = "" // 从头开始所以这个条件不再适用，清空
 			}
 		}
-
 	}
 
+	// 返回结果
 	result.Total = cmn.Uint32ToString(total)                                          // 总件数
 	result.Count = cmn.Uint32ToString(count)                                          // 最大匹配检索（笼统，在最大查取件数（5000件）内查完时，前端会改成精确的和结果一样的件数）
 	result.TimeMessage = "耗时" + cmn.GetTimeInfo(time.Since(startTime).Milliseconds()) // 查询耗时

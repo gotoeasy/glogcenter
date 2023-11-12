@@ -29,6 +29,9 @@ type SearchCondition struct {
 	Forward          bool     // 隐藏条件，是否向前检索（玩下滚动查询）
 	Kws              []string // 【内部用】解析条件所得的检索关键词，非直接输入的检索文本
 	SearchSize       int      // 【内部用】需要查询多少件（跨仓检索时可能多次检索，中间会内部调整）
+	Systems          []string // 【内部用】有权限的系统名（一定有值，第一个元素是“*”时表示全部）
+	OrgSystem        string   // 【内部用】保存输入的系统名条件
+	OrgSystems       []string // 【内部用】保存有权限的系统名（一定有值，第一个元素是“*”时表示全部）
 }
 
 type SearchResult struct {
@@ -158,6 +161,36 @@ func SearchLogData(storeName string, cond *SearchCondition) *SearchResult {
 		}
 
 		for i := max; i >= min; i-- {
+			if cond.System == "" && cond.Systems[0] != "*" {
+				// 权限范围系统内作过滤检查
+				idxdocStorage := indexdoc.NewDocIndexStorage(storeName) // 判断系统权限用
+				has := false
+				for j, max2 := 0, len(cond.Systems); j < max2; j++ {
+					if (idxdocStorage.GetWordDocSeq(cond.Systems[j], i)) > 0 {
+						has = true
+						break
+					}
+				}
+				if !has {
+					continue // 权限范围内的系统内找不到时，跳过该日志
+				}
+			}
+
+			if cond.Loglevel == "" && len(cond.Loglevels) > 0 {
+				// 日志级别范围内作过滤检查
+				idxdocStorage := indexdoc.NewDocIndexStorage(storeName)
+				has := false
+				for j, max2 := 0, len(cond.Loglevels); j < max2; j++ {
+					if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], i)) > 0 {
+						has = true
+						break
+					}
+				}
+				if !has {
+					continue // 权限范围内的系统内找不到时，跳过该日志
+				}
+			}
+
 			md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
 			if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 				rs.Data = append(rs.Data, md)
@@ -186,6 +219,36 @@ func SearchLogData(storeName string, cond *SearchCondition) *SearchResult {
 			}
 
 			for i := max; i >= min; i-- {
+				if cond.System == "" && cond.Systems[0] != "*" {
+					// 权限范围系统内作过滤检查
+					idxdocStorage := indexdoc.NewDocIndexStorage(storeName) // 判断系统权限用
+					has := false
+					for j, max2 := 0, len(cond.Systems); j < max2; j++ {
+						if (idxdocStorage.GetWordDocSeq(cond.Systems[j], i)) > 0 {
+							has = true
+							break
+						}
+					}
+					if !has {
+						continue // 权限范围内的系统内找不到时，跳过该日志
+					}
+				}
+
+				if cond.Loglevel == "" && len(cond.Loglevels) > 0 {
+					// 日志级别范围内作过滤检查
+					idxdocStorage := indexdoc.NewDocIndexStorage(storeName)
+					has := false
+					for j, max2 := 0, len(cond.Loglevels); j < max2; j++ {
+						if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], i)) > 0 {
+							has = true
+							break
+						}
+					}
+					if !has {
+						continue // 权限范围内的系统内找不到时，跳过该日志
+					}
+				}
+
 				md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
 				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 					rs.Data = append(rs.Data, md)
@@ -211,6 +274,36 @@ func SearchLogData(storeName string, cond *SearchCondition) *SearchResult {
 			}
 
 			for i := max; i >= min; i-- {
+				if cond.System == "" && cond.Systems[0] != "*" {
+					// 权限范围系统内作过滤检查
+					idxdocStorage := indexdoc.NewDocIndexStorage(storeName) // 判断系统权限用
+					has := false
+					for j, max2 := 0, len(cond.Systems); j < max2; j++ {
+						if (idxdocStorage.GetWordDocSeq(cond.Systems[j], i)) > 0 {
+							has = true
+							break
+						}
+					}
+					if !has {
+						continue // 权限范围内的系统内找不到时，跳过该日志
+					}
+				}
+
+				if cond.Loglevel == "" && len(cond.Loglevels) > 0 {
+					// 日志级别范围内作过滤检查
+					idxdocStorage := indexdoc.NewDocIndexStorage(storeName)
+					has := false
+					for j, max2 := 0, len(cond.Loglevels); j < max2; j++ {
+						if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], i)) > 0 {
+							has = true
+							break
+						}
+					}
+					if !has {
+						continue // 权限范围内的系统内找不到时，跳过该日志
+					}
+				}
+
 				md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
 				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 					rs.Data = append(rs.Data, md)
@@ -301,6 +394,37 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 						tmpMinIdx = widxs[n] // 当前最短索引，存起来下回比较用
 					}
 				}
+
+				if flg && cond.System == "" && cond.Systems[0] != "*" {
+					// 权限范围系统内作过滤检查
+					idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName()) // 判断系统权限用
+					has := false
+					for j, max2 := 0, len(cond.Systems); j < max2; j++ {
+						if (idxdocStorage.GetWordDocSeq(cond.Systems[j], i)) > 0 {
+							has = true
+							break
+						}
+					}
+					if !has {
+						flg = false // 没找到
+					}
+				}
+
+				if cond.Loglevel == "" && len(cond.Loglevels) > 0 {
+					// 日志级别范围内作过滤检查
+					idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName())
+					has := false
+					for j, max2 := 0, len(cond.Loglevels); j < max2; j++ {
+						if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], i)) > 0 {
+							has = true
+							break
+						}
+					}
+					if !has {
+						flg = false // 没找到
+					}
+				}
+
 				// 找到则加入结果
 				if flg {
 					md := storeLogData.GetLogDataModel(docId)
@@ -332,15 +456,46 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 
 			// 比较
 			flg = true
-			for i := 0; i < cnt; i++ {
-				if widxs[i] == minIdx {
+			for n := 0; n < cnt; n++ {
+				if widxs[n] == minIdx {
 					continue // 跳过比较自己
 				}
-				if widxs[i].idxdocStorage.GetWordDocSeq(widxs[i].word, docId) == 0 {
+				if widxs[n].idxdocStorage.GetWordDocSeq(widxs[n].word, docId) == 0 {
 					flg = false // 没找到
 					break
 				}
 			}
+
+			if flg && cond.System == "" && cond.Systems[0] != "*" {
+				// 权限范围系统内作过滤检查
+				idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName()) // 判断系统权限用
+				has := false
+				for j, max2 := 0, len(cond.Systems); j < max2; j++ {
+					if (idxdocStorage.GetWordDocSeq(cond.Systems[j], i)) > 0 {
+						has = true
+						break
+					}
+				}
+				if !has {
+					flg = false // 没找到
+				}
+			}
+
+			if cond.Loglevel == "" && len(cond.Loglevels) > 0 {
+				// 日志级别范围内作过滤检查
+				idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName())
+				has := false
+				for j, max2 := 0, len(cond.Loglevels); j < max2; j++ {
+					if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], i)) > 0 {
+						has = true
+						break
+					}
+				}
+				if !has {
+					flg = false // 没找到
+				}
+			}
+
 			// 找到则加入结果
 			if flg {
 				md := storeLogData.GetLogDataModel(docId)
@@ -418,3 +573,16 @@ func findLE(storeLogData *storage.LogDataStorageHandle, min uint32, max uint32, 
 	}
 	return min, middle - 1, false, 0 // 不匹配（maxDatetime<middle的日时），返回下次待查找的范围
 }
+
+// // 判断是否有权限访问指定的系统
+// func matchSystems(systems []string, sys string) bool {
+// 	if systems[0] == "*" {
+// 		return true
+// 	}
+// 	for i := 0; i < len(systems); i++ {
+// 		if cmn.EqualsIngoreCase(systems[i], sys) {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }

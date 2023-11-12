@@ -28,7 +28,7 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	addDataModelLog(md)
 
 	if conf.IsClusterMode() {
-		go TransferGlc(md.ToJson()) // 转发其他GLC服务
+		go TransferGlc(conf.LogTransferAdd, md.ToJson()) // 转发其他GLC服务
 	}
 
 	return gweb.Ok()

@@ -8,6 +8,7 @@ package sysmnt
 import (
 	"errors"
 	"glc/conf"
+	"sort"
 	"sync"
 	"time"
 
@@ -22,6 +23,9 @@ type SysmntStorage struct {
 	lastTime int64       // 最后一次访问时间
 	closing  bool        // 是否关闭中状态
 }
+
+const USER_PREFIX = "sysuser:"
+const USER_NAMES = "sysusernames:"
 
 var sdbMu sync.Mutex             // 锁
 var sysmntStorage *SysmntStorage // 缓存用存储器
@@ -99,6 +103,70 @@ func (s *SysmntStorage) Close() {
 	sysmntStorage = nil
 
 	cmn.Info("关闭SysmntStorage：", s.subPath)
+}
+
+// 取全部用户名（不含admin）
+func (s *SysmntStorage) GetSysUsernames() []string {
+	bs, err := s.Get(cmn.StringToBytes(USER_NAMES))
+	if err != nil {
+		var rs []string
+		return rs
+	}
+	return cmn.Split(cmn.BytesToString(bs), ",")
+}
+
+// 存全部用户名（不含admin）
+func (s *SysmntStorage) SaveSysUsernames(names []string) error {
+	return s.Put(cmn.StringToBytes(USER_NAMES), cmn.StringToBytes(cmn.Join(names, ",")))
+}
+
+// 取用户
+func (s *SysmntStorage) GetSysUser(username string) *SysUser {
+	bs, err := s.Get(cmn.StringToBytes(USER_PREFIX + username))
+	if err != nil {
+		return nil
+	}
+	user := &SysUser{}
+	user.LoadBytes(bs)
+	return user
+}
+
+// 存用户
+func (s *SysmntStorage) SaveSysUser(user *SysUser) error {
+	oldUser := s.GetSysUser(user.Username)
+	if oldUser == nil {
+		// 新增
+		names := s.GetSysUsernames()
+		names = append(names, user.Username)
+		sort.Slice(names, func(i, j int) bool {
+			return names[i] < names[j] // 排序
+		})
+		s.SaveSysUsernames(names) // 保存用户名列表
+	} else {
+		// 更新时，如果密码没传，保持原密码不变
+		if user.Password == "" {
+			user.Password = oldUser.Password
+		}
+	}
+	// 保存
+	return s.Put(cmn.StringToBytes(USER_PREFIX+user.Username), user.ToBytes())
+}
+
+// 删用户
+func (s *SysmntStorage) DeleteSysUser(user *SysUser) error {
+	var newNames []string
+	names := s.GetSysUsernames()
+	for i := 0; i < len(names); i++ {
+		if !cmn.EqualsIngoreCase(names[i], user.Username) {
+			newNames = append(newNames, names[i])
+		}
+	}
+	// 排序
+	sort.Slice(newNames, func(i, j int) bool {
+		return newNames[i] < newNames[j]
+	})
+	s.SaveSysUsernames(newNames)                                               // 用户名列表中删除该用户名
+	return s.leveldb.Delete(cmn.StringToBytes(USER_PREFIX+user.Username), nil) // 删除该用户数据
 }
 
 func (s *SysmntStorage) GetStorageDataCount(storeName string) uint32 {

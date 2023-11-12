@@ -46,7 +46,12 @@ div.vxe-modal--footer {
   padding-left: 8px;
 }
 
-// // 删除行
-// .el-table__row:has(.c-gx--is-deleted) > td {
-//   background: lightgray !important;
-// }
+// 对话框内输入框高度调整
+div.c-gx-dialog .el-input--small input.el-input__inner {
+  height: 30px;
+}
+
+// 消息框按钮高度调整
+div.el-message-box__btns button.el-button--small {
+  height: 30px;
+}

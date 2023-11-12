@@ -27,7 +27,8 @@ export const userLogin = async params => {
   }
 
   const tokenStore = useTokenStore();
-  tokenStore.token = rs.result; // 登录成功后设定令牌
+  tokenStore.token = rs.result.token; // 令牌
+  tokenStore.role = rs.result.role; // 角色
   tokenStore.loginUserName = username;
   tokenStore.time = new Date().getTime();
   return rs.result;
@@ -57,6 +58,14 @@ export const getUserMenu = async () => {
     icon: 'db',
     component: '/glc/storages/StoragesMain',
     openInner: true,
+  });
+  menus.push({
+    path: '/glc/sysuser',
+    title: '用户管理',
+    icon: 'users',
+    component: '/glc/sysuser/SysuserMain',
+    openInner: true,
+    role: 'admin',
   });
   return (menuState.aryMenu = menus);
 };

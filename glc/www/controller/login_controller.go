@@ -5,25 +5,19 @@ import (
 	"encoding/hex"
 	"glc/conf"
 	"glc/gweb"
+	"glc/ldb/sysmnt"
 	"time"
 
 	"github.com/gotoeasy/glang/cmn"
 )
 
-var sessionid string
-var catch *cmn.Cache
+var catchLoginCheck *cmn.Cache // 缓存：登录失败次数检查
+var catchSession *cmn.Cache    // 缓存：登录会话
 
 func init() {
 	if conf.IsEnableLogin() {
-		catch = cmn.NewCache(time.Minute * 15)
-		sessionid = createSessionid()
-		go func() {
-			ticker := time.NewTicker(time.Hour) // 一小时更新一次
-			for {
-				<-ticker.C
-				sessionid = createSessionid()
-			}
-		}()
+		catchLoginCheck = cmn.NewCache(time.Minute * 15)
+		catchSession = cmn.NewCache(time.Hour * 12)
 	}
 }
 
@@ -32,46 +26,104 @@ func LoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 	if !InWhiteList(req) && InBlackList(req) {
 		return gweb.Error403() // 黑名单，访问受限
 	}
+	if !conf.IsEnableLogin() {
+		return gweb.Ok() // 登录相关变量没有初始化，不适合继续
+	}
 
 	username := req.GetFormParameter("username")
 	password := req.GetFormParameter("password")
 	key := getClientHash(req)
-	val, find := catch.Get(key)
+	val, find := catchLoginCheck.Get(key)
 	cnt := 0
 	if find {
 		cnt = val.(int)
 		if cnt >= 5 {
-			catch.Set(key, cnt) // 还试，重新计算限制时间，再等15分钟吧
+			catchLoginCheck.Set(key, cnt) // 还试，重新计算限制时间，再等15分钟吧
 			return gweb.Error500("连续多次失败，当前已被限制登录")
 		}
 	}
-	if username != conf.GetUsername() || password != conf.GetPassword() {
-		cnt++
-		catch.Set(key, cnt)
-		return gweb.Error500("用户名或密码错误")
+
+	role := ""
+	if username == conf.GetUsername() {
+		// 管理员登录
+		if password != conf.GetPassword() {
+			cnt++
+			catchLoginCheck.Set(key, cnt)
+			return gweb.Error500("用户名或密码错误")
+		}
+		role = "admin"
+	} else {
+		// 一般用户登录
+		user := sysmnt.NewSysmntStorage().GetSysUser(username)
+		if user == nil || password != user.Password {
+			cnt++
+			catchLoginCheck.Set(key, cnt)
+			return gweb.Error500("用户名或密码错误")
+		}
 	}
 
-	catch.Delete(key)
-	return gweb.Result(sessionid)
+	token := createSessionid(username)
+	catchSession.Set(token, username)
+
+	catchLoginCheck.Delete(key)
+
+	if conf.IsClusterMode() {
+		user := &sysmnt.SysUser{Username: username, Password: password}
+		go TransferGlc(conf.UserTransferLogin, user.ToJson()) // 转发其他GLC服务
+	}
+
+	return gweb.Result(cmn.OfMap("token", token, "role", role))
+}
+
+// 登录（来自数据转发）
+func UserTransferLoginController(req *gweb.HttpRequest) *gweb.HttpResult {
+
+	// 开启API秘钥校验时才检查
+	if conf.IsEnableSecurityKey() && req.GetHeader(conf.GetHeaderSecurityKey()) != conf.GetSecurityKey() {
+		return gweb.Error(403, "未经授权的访问，拒绝服务")
+	}
+
+	loginuser := &sysmnt.SysUser{}
+	req.BindJSON(loginuser)
+	if loginuser.Username == conf.GetUsername() {
+		// 管理员登录
+		if loginuser.Password != conf.GetPassword() {
+			return gweb.Error500("用户名或密码错误")
+		}
+	} else {
+		// 一般用户登录
+		user := sysmnt.NewSysmntStorage().GetSysUser(loginuser.Username)
+		if user == nil || loginuser.Password != user.Password {
+			return gweb.Error500("用户名或密码错误")
+		}
+	}
+
+	token := createSessionid(loginuser.Username)
+	catchSession.Set(token, loginuser.Username)
+	return gweb.Ok()
 }
 
 func IsEnableLoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return gweb.Result(conf.IsEnableLogin())
 }
 
-func createSessionid() string {
+func createSessionid(username string) string {
 	ymd := cmn.Today()
-	by1 := md5.Sum(cmn.StringToBytes(conf.GetUsername() + ymd))
-	by2 := md5.Sum(cmn.StringToBytes(ymd + conf.GetPassword()))
-	by3 := md5.Sum(cmn.StringToBytes(ymd + "添油" + conf.GetUsername() + "加醋" + conf.GetPassword() + conf.GetTokenSalt())) // 增加配置的令牌盐
+	by1 := md5.Sum(cmn.StringToBytes(username + ymd))
+	by2 := md5.Sum(cmn.StringToBytes(ymd + username + "添油"))
+	by3 := md5.Sum(cmn.StringToBytes(ymd + username + "加醋" + conf.GetTokenSalt())) // 增加配置的令牌盐
 	str1 := hex.EncodeToString(by1[:])
 	str2 := hex.EncodeToString(by2[:])
 	str3 := hex.EncodeToString(by3[:])
 	return cmn.Right(str1, 15) + cmn.Left(str2, 15) + cmn.Left(str3, 30)
 }
 
-func GetSessionid() string {
-	return sessionid
+func GetUsernameByToken(token string) string {
+	username, find := catchSession.Get(token)
+	if find {
+		return username.(string)
+	}
+	return ""
 }
 
 func getClientHash(req *gweb.HttpRequest) string {
@@ -89,6 +141,7 @@ func getClientHash(req *gweb.HttpRequest) string {
 	ary = append(ary, req.GetHeader("Sec-Ch-Ua"))
 	ary = append(ary, req.GetHeader("Referer"))
 	ary = append(ary, req.GinCtx.ClientIP())
+	ary = append(ary, req.GetFormParameter("username"))
 	return cmn.HashString(cmn.Join(ary, ","))
 }
 

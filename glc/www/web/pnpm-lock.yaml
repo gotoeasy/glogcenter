@@ -9,8 +9,8 @@ dependencies:
     specifier: ^2.1.0
     version: 2.1.0(vue@3.3.4)
   '@gotoeasy/glcui':
-    specifier: ^0.1.2
-    version: 0.1.2
+    specifier: ^0.1.7
+    version: 0.1.7
   '@imengyu/vue3-context-menu':
     specifier: ^1.3.0
     version: 1.3.0
@@ -772,8 +772,8 @@ packages:
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
     dev: true
 
-  /@gotoeasy/glcui@0.1.2:
-    resolution: {integrity: sha512-ALDY/SirAm2rMLyJUde6Ree2QPJr0N3BCQwbT4RdXE2BMuugAbD9ehyg3DGLX40Ovo90sa0REa8R3p6SL1S+zg==}
+  /@gotoeasy/glcui@0.1.7:
+    resolution: {integrity: sha512-fz2DiF/OY3KcUrxATX6CrNAp3jdj7SP0/5xrlMlj4PgKxrAS5hKpZGOZtsTBfIkF0V+yhWE3lmk4mZBlvxJlIA==}
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:

@@ -32,7 +32,7 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 		addDataModelLog(md)
 
 		if conf.IsClusterMode() {
-			go TransferGlc(md.ToJson()) // 转发其他GLC服务
+			go TransferGlc(conf.LogTransferAdd, md.ToJson()) // 转发其他GLC服务
 		}
 
 		md2 := &logdata.LogDataModel{
@@ -48,7 +48,7 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 		addDataModelLog(md2)
 
 		if conf.IsClusterMode() {
-			go TransferGlc(md2.ToJson()) // 转发其他GLC服务
+			go TransferGlc(conf.LogTransferAdd, md2.ToJson()) // 转发其他GLC服务
 		}
 
 		if cnt >= 1000 {

@@ -36,6 +36,14 @@ func (r *HttpRequest) SetHeader(key string, value string) {
 	r.GinCtx.Header(key, value)
 }
 
+func (r *HttpRequest) GetToken() string {
+	token := r.GetFormParameter("token")
+	if token == "" {
+		token = r.GetHeader("X-Access-Token")
+	}
+	return token
+}
+
 func (r *HttpRequest) GetHeader(name string) string {
 	ary := r.mapHead[cmn.ToLower(name)]
 	if ary == nil {

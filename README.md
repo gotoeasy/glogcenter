@@ -91,8 +91,8 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_SAVE_DAYS`日志仓按日存储自动维护时的保留天数(有效范围`0~1200`)，`0`表示不自动删除，默认`180`天
 - [x] `GLC_SEARCH_MULIT_LINE`，是否对日志列的全部行进行索引检索，默认`false`仅第一行
 - [x] `GLC_ENABLE_LOGIN`是否开启用户密码登录功能，默认`false`
-- [x] `GLC_USERNAME`查询界面登录用的用户名，默认`glc`
-- [x] `GLC_PASSWORD`查询界面登录用的密码，默认`GLogCenter100%666`
+- [x] `GLC_USERNAME`管理员用户名，默认`glc`，从`0.13.0`版本开始，管理员新增用户及权限管理功能
+- [x] `GLC_PASSWORD`管理员密码，默认`GLogCenter100%666`
 - [x] `GLC_TOKEN_SALT`用以生成令牌的字符串令牌盐，开启登录功能时建议设定提高安全性，默认空白
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
 - [x] `GLC_HEADER_SECURITY_KEY`API秘钥的`header`键名，默认`X-GLC-AUTH`
@@ -231,9 +231,18 @@ func main() {
 ### 开发版`latest`
 
 - [ ] 日志审计、告警
-- [ ] 多用户及日志仓权限管理
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.13.0`
+
+- [x] 新增用户及其权限管理，仅管理员能操作，可控制指定用户只能访问指定系统的日志，多系统共用且有数据安全需求时尤显重要
+- [x] 新增会话超时`GLC_SESSION_TIMEOUT`环境变量，单位为分钟，默认30分钟
+- [x] 优化检索性能，部分多选日志级别场景下性能改善明显
+
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.12.3`
 
@@ -256,9 +265,6 @@ func main() {
 
 - [x] 增加配置开关`GLC_SEARCH_MULIT_LINE`，设定为`true`时，支持对日志列的全部行进行索引和检索，默认`false`。注意：不会对历史数据进行重新索引，也就是说，设定为`true`时，新加入的日志会做多行索引，但历史数据如果没有多行索引的仍旧没法进行多行检索
 - [x] 同步升级`glc-logback-appender`，增加过滤器类`GlcFilter`用以生成客户端IP和跟踪码，可按需配置使用
-
-<details>
-<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.11.7`
 

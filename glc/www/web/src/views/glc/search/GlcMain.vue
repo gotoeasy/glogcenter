@@ -13,7 +13,7 @@
             </el-form-item>
             <el-form-item label="系统名">
               <el-select v-model="formData.system" :multiple="false" filterable allow-create default-first-option
-                style="width:420px;" clearable :reserve-keyword="true" placeholder="请输入系统名">
+                style="width:420px;" clearable :reserve-keyword="false" placeholder="请输入系统名">
                 <el-option v-for="item in systemOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
@@ -208,6 +208,16 @@ onMounted(() => {
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
       router.push('/login');
+    }
+  });
+
+  // 查询有权限的系统名
+  $post('/v1/store/systems', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
+    if (rs.success) {
+      for (let i = 0; i < rs.result.length; i++) {
+        systemSet.add(rs.result[i]);
+        systemSet.add(rs.result[i]) && systemOptions.value.push({ value: rs.result[i], label: rs.result[i] });
+      }
     }
   });
 

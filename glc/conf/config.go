@@ -14,6 +14,12 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
+const LogTransferAdd = "/v1/log/transferAdd"
+const SysUserTransferSave = "/v1/sysuser/transferSave"
+const SysUserTransferChgPsw = "/v1/sysuser/transferChgPsw"
+const SysUserTransferDel = "/v1/sysuser/transferDel"
+const UserTransferLogin = "/v1/user/transferLogin"
+
 var storeRoot string = "/glogcenter" // 【固定】容器化缘故，不适合修改
 var serverPort string = "8080"       // 【固定】容器化缘故，不适合修改
 var contextPath string = "/glc"      // 【固定】容器化缘故，不适合修改
@@ -34,6 +40,7 @@ var saveDays int
 var enableLogin bool
 var username string
 var password string
+var sessionTimeout int
 var clusterMode bool
 var clusterUrls []string
 var enableBackup bool
@@ -59,7 +66,7 @@ func init() {
 func UpdateConfigByEnv() {
 	// 读取环境变量初始化配置，各配置都有默认值
 	storeChanLength = cmn.GetEnvInt("GLC_STORE_CHAN_LENGTH", 64)                // 【X】存储通道长度
-	maxIdleTime = cmn.GetEnvInt("GLC_MAX_IDLE_TIME", 180)                       // 【X】最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
+	maxIdleTime = cmn.GetEnvInt("GLC_MAX_IDLE_TIME", 300)                       // 【X】最大闲置时间（秒）,超过闲置时间将自动关闭，0时表示不关闭
 	storeNameAutoAddDate = cmn.GetEnvBool("GLC_STORE_NAME_AUTO_ADD_DATE", true) // 存储名是否自动添加日期（日志量大通常按日单位区分存储），默认true
 	serverUrl = cmn.GetEnvStr("GLC_SERVER_URL", "")                             // 服务URL，默认“”，集群配置时自动获取地址可能不对，可通过这个设定
 	serverIp = cmn.GetEnvStr("GLC_SERVER_IP", "")                               // 【X】服务IP，默认“”，当“”时会自动获取
@@ -73,6 +80,7 @@ func UpdateConfigByEnv() {
 	amqpJsonFormat = cmn.GetEnvBool("GLC_AMQP_JSON_FORMAT", true)               // rabbitMq消息文本是否为json格式，默认true
 	saveDays = cmn.GetEnvInt("GLC_SAVE_DAYS", 180)                              // 日志分仓时的保留天数(0~1200)，0表示不自动删除，默认180天
 	enableLogin = cmn.GetEnvBool("GLC_ENABLE_LOGIN", false)                     // 是否开启用户密码登录，默认“false”
+	sessionTimeout = cmn.GetEnvInt("GLC_SESSION_TIMEOUT", 30)                   // 登录会话超时时间，默认“30”分钟
 	username = cmn.GetEnvStr("GLC_USERNAME", "glc")                             // 登录用户名，默认“glc”
 	password = cmn.GetEnvStr("GLC_PASSWORD", "GLogCenter100%666")               // 登录密码，默认“GLogCenter100%666”
 	tokenSalt = cmn.GetEnvStr("GLC_TOKEN_SALT", "")                             // 令牌盐，默认“”
@@ -80,7 +88,7 @@ func UpdateConfigByEnv() {
 	aryBlack = cmn.Split(cmn.GetEnvStr("GLC_BLACK_LIST", ""), ",")              // IP或区域黑名单，逗号分隔，单个*代表全部，内网地址不受限制，默认“”
 	clusterMode = cmn.GetEnvBool("GLC_CLUSTER_MODE", false)                     // 是否开启集群模式，默认false
 	splitUrls(cmn.GetEnvStr("GLC_CLUSTER_URLS", ""))                            // 从服务器地址，多个时逗号分开，默认“”
-	enableBackup = cmn.GetEnvBool("GLC_ENABLE_BACKUP", false)                   // 是否开启备份，默认false
+	enableBackup = cmn.GetEnvBool("GLC_ENABLE_BACKUP", false)                   // 【X】是否开启备份，默认false
 	glcGroup = cmn.GetEnvStr("GLC_GROUP", "default")                            // 【X】日志中心分组名，默认“default”
 	minioUrl = cmn.GetEnvStr("GLC_MINIO_URL", "")                               // 【X】MINIO地址，默认“”
 	minioUser = cmn.GetEnvStr("GLC_MINIO_USER", "")                             // 【X】MINIO用户名，默认“”
@@ -92,6 +100,11 @@ func UpdateConfigByEnv() {
 	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))             // 每次检索件数，默认100（有效范围1~1000）
 	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)            // 是否检索日志的全部行（日志可能有换行），默认false仅第一行
 	testMode = cmn.GetEnvBool("GLC_TEST_MODE", false)                           // 是否测试模式，默认false
+}
+
+// 取配置： 登录会话超时时间，可通过环境变量“GLC_SESSION_TIMEOUT”设定，默认“30”分钟
+func GetSessionTimeout() int {
+	return sessionTimeout
 }
 
 // 取配置： 白名单，可通过环境变量“GLC_WHITE_LIST”设定，默认“”
@@ -225,9 +238,12 @@ func GetUsername() string {
 	return username
 }
 
-// 取配置： 登录用户名，可通过环境变量“GLC_PASSWORD”设定，默认“glogcenter”
+// 存取配置： 登录用户名，可通过环境变量“GLC_PASSWORD”设定，默认“glogcenter”
 func GetPassword() string {
 	return password
+}
+func SetPassword(psw string) {
+	password = psw
 }
 
 // 取配置： 日志分仓时的保留天数(0~180)，0表示不自动删除，可通过环境变量“GLC_SAVE_DAYS”设定，默认180天

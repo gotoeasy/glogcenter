@@ -107,3 +107,7 @@ func (s *LogDataStorageHandle) GetLogDataModel(id uint32) *logdata.LogDataModel 
 func (s *LogDataStorageHandle) TotalCount() uint32 {
 	return s.storage.TotalCount()
 }
+
+func (s *LogDataStorageHandle) GetStoreName() string {
+	return s.storage.StoreName()
+}
