@@ -10,8 +10,9 @@ services:
       # 【例】每天一个日志仓，自动维护保留90天
       GLC_STORE_NAME_AUTO_ADD_DATE: 'true'
       GLC_SAVE_DAYS: '90'
-      # 【例】开启登录，设定好用户名密码、令牌盐、黑白名单组合控制仅内网及指定的IP允许访问
+      # 【例】开启登录，会话30分钟超时，设定用户名密码、令牌盐、黑白名单组合控制仅内网及指定的IP允许访问
       GLC_ENABLE_LOGIN: 'true'
+      GLC_SESSION_TIMEOUT: '30'
       GLC_USERNAME: 'admin'
       GLC_PASSWORD: 'YourPassword'
       GLC_TOKEN_SALT: 'YourTokenSalt'
