@@ -183,13 +183,13 @@ function checkVersion() {
         if (rs.result.latest && normalizeVer(rs.result.version) < normalizeVer(rs.result.latest)) {
           verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${rs.result.latest} 可更新`
         }
-        // 有新版本时，左上角图标鼠标悬停显示提示（注：最新版本号的查询服务并不保证随时可用）
+        // 有新版本时，左上角图标鼠标悬停显示提示（最新版本号的查询服务并不保证随时可用）
         fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${verInfo.value}`)
           .then(response => response.json())
           .then(data => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
             if (data.version && normalizeVer(rs.result.version) < normalizeVer(data.version)) {
               verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${data.version} 可更新`;
-              notifyUpdate(data.version);
+              notifyUpdate(rs.result.version, data.version);
             }
           })
           .catch(e => console.log(e));
@@ -204,13 +204,24 @@ function normalizeVer(ver) {
   return `v${100 + (ary[0] - 0)}.${1000 + (ary[1] - 0)}.${1000 + (ary[2] - 0)}`
 }
 
-function notifyUpdate(ver) {
-  if (localStorage.getItem('NotNotify')) return;
-  let message = `有新版本 ${ver} 可以更新`;
+function notifyUpdate(over, nver) {
+  let duration = 5000;
+  let disabled = ""
+  let showClose = true
+  if ((nver.substring(1, 4) - 0) - (over.substring(1, 4) - 0) > 0) {
+    // 重大版本更新时，不自动关闭
+    localStorage.removeItem("NotNotify")
+    disabled = "disabled"
+    showClose = false
+    duration = 0
+  } else if (localStorage.getItem('NotNotify')) {
+    return;
+  }
+  let message = `有新版本 ${nver} 可以更新`;
   message += `，<span style="color:blue" class="hand" onclick="window.open('https://github.com/gotoeasy/glogcenter', '_blank')">点击查看</span>`
   message += `<br><br>`
-  message += `<input class="hand" type="checkbox" id="ccvvuu" onclick="localStorage.setItem('NotNotify', this.checked?'1':'')"><label class="hand" for="ccvvuu"> 不再提醒</label>`
-  ElNotification({ title: "提示", message, type: "info", position: 'bottom-right', dangerouslyUseHTMLString: true });
+  message += `<input class="hand" type="checkbox" ${disabled} id="ccvvuu" onclick="localStorage.setItem('NotNotify', this.checked?'1':'')"><label class="hand" for="ccvvuu"> 不再提醒</label>`
+  ElNotification({ title: "提示", message, type: "info", position: 'bottom-right', dangerouslyUseHTMLString: true, duration, showClose });
 }
 
 </script>
