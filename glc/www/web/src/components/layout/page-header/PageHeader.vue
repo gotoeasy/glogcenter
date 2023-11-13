@@ -132,7 +132,7 @@ const svgLogoColor = computed(() => {
 });
 
 onMounted(() => {
-  false && checkVersion();
+  checkVersion();
 });
 
 const fnChangePsw = (form) => {
