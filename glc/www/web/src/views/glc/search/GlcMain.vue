@@ -213,7 +213,7 @@ onMounted(() => {
 
   // 查询有权限的系统名
   $post('/v1/store/systems', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
-    if (rs.success) {
+    if (rs.success && rs.result?.length) {
       for (let i = 0; i < rs.result.length; i++) {
         systemSet.add(rs.result[i]);
         systemSet.add(rs.result[i]) && systemOptions.value.push({ value: rs.result[i], label: rs.result[i] });
