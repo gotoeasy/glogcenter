@@ -39,6 +39,7 @@ type LogDataStorage struct {
 var zeroUint32Bytes []byte = cmn.Uint32ToBytes(0)
 var ldbMu sync.Mutex
 var mapStorage map[string](*LogDataStorage)
+var mapStorageMu sync.Mutex
 
 func init() {
 	mapStorage = make(map[string](*LogDataStorage))
@@ -65,6 +66,8 @@ func NewLogDataStorage(storeName string) *LogDataStorage { // 存储器，文档
 	}
 
 	// 缓存无则锁后创建返回并存缓存
+	mapStorageMu.Lock()                   // 缓存map锁
+	defer mapStorageMu.Unlock()           // 缓存map解锁
 	ldbMu.Lock()                          // 上锁
 	defer ldbMu.Unlock()                  // 解锁
 	cacheStore = getCacheStore(cacheName) // 再次尝试取用缓存中存储器
@@ -280,8 +283,10 @@ func (s *LogDataStorage) Close() {
 		return
 	}
 
-	s.mu.Lock()         // 锁
-	defer s.mu.Unlock() // 解锁
+	mapStorageMu.Lock()         // 缓存map锁
+	defer mapStorageMu.Unlock() // 缓存map解锁
+	s.mu.Lock()                 // 锁
+	defer s.mu.Unlock()         // 解锁
 	if s.closing {
 		return
 	}
@@ -361,7 +366,10 @@ func (s *LogDataStorage) IsClose() bool {
 
 func onExit() {
 	for k := range mapStorage {
-		mapStorage[k].Close()
+		s := mapStorage[k]
+		if s != nil {
+			s.Close()
+		}
 	}
 	cmn.Info("退出LogDataStorage")
 }
