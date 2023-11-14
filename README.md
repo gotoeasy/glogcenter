@@ -14,7 +14,7 @@
 <br>
 
 <p align="center">
-    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.3-brightgreen.svg"></a>
+    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.4-brightgreen.svg"></a>
     <a href="https://hub.docker.com/r/gotoeasy/glc"><img src="https://img.shields.io/docker/pulls/gotoeasy/glc"></a>
     <a href="https://github.com/gotoeasy/glogcenter/releases/latest"><img src="https://img.shields.io/github/release/gotoeasy/glogcenter.svg"></a>
     <a href="https://github.com/gotoeasy/glogcenter/blob/master/LICENSE"><img src="https://img.shields.io/github/license/gotoeasy/glogcenter"></a>
@@ -236,6 +236,7 @@ func main() {
 ### 版本`0.13.0`
 
 - [x] 新增用户及系统权限管理，仅管理员能操作，可控制指定用户只能访问指定系统的日志，多系统共用且有数据安全需求时尤显重要
+- [x] 升级使用`Go1.21.4`进行编译
 
 
 <details>
