@@ -184,7 +184,7 @@ function checkVersion() {
           verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${rs.result.latest} 可更新`
         }
         // 有新版本时，左上角图标鼠标悬停显示提示（最新版本号的查询服务并不保证随时可用）
-        fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${verInfo.value}`)
+        fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${rs.result.version}`)
           .then(response => response.json())
           .then(data => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
             if (data.version && normalizeVer(rs.result.version) < normalizeVer(data.version)) {
