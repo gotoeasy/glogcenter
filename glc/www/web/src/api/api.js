@@ -59,13 +59,13 @@ export const getUserMenu = async () => {
     component: '/glc/storages/StoragesMain',
     openInner: true,
   });
-  // menus.push({
-  //   path: '/glc/sysuser',
-  //   title: '用户管理',
-  //   icon: 'users',
-  //   component: '/glc/sysuser/SysuserMain',
-  //   openInner: true,
-  //   role: 'admin',
-  // });
+  menus.push({
+    path: '/glc/sysuser',
+    title: '用户管理',
+    icon: 'users',
+    component: '/glc/sysuser/SysuserMain',
+    openInner: true,
+    role: 'admin',
+  });
   return (menuState.aryMenu = menus);
 };
