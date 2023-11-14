@@ -70,8 +70,7 @@ func SystemNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
 		}
 	}
 
-	var ary []string
-	return gweb.Result(ary)
+	return gweb.Ok() // 都有权限，不返回结果
 }
 
 // 查询日志仓信息列表

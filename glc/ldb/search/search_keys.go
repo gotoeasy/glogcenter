@@ -573,16 +573,3 @@ func findLE(storeLogData *storage.LogDataStorageHandle, min uint32, max uint32, 
 	}
 	return min, middle - 1, false, 0 // 不匹配（maxDatetime<middle的日时），返回下次待查找的范围
 }
-
-// // 判断是否有权限访问指定的系统
-// func matchSystems(systems []string, sys string) bool {
-// 	if systems[0] == "*" {
-// 		return true
-// 	}
-// 	for i := 0; i < len(systems); i++ {
-// 		if cmn.EqualsIngoreCase(systems[i], sys) {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }

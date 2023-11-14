@@ -40,6 +40,7 @@
 
       </div>
     </div>
+    <div class="login-footer">Copyright © 2022-present gotoeasy.top</div>
   </div>
 </template>
 
@@ -203,6 +204,14 @@ onMounted(async () => {
       }
     }
   }
+}
+
+.login-footer {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  color: lightgrey;
+  transform: translateX(-50%);
 }
 
 @media screen and (max-width: 1100px) {

@@ -192,7 +192,7 @@ function checkVersion() {
               notifyUpdate(rs.result.version, data.version);
             }
           })
-          .catch(e => console.log(e));
+          .catch(() => { });
       }
     });
   }
