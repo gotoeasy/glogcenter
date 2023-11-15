@@ -120,8 +120,9 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
       字段`servername`： 字符串，对应页面的`主机名` <br>
       字段`serverip`： 字符串，对应页面的`主机IP` <br>
       字段`loglevel`： 字符串，对应页面的`日志级别` <br>
-      字段`traceid`： 字符串，对应页面的`追踪ID` <br>
+      字段`traceid`： 字符串，对应页面的`追踪码` <br>
       字段`clientip`： 字符串，对应页面的`客户端IP` <br>
+      字段`user`： 字符串，对应页面的`用户` <br>
 
 ```shell
 # 发送测试数据的参考脚本
@@ -137,7 +138,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.13.0</version>
+    <version>0.14.0</version>
 </dependency>
 ```
 
@@ -233,14 +234,20 @@ func main() {
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
-### 版本`0.13.0`
+### 版本`0.14.0`
 
-- [x] 新增用户及系统权限管理，仅管理员能操作，可控制指定用户只能访问指定系统的日志，多系统共用且有数据安全需求时尤显重要
-- [x] 升级使用`Go1.21.4`进行编译
+- [x] 日志新增用户字段，界面新增用户的精确检索条件，当要做特定用户维度的日志审计时，这个功能会显得非常实用
+- [x] 包`glc-logback-appender`同步升级，新增MDC存取用户的接口
+- [x] 修复已知问题
 
 
 <details>
 <summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
+
+### 版本`0.13.0`
+
+- [x] 新增用户及系统权限管理，仅管理员能操作，可控制指定用户只能访问指定系统的日志，多系统共用且有数据安全需求时尤显重要
+- [x] 升级使用`Go1.21.4`进行编译
 
 ### 版本`0.12.4`
 
