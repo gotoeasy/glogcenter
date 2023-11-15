@@ -28,6 +28,7 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 			ClientIp:   "127.0.0.1",
 			TraceId:    traceId,
 			LogLevel:   "INFO",
+			User:       "tuser-" + cmn.RandomString(1),
 		}
 		addDataModelLog(md)
 
@@ -44,6 +45,7 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 			ClientIp:   "127.0.0.1",
 			TraceId:    traceId,
 			LogLevel:   "DEBUG",
+			User:       "tuser-" + cmn.RandomString(1),
 		}
 		addDataModelLog(md2)
 

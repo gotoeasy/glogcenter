@@ -52,7 +52,7 @@ func (e *Engine) Search(cond *search.SearchCondition) *search.SearchResult {
 
 	// 分词后检索
 	var adds []string
-	adds = append(adds, cond.OrgSystem, cond.Loglevel)
+	adds = append(adds, cond.OrgSystem, cond.Loglevel, cond.User)
 	kws := tokenizer.CutForSearchEx(cond.SearchKey, adds, nil) // 检索用关键词处理
 
 	// 【快速检查1】，存在无索引数据的关键词时，直接返回

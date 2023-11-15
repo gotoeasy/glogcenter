@@ -25,11 +25,8 @@ public class GlcFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        // 设定日志中心相关的的traceid、clientip
-        HttpServletRequest httpServletRequest = (HttpServletRequest)request;
-        String traceid = httpServletRequest.getHeader(MdcUtil.TRACE_ID);
-        MdcUtil.setTraceId((traceid == null || traceid.length() == 0) ? MdcUtil.generateTraceId() : traceid);
-        MdcUtil.setClientIp(getIpAddr(httpServletRequest));
+        // 设定日志中心相关的的traceid、clientip，若需要设定user，可继承setMdcKeyValues添加相关逻辑
+        setMdcKeyValues(request);
 
         chain.doFilter(request, response);
     }
@@ -38,7 +35,15 @@ public class GlcFilter implements Filter {
     public void destroy() {
     }
 
-    private static String getIpAddr(HttpServletRequest request) {
+    protected void setMdcKeyValues(ServletRequest request) {
+        // 设定日志中心相关的的traceid、clientip
+        HttpServletRequest httpServletRequest = (HttpServletRequest)request;
+        String traceid = httpServletRequest.getHeader(MdcUtil.TRACE_ID);
+        MdcUtil.setTraceId((traceid == null || traceid.length() == 0) ? MdcUtil.generateTraceId() : traceid);
+        MdcUtil.setClientIp(getIpAddr(httpServletRequest));
+    }
+
+    protected String getIpAddr(HttpServletRequest request) {
         String[] headerNames = { "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP",
                 "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
         for (String headerName : headerNames) {

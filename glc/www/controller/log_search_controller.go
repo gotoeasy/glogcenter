@@ -34,7 +34,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 		catchSession.Set(token, username) // 会话重新计时
 	}
 
-	// 准备好各种场景的检索条件
+	// 准备好各种场景的检索条件（系统【~】、日志级别【!】、用户【@】）
 	startTime := time.Now()
 	mnt := sysmnt.NewSysmntStorage()
 	cond := &search.SearchCondition{SearchSize: conf.GetPageSize()}
@@ -46,8 +46,12 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	cond.DatetimeFrom = req.GetFormParameter("datetimeFrom")                  // 日期范围（From）
 	cond.DatetimeTo = req.GetFormParameter("datetimeTo")                      // 日期范围（To）
 	cond.OrgSystem = cmn.Trim(req.GetFormParameter("system"))                 // 系统
-	cond.Loglevel = req.GetFormParameter("loglevel")                          // 单选条件
+	cond.User = cmn.ToLower(cmn.Trim(req.GetFormParameter("user")))           // 用户
+	cond.Loglevel = cmn.ToLower(req.GetFormParameter("loglevel"))             // 单选条件
 	cond.Loglevels = cmn.Split(cond.Loglevel, ",")                            // 多选条件
+	if cond.User != "" {
+		cond.User = "@" + cond.User // 有指定用户条件
+	}
 	if len(cond.Loglevels) <= 1 || len(cond.Loglevels) >= 4 {
 		cond.Loglevels = make([]string, 0) // 多选的单选或全选，都清空（单选走loglevel索引，全选等于没选）
 	}
@@ -80,7 +84,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 					cond.OrgSystem = "~" + cond.OrgSystem // 多个系统权限，按输入的系统作条件
 				}
 			} else {
-				ary := cmn.Split(user.Systems, ",")
+				ary := cmn.Split(cmn.ToLower(user.Systems), ",")
 				okSystem := false
 				for i := 0; i < len(ary); i++ {
 					cond.OrgSystems = append(cond.OrgSystems, "~"+ary[i]) // 仅设定的系统有访问权限

@@ -8,6 +8,11 @@ public class MdcUtil {
 
     public static final String TRACE_ID = "traceid";
     public static final String CLIENT_IP = "clientip";
+    public static final String USER = "user";
+
+    public static void setUser(String user) {
+        MDC.put(USER, user);
+    }
 
     public static void setClientIp(String clientip) {
         MDC.put(CLIENT_IP, clientip);
@@ -15,6 +20,10 @@ public class MdcUtil {
 
     public static void setTraceId(String traceid) {
         MDC.put(TRACE_ID, traceid);
+    }
+
+    public static void removeUser() {
+        MDC.remove(USER);
     }
 
     public static void removeClientIp() {

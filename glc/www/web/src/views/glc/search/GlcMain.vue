@@ -31,6 +31,10 @@
                 value-format="YYYY-MM-DD HH:mm:ss" start-placeholder="开始时间" end-placeholder="结束时间"
                 popper-class="c-datapicker" />
             </el-form-item>
+            <el-form-item label="用户">
+              <el-input v-model="formData.user" :disabled="readonly" placeholder="请输入用户" maxlength="100"
+                style="width:420px;" />
+            </el-form-item>
           </el-row>
         </SearchForm>
       </template>
@@ -290,6 +294,7 @@ function search() {
   data.loglevel = (formData.value.loglevel || []).join(',');
   data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
   data.datetimeTo = (formData.value.datetime || ['', ''])[1];
+  data.user = formData.value.user;
 
   // 保存好滚动检索的输入条件，保持和检索时一致，避免修改输入再滚动查询而出现矛盾结果
   moreConditon.value = data;
@@ -417,6 +422,11 @@ function fnDownload() {
 
 .c-search-form.el-form--inline .el-input {
   --el-input-width: 100%;
+}
+
+.c-search-form .el-form-item--small .el-form-item__label {
+  height: 30px;
+  line-height: 30px;
 }
 
 .c-datapicker.el-popper.is-pure {

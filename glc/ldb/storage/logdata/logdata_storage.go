@@ -187,23 +187,24 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	}
 
 	// 整理生成关键词
-	adds := docm.Keywords
-	adds = append(adds, docm.Tags...)
+	var adds []string
 	if docm.System != "" {
 		adds = append(adds, "~"+docm.System)
 	}
 	if docm.LogLevel != "" {
 		adds = append(adds, "!"+docm.LogLevel)
 	}
+	if docm.User != "" {
+		adds = append(adds, "@"+docm.User)
+	}
 
-	tgtStr := docm.System + " " + docm.ServerName + " " + docm.ServerIp +
-		" " + docm.ClientIp + " " + docm.TraceId + " " + docm.LogLevel + " " + docm.User + " " + docm.Module + " " + docm.Operation
+	tgtStr := docm.System + " " + docm.ServerName + " " + docm.ServerIp + " " + docm.ClientIp + " " + docm.TraceId + " " + docm.LogLevel + " " + docm.User
 	if docm.Detail != "" && conf.IsMulitLineSearch() {
 		tgtStr = tgtStr + " " + docm.Detail // 支持日志列全部行作为索引检索对象
 	} else {
 		tgtStr = tgtStr + " " + docm.Text // 日志列仅第一行作为索引检索对象
 	}
-	kws := tokenizer.CutForSearchEx(tgtStr, adds, docm.Sensitives) // 两数组参数的元素可以重复或空白，会被判断整理
+	kws := tokenizer.CutForSearchEx(tgtStr, adds, nil) // 两数组参数的元素可以重复或空白，会被判断整理
 
 	// 每个关键词都创建反向索引
 	for _, word := range kws {

@@ -24,6 +24,7 @@ type SearchCondition struct {
 	DatetimeTo       string   // 输入的日期范围（to）条件
 	Loglevel         string   // 输入的日志级别（单选条件）条件【内部会过滤修改】
 	Loglevels        []string // 输入的日志级别（多选条件）条件【内部会过滤修改】
+	User             string   // 输入的用户条件
 	CurrentStoreName string   // 隐藏条件，当前日志文档ID所属的日志仓
 	CurrentId        uint32   // 隐藏条件，当前日志文档ID
 	Forward          bool     // 隐藏条件，是否向前检索（玩下滚动查询）
@@ -400,7 +401,7 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 					idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName()) // 判断系统权限用
 					has := false
 					for j, max2 := 0, len(cond.Systems); j < max2; j++ {
-						if (idxdocStorage.GetWordDocSeq(cond.Systems[j], i)) > 0 {
+						if (idxdocStorage.GetWordDocSeq(cond.Systems[j], docId)) > 0 {
 							has = true
 							break
 						}
@@ -410,12 +411,12 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 					}
 				}
 
-				if cond.Loglevel == "" && len(cond.Loglevels) > 0 {
+				if flg && cond.Loglevel == "" && len(cond.Loglevels) > 0 {
 					// 日志级别范围内作过滤检查
 					idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName())
 					has := false
 					for j, max2 := 0, len(cond.Loglevels); j < max2; j++ {
-						if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], i)) > 0 {
+						if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], docId)) > 0 {
 							has = true
 							break
 						}
@@ -471,7 +472,7 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 				idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName()) // 判断系统权限用
 				has := false
 				for j, max2 := 0, len(cond.Systems); j < max2; j++ {
-					if (idxdocStorage.GetWordDocSeq(cond.Systems[j], i)) > 0 {
+					if (idxdocStorage.GetWordDocSeq(cond.Systems[j], docId)) > 0 {
 						has = true
 						break
 					}
@@ -481,12 +482,12 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 				}
 			}
 
-			if cond.Loglevel == "" && len(cond.Loglevels) > 0 {
+			if flg && cond.Loglevel == "" && len(cond.Loglevels) > 0 {
 				// 日志级别范围内作过滤检查
 				idxdocStorage := indexdoc.NewDocIndexStorage(storeLogData.GetStoreName())
 				has := false
 				for j, max2 := 0, len(cond.Loglevels); j < max2; j++ {
-					if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], i)) > 0 {
+					if (idxdocStorage.GetWordDocSeq("!"+cond.Loglevels[j], docId)) > 0 {
 						has = true
 						break
 					}
