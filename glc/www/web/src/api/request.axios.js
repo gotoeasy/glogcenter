@@ -189,12 +189,9 @@ export const uploadAction = (url, data = {}, params = {}) =>
       });
   });
 
-/**
- * TODO 文件下载请求
- */
-
 // ------------------------------------------------
 export const getUrl = getRequestUrl;
+window.$getUrl = getUrl;
 
 // 以下全局自动import，供直接使用
 export const $post = postAction;

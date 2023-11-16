@@ -1,5 +1,5 @@
 <template>
-  <div class="copyright">Copyright © 2022-Present gotoeasy.top</div>
+  <div class="copyright">Copyright © 2022-present gotoeasy.top</div>
 </template>
 
 <script setup>
@@ -8,7 +8,7 @@ import { useThemeStore } from '~/pkgs';
 const themeStore = useThemeStore();
 </script>
 
-<style scoped lang="css">
+<style lang="css">
 .copyright {
   display: flex;
   justify-content: center;

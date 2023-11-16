@@ -9,7 +9,7 @@
         </div>
         <el-form ref="form" :model="formData" :rules="rules" size="large">
           <el-form-item prop="username">
-            <el-input v-model="formData.username" placeholder="请输入用户名">
+            <el-input v-model="formData.username" placeholder="请输入用户名" maxlength="100">
               <template #prefix>
                 <el-icon class="el-input__icon">
                   <user />
@@ -18,7 +18,8 @@
             </el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="formData.password" type="password" placeholder="请输入密码" autocomplete="new-password">
+            <el-input v-model="formData.password" type="password" placeholder="请输入密码" autocomplete="new-password"
+              maxlength="100">
               <template #prefix>
                 <el-icon class="el-input__icon">
                   <lock />

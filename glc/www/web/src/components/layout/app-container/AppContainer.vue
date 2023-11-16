@@ -69,27 +69,6 @@ $emitter.on('$layout:SwitchMaximizePage', () => {
   themeState.pageMaximize = !themeState.pageMaximize;
 });
 
-// // ------------ 检索一览页面用 ------------
-// const downPanelWidth = computed(() => {
-//   let menu = 0;
-//   if (themeStore.layout !== 'HeaderMainFooter' && !themeState.tabsMaximize && !themeState.pageMaximize) {
-//     menu = themeStore.menuCollapse ? themeStore.menuCollapseWidth : themeStore.menuExpandWidth;
-//   }
-//   const margin = themeStore.mainPanelMarginLeft + themeStore.mainPanelMarginRight;
-//   const padding = themeStore.mainPanelPaddingLeft + themeStore.mainPanelPaddingRight;
-//   return `calc(100vw - ${menu + margin + padding + 8}px)`
-// });
-// const downPanelPadding = computed(() => {
-//   const left = themeStore.mainPanelPaddingLeft - 8;
-//   const right = themeStore.mainPanelPaddingRight;
-//   return `16px ${right}px 16px ${left}px`
-// });
-// const downPanelMarginLeft = computed(() => {
-//   let margin = themeStore.mainPanelPaddingLeft - 8;
-//   margin < 0 && (margin = 0);
-//   return `-${margin}px`;
-// });
-
 // ------------ iframe ------------
 const iframeHeight = computed(() => {
   const header = ((themeState.pageMaximize || themeState.tabsMaximize) ? 0 : themeStore.headerHeight);

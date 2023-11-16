@@ -51,7 +51,7 @@ const opt = { emitter, pageSettingStore: usePageSettingStore() };
 const { visible, tableData, getTableHeight, pageSettingStore, showTableLoadding } = usePageMainHooks(opt);
 
 const table = ref(); // 表格实例
-const tid = ref('userMain'); // 表格ID
+const tid = ref('userMain231126'); // 表格ID
 
 const tableHeight = computed(() => getTableHeight(false, true, 19)); // 表格高度
 

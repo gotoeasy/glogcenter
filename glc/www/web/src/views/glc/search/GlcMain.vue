@@ -32,8 +32,7 @@
                 popper-class="c-datapicker" />
             </el-form-item>
             <el-form-item label="用户">
-              <el-input v-model="formData.user" :disabled="readonly" placeholder="请输入用户" maxlength="100"
-                style="width:420px;" />
+              <el-input v-model="formData.user" placeholder="请输入用户" maxlength="100" style="width:420px;" />
             </el-form-item>
           </el-row>
         </SearchForm>
@@ -81,7 +80,7 @@
 
 <script setup>
 import { useEmitter, usePageMainHooks, useTabsState } from "~/pkgs";
-import { userLogout } from "~/api";
+import { userLogout, enableLogin } from "~/api";
 
 const tabsState = useTabsState();
 const emitter = useEmitter(tabsState.activePath);
@@ -96,7 +95,7 @@ const { formData, visible, tableData, tableHeight, pageSettingStore, showTableLo
 const showTestBtn = ref(false); // 是否显示生成测试数据按钮
 const autoSearchMode = ref(false); // 自动查询
 const table = ref(); // 表格实例
-const tid = ref('glcSearchMain'); // 表格ID
+const tid = ref('searchMain231126'); // 表格ID
 const info = ref(''); // 底部提示信息
 const storageOptions = ref([]) // 日志仓
 const systemSet = new Set();
@@ -189,7 +188,7 @@ const shortcuts = ref([
 ]);
 
 // 初期默认检索
-onMounted(() => {
+onMounted(async () => {
   const configStore = $emitter.emit('$table:config', { id: tid.value });
   !configStore.columns.length && $emitter.emit('$table:config', { id: tid.value, update: true }); // 首次使用开启默认布局
   // 日志仓列表查询
@@ -240,6 +239,8 @@ onMounted(() => {
     }
   });
 
+  // 检查下，避免不需要登录又还显示着登录状态
+  await enableLogin();
 });
 
 // 清除日志仓条件时，重新拉取最新日志仓列表

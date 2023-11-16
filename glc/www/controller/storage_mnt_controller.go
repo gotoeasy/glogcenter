@@ -13,7 +13,7 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
-var glcLatest string = ver.VERSION
+var glcLatest string = ""
 
 // 查询是否测试模式
 func TestModeController(req *gweb.HttpRequest) *gweb.HttpResult {

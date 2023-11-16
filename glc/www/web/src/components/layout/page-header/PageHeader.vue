@@ -68,7 +68,6 @@
 </template>
 
 <script setup>
-import { ElNotification } from 'element-plus';
 import { gxUtil, useThemeStore, useTokenStore } from '~/pkgs';
 import { userLogout } from '~/api';
 
@@ -79,6 +78,7 @@ const themeStore = useThemeStore();
 const formData = ref({ oldPassword: '', password1: '', password2: '' });
 const form = ref(); // 表单实例
 const dialog = ref();
+const checkVersionDone = ref(false)
 
 const validatePass2 = (rule, value, callback) => {
   if (!value) {
@@ -131,9 +131,7 @@ const svgLogoColor = computed(() => {
   return '#eeeeee';
 });
 
-onMounted(() => {
-  checkVersion();
-});
+onMounted(() => checkVersion());
 
 const fnChangePsw = (form) => {
   form.validate(valid => {
@@ -174,8 +172,8 @@ const clickLogo = () => {
 };
 
 function checkVersion() {
-  if (!window.$checkVersionDone) {
-    window.$checkVersionDone = true;
+  if (!checkVersionDone.value) {
+    checkVersionDone.value = true;
     // 从后台服务读取当前运行版本，避免多处维护版本号
     $post('/v1/version/info', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' }).then(rs => {
       if (rs.success) {
@@ -183,16 +181,6 @@ function checkVersion() {
         if (rs.result.latest && normalizeVer(rs.result.version) < normalizeVer(rs.result.latest)) {
           verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${rs.result.latest} 可更新`
         }
-        // 有新版本时，左上角图标鼠标悬停显示提示（最新版本号的查询服务并不保证随时可用）
-        fetch(`https://glc.gotoeasy.top/glogcenter/current/version.json?v=${rs.result.version}`)
-          .then(response => response.json())
-          .then(data => {  // 最新版本（服务不保证可用，可能查不到，仅查到有新版本时更新tip）
-            if (data.version && normalizeVer(rs.result.version) < normalizeVer(data.version)) {
-              verInfo.value = `当前版本 ${rs.result.version} ，有新版本 ${data.version} 可更新`;
-              notifyUpdate(rs.result.version, data.version);
-            }
-          })
-          .catch(() => { });
       }
     });
   }
@@ -202,26 +190,6 @@ function checkVersion() {
 function normalizeVer(ver) {
   const ary = ver.replace("v", "").split(".")
   return `v${100 + (ary[0] - 0)}.${1000 + (ary[1] - 0)}.${1000 + (ary[2] - 0)}`
-}
-
-function notifyUpdate(over, nver) {
-  let duration = 5000;
-  let disabled = ""
-  let showClose = true
-  if ((nver.substring(1, 4) - 0) - (over.substring(1, 4) - 0) > 0) {
-    // 重大版本更新时，不自动关闭
-    localStorage.removeItem("NotNotify")
-    disabled = "disabled"
-    showClose = false
-    duration = 0
-  } else if (localStorage.getItem('NotNotify')) {
-    return;
-  }
-  let message = `有新版本 ${nver} 可以更新`;
-  message += `，<span style="color:blue" class="hand" onclick="window.open('https://github.com/gotoeasy/glogcenter', '_blank')">点击查看</span>`
-  message += `<br><br>`
-  message += `<input class="hand" type="checkbox" ${disabled} id="ccvvuu" onclick="localStorage.setItem('NotNotify', this.checked?'1':'')"><label class="hand" for="ccvvuu"> 不再提醒</label>`
-  ElNotification({ title: "提示", message, type: "info", position: 'bottom-right', dangerouslyUseHTMLString: true, duration, showClose });
 }
 
 </script>

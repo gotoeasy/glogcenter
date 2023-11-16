@@ -3,26 +3,26 @@
     <el-card shadow="never">
 
       <el-form-item label="账号" prop="username">
-        <el-input v-model="formData.username" :disabled="!isCreateMode" placeholder="请输入账号" />
+        <el-input v-model="formData.username" :disabled="!isCreateMode" placeholder="请输入账号" maxlength="100" />
       </el-form-item>
 
       <el-form-item v-if="!readonly" label="密码" prop="password1">
         <el-input v-model="formData.password1" type="password" :placeholder="isCreateMode ? '请输入密码' : '需要修改密码时请输入'"
-          autocomplete="new-password" />
+          autocomplete="new-password" maxlength="100" />
       </el-form-item>
 
       <el-form-item v-if="!readonly" label="确认密码" prop="password2">
         <el-input v-model="formData.password2" type="password" :placeholder="isCreateMode ? '请输入密码' : '需要修改密码时请输入'"
-          autocomplete="new-password" />
+          autocomplete="new-password" maxlength="100" />
       </el-form-item>
 
       <el-form-item label="系统权限" prop="roles">
         <el-input v-model="formData.systems" :disabled="readonly"
-          :placeholder="readonly ? '' : '请输入可访问系统，多系统时逗号分隔，不填或*代表全部'" />
+          :placeholder="readonly ? '' : '请输入可访问系统，多系统时逗号分隔，不填或*代表全部'" maxlength="1000" />
       </el-form-item>
 
       <el-form-item label="备注">
-        <el-input v-model="formData.note" type="textarea" :disabled="readonly" resize="none"
+        <el-input v-model="formData.note" type="textarea" :disabled="readonly" resize="none" maxlength="2000"
           :autosize="{ minRows: 4, maxRows: 4 }" :placeholder="readonly ? '' : '请输入备注'" />
       </el-form-item>
 
