@@ -32,7 +32,8 @@
                 popper-class="c-datapicker" />
             </el-form-item>
             <el-form-item label="用户">
-              <el-input v-model="formData.user" placeholder="请输入用户" maxlength="100" style="width:420px;" />
+              <el-input v-model="formData.user" placeholder="请输入用户" maxlength="100" style="width:420px;"
+                @keyup.enter="() => $emitter.emit('fnSearch')" />
             </el-form-item>
           </el-row>
         </SearchForm>
@@ -79,7 +80,7 @@
 </template>
 
 <script setup>
-import { useEmitter, usePageMainHooks, useTabsState } from "~/pkgs";
+import { useEmitter, $emitter, usePageMainHooks, useTabsState } from "~/pkgs";
 import { userLogout, enableLogin } from "~/api";
 
 const tabsState = useTabsState();

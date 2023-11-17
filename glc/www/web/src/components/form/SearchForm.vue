@@ -1,9 +1,6 @@
 <template>
   <el-form ref="form" :inline="true" :model="formData" :rules="formRules" label-width="100">
     <el-row>
-      <!-- <el-form-item label="" class="c-search-form-item">
-        <el-input v-model="formData.searchKeys" input-style="width:500px" @keyup.enter="fnSearch" />
-      </el-form-item> -->
       <el-form-item class="c-search-form-item">
         <el-input v-model="formData.searchKeys" placeholder="请输入关键词检索，支持多关键词" input-style="width:500px;height: 30px"
           maxlength="1000" @keyup.enter="fnSearch">
@@ -82,6 +79,7 @@ const fnSearch = () => {
   moreVisible.value = false;
   emit('search', 1);
 }
+$emitter.on("fnSearch", fnSearch);
 
 const fnReset = () => {
 
