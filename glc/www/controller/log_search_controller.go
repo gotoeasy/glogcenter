@@ -108,7 +108,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	// 范围内的日志仓都查一遍
 	// 注1）日志不断新增时，总件数可能会因为时间点原因不适最新，从而变现出点点小误差【完全可接受】
-	// 注2）跨仓检索时，非本次检索的目标仓的话，只查取相关件数不做真正筛选计数以提高性能，醉打匹配件数有时可能出现较大误差【折中可接受】
+	// 注2）跨仓检索时，非本次检索的目标仓的话，只查取相关件数不做真正筛选计数以提高性能，最大匹配件数有时可能出现较大误差【折中可接受】
 	result := &search.SearchResult{PageSize: cmn.IntToString(conf.GetPageSize())}
 	var total uint32
 	var count uint32
