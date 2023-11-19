@@ -146,9 +146,9 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	}
 
 	// 返回结果
-	result.Total = cmn.Uint32ToString(total)                                          // 总件数
-	result.Count = cmn.Uint32ToString(count)                                          // 最大匹配检索（笼统，在最大查取件数（5000件）内查完时，前端会改成精确的和结果一样的件数）
-	result.TimeMessage = "耗时" + cmn.GetTimeInfo(time.Since(startTime).Milliseconds()) // 查询耗时
+	result.Total = cmn.Uint32ToString(total)                                      // 总件数
+	result.Count = cmn.Uint32ToString(count)                                      // 最大匹配检索（笼统，在最大查取件数（5000件）内查完时，前端会改成精确的和结果一样的件数）
+	result.TimeMessage = "耗时" + getTimeInfo(time.Since(startTime).Milliseconds()) // 查询耗时
 	return gweb.Result(result)
 }
 
@@ -199,4 +199,11 @@ func getStoreItems(storeName string, datetimeFrom string, datetimeTo string) []*
 		items = append(items, item)
 	}
 	return items
+}
+
+func getTimeInfo(milliseconds int64) string {
+	if milliseconds >= 1000 {
+		return " " + cmn.Float64ToString(cmn.Round1(float64(milliseconds)/1000.0)) + " 秒"
+	}
+	return " " + cmn.Int64ToString(milliseconds) + " 毫秒"
 }
