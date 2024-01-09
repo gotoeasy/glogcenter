@@ -1,16 +1,72 @@
 package top.gotoeasy.framework.glc.logback.appender;
 
 import java.math.BigDecimal;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.text.CharacterIterator;
 import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
 
 public class Util {
 
     private static String serverIp = "";
     private static String serverName = "";
+
+    private static void initServerIp() {
+
+        List<InetAddress> list = new ArrayList<>();
+        try {
+            Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+            InetAddress ip;
+            while (allNetInterfaces.hasMoreElements()) {
+                NetworkInterface netInterface = allNetInterfaces.nextElement();
+
+                if (!netInterface.isLoopback() && !netInterface.isVirtual() && netInterface.isUp()) {
+                    Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+                    while (addresses.hasMoreElements()) {
+                        ip = addresses.nextElement();
+                        if (ip instanceof Inet4Address) {
+                            String addr = ip.getHostAddress();
+                            if ("eth0".equals(netInterface.getName())) {
+                                // 有eth0网卡ip时最优先，直接结束
+                                serverIp = addr;
+                                return;
+                            }
+                            list.add(ip);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+
+        // 192.* > 172.* > 10.* 
+        for (int i = 0; i < list.size(); i++) {
+            String ip = list.get(i).getHostAddress();
+            if (ip.startsWith("192.")) {
+                serverIp = ip;
+            } else if (ip.startsWith("17.")) {
+                if (!serverIp.startsWith("192.")) {
+                    serverIp = ip;
+                }
+            } else if (ip.startsWith("10.")) {
+                if (!serverIp.startsWith("192.") && !serverIp.startsWith("172.")) {
+                    serverIp = ip;
+                }
+            } else {
+                if ("".equals(serverIp)) {
+                    serverIp = ip;
+                }
+            }
+        }
+
+    }
 
     public static String getServerName() {
         if ("".equals(serverName)) {
@@ -24,6 +80,9 @@ public class Util {
     }
 
     public static String getServerIp() {
+        if ("".equals(serverIp)) {
+            initServerIp();
+        }
         if ("".equals(serverIp)) {
             try {
                 serverIp = InetAddress.getLocalHost().getHostAddress();
