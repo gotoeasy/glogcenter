@@ -58,5 +58,16 @@ func JsonLogTransferAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 // 添加日志
 func addDataModelLog(data *logdata.LogDataModel) {
 	engine := ldb.NewDefaultEngine()
+
+	// 按配置要求在IP字段上附加城市信息（当IP含空格时认为已附加过）
+	if conf.IsIpAddCity() {
+		if data.ClientIp != "" && !cmn.Contains(data.ClientIp, " ") {
+			data.ClientIp = cmn.GetCityIp(data.ClientIp)
+		}
+		if data.ServerIp != "" && !cmn.Contains(data.ServerIp, " ") {
+			data.ServerIp = cmn.GetCityIp(data.ServerIp)
+		}
+	}
+
 	engine.AddLogDataModel(data)
 }
