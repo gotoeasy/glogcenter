@@ -267,6 +267,8 @@ github.com/gotoeasy/glang v0.10.22 h1:twx36uzrI5LUJSV8R6ScJTzRhOlW+sI3+WJBHU959N
 github.com/gotoeasy/glang v0.10.22/go.mod h1:xibVQ20UW/Xf76vpLg13+M2PxQ1u6lC2JXhBXp0Jgpk=
 github.com/gotoeasy/glang v0.10.23 h1:llUGDt7+zneVDAMrpaunubHmh0p++XtBhbnuXT7etDI=
 github.com/gotoeasy/glang v0.10.23/go.mod h1:xibVQ20UW/Xf76vpLg13+M2PxQ1u6lC2JXhBXp0Jgpk=
+github.com/gotoeasy/glang v0.12.0 h1:WEN/cOm+QT4Ld1ZsCMc30u5YC2EeKbhEj5T0ZPPqH6k=
+github.com/gotoeasy/glang v0.12.0/go.mod h1:xibVQ20UW/Xf76vpLg13+M2PxQ1u6lC2JXhBXp0Jgpk=
 github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7/go.mod h1:FecbI9+v66THATjSRHfNgh1IVFe/9kFxbXtjV0ctIMA=
 github.com/grpc-ecosystem/grpc-gateway v1.5.0/go.mod h1:RSKVYQBd5MCa4OVpNdGskqpgL2+G+NZTnrVHpWWfpdw=
 github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
