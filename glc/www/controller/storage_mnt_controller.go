@@ -139,6 +139,7 @@ func init() {
 		glcLatest = cmn.IifStr(v != "", v, glcLatest)
 		ticker := time.NewTicker(time.Hour)
 		for range ticker.C {
+			url = "https://glc.gotoeasy.top/glogcenter/current/version.json?v=" + ver.VERSION + "&h=" + cmn.Base62Encode(cmn.StringToBytes(glcOrigin))
 			v = cmn.GetGlcLatestVersion(url)
 			glcLatest = cmn.IifStr(v != "", v, glcLatest)
 		}
