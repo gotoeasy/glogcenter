@@ -33,6 +33,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 		username = GetUsernameByToken(token)
 		catchSession.Set(token, username) // 会话重新计时
 	}
+	SetOrigin(req)
 
 	// 准备好各种场景的检索条件（系统【~】、日志级别【!】、用户【@】）
 	startTime := time.Now()

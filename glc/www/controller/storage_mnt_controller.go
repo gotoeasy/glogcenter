@@ -23,9 +23,15 @@ func TestModeController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 // 查询版本信息
 func VersionController(req *gweb.HttpRequest) *gweb.HttpResult {
-	glcOrigin = req.GinCtx.GetHeader("Origin")
 	rs := cmn.OfMap("version", ver.VERSION, "latest", glcLatest) // version当前版本号，latest最新版本号
 	return gweb.Result(rs)
+}
+
+func SetOrigin(req *gweb.HttpRequest) {
+	origin := req.GinCtx.GetHeader("Origin")
+	if origin != "" {
+		glcOrigin = origin
+	}
 }
 
 // 查询日志仓名称列表
