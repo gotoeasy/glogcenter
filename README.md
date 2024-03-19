@@ -91,7 +91,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_SAVE_DAYS`日志仓按日存储自动维护时的保留天数(有效范围`0~1200`)，`0`表示不自动删除，默认`180`天
 - [x] `GLC_SEARCH_MULIT_LINE`，是否对日志列的全部行进行索引检索，默认`false`仅第一行
 - [x] `GLC_ENABLE_LOGIN`是否开启用户密码登录功能，默认`false`
-- [x] `GLC_USERNAME`管理员用户名，默认`glc`，从`0.13.0`版本开始，管理员新增用户及权限管理功能
+- [x] `GLC_USERNAME`管理员用户名，默认`glc`，从`0.13.0`版本开始，管理员有新增用户及权限管理功能，并且有全部系统的查询权限
 - [x] `GLC_PASSWORD`管理员密码，默认`GLogCenter100%666`
 - [x] `GLC_TOKEN_SALT`用以生成令牌的字符串令牌盐，开启登录功能时建议设定提高安全性，默认空白
 - [x] `GLC_ENABLE_SECURITY_KEY`日志添加的接口是否开启API秘钥校验，默认`false`
