@@ -2,7 +2,6 @@ version: '3'
 services:
   glc:
     image: 'gotoeasy/glc'
-    pull: always
     container_name: glc
     ports:
       - '8080:8080'
