@@ -131,6 +131,20 @@ func (e *Engine) Search(cond *search.SearchCondition) *search.SearchResult {
 		cond.Systems = cond.OrgSystems
 	}
 
+	if cond.System != "" {
+		// 可能内部优化调整增加了系统条件，需要确保加入检索关键字
+		hasSystemCondition := false
+		for _, w := range kws {
+			if w == cond.System {
+				hasSystemCondition = true
+				break
+			}
+		}
+		if !hasSystemCondition {
+			kws = append(kws, cond.System)
+		}
+	}
+
 	cond.Kws = kws
 	var rs *search.SearchResult
 	if len(cond.Kws) == 0 {
