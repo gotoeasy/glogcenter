@@ -77,7 +77,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 			// 一般用户，按设定权限
 			user := mnt.GetSysUser(username)
 			if user == nil {
-				return gweb.Error500("") // 不应该出现，保险起见防意外
+				return gweb.Error403() // 可能出现，用户登录使用期间被管理员删除账号
 			}
 			if user.Systems == "*" {
 				cond.OrgSystems = append(cond.OrgSystems, "*") // 全部系统都有访问权限
