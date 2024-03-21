@@ -22,7 +22,7 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 		md := &logdata.LogDataModel{
 			Text:       "测试用的日志，字段名为Text，" + "字段Date的格式为YYYY-MM-DD HH:MM:SS.SSS，必须格式一致才能正常使用时间范围检索条件。" + "随机3位字符串：" + cmn.RandomString(3) + "，第" + cmn.IntToString(cnt) + "条",
 			Date:       cmn.Now(),
-			System:     "demo",
+			System:     "demo1",
 			ServerName: "default",
 			ServerIp:   "127.0.0.1",
 			ClientIp:   "127.0.0.1",
@@ -39,7 +39,7 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 		md2 := &logdata.LogDataModel{
 			Text:       "几个随机字符串供查询试验：" + cmn.RandomString(1) + "，" + cmn.Right(cmn.ULID(), 2) + "，" + cmn.RandomString(3) + "，" + cmn.Right(cmn.ULID(), 4) + "，" + cmn.Right(cmn.ULID(), 5),
 			Date:       cmn.Now(),
-			System:     "demo",
+			System:     "demo2",
 			ServerName: "default",
 			ServerIp:   "127.0.0.1",
 			ClientIp:   "127.0.0.1",
@@ -51,6 +51,23 @@ func JsonLogAddTestDataController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 		if conf.IsClusterMode() {
 			go TransferGlc(conf.LogTransferAdd, md2.ToJson()) // 转发其他GLC服务
+		}
+
+		md3 := &logdata.LogDataModel{
+			Text:       "几个随机字符串供查询试验：" + cmn.RandomString(1) + "，" + cmn.Right(cmn.ULID(), 2) + "，" + cmn.RandomString(3) + "，" + cmn.Right(cmn.ULID(), 4) + "，" + cmn.Right(cmn.ULID(), 5),
+			Date:       cmn.Now(),
+			System:     "demo3",
+			ServerName: "default",
+			ServerIp:   "127.0.0.1",
+			ClientIp:   "127.0.0.1",
+			TraceId:    traceId,
+			LogLevel:   "WARN",
+			User:       "tuser-" + cmn.RandomString(1),
+		}
+		addDataModelLog(md3)
+
+		if conf.IsClusterMode() {
+			go TransferGlc(conf.LogTransferAdd, md3.ToJson()) // 转发其他GLC服务
 		}
 
 		if cnt >= 1000 {
