@@ -63,8 +63,8 @@ func init() {
 	}
 
 	// 端口冲突时退出
-	if cmn.IsPortOpening("8080") {
-		fmt.Printf("%s\n", "port 8080 conflict, startup failed.")
+	if !(stop || restart) && cmn.IsPortOpening(conf.GetServerPort()) {
+		fmt.Printf("%s\n", "port "+conf.GetServerPort()+" conflict, startup failed.")
 		os.Exit(0)
 	}
 
