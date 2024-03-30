@@ -227,6 +227,29 @@ func main() {
 ```
 
 
+## 使用`python`语言的项目，提供工具包，开箱即用
+```shell
+# 暂时以下环境变量简化支持
+# GLC_API_URL配置时控制台不打印，否则打印
+export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add'
+export GLC_API_KEY='X-GLC-AUTH:glogcenter'
+export GLC_SYSTEM=demo
+export GLC_TRACE_ID=12345
+```
+
+```python
+# 使用
+from glogcenter import glc
+
+glc.debug("这是Debug级别日志")
+glc.info("这是Info级别日志", "多个参数", "会被拼接")
+gd = glc.GlcData()
+gd.user = 'abcd'
+glc.warn("这里的GlcData类型参数都不会打印", "gd只起传值作用", gd)
+glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了特殊的判断处理")
+```
+
+
 ## 更新履历
 
 ### 开发版`latest`

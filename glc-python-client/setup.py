@@ -18,7 +18,7 @@ URL = 'https://github.com/gotoeasy/glogcenter'
 EMAIL = 'gotoeasy@163.com'
 AUTHOR = 'gotoeasy'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.8'
+VERSION = '0.1.10'
 
 # What packages are required for this module to be executed?
 REQUIRED = [

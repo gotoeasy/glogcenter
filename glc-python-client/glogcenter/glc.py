@@ -92,8 +92,10 @@ def post_glc_data(glc_data, logLevel):
     json_data = json.dumps(data)
 
     headers = {'Content-Type': 'application/json', 'X-GLC-AUTH': 'glogcenter'}
-    if os.getenv('GLC_API_KEY') is not None:
-        headers['X-GLC-AUTH'] = os.getenv('GLC_API_KEY')
+    glc_api_key = os.getenv('GLC_API_KEY') # X-GLC-AUTH:glogcenter
+	if glc_api_key and ':' in glc_api_key:
+        key_parts = glc_api_key.split(':')
+        headers[key_parts[0]] = key_parts[1]
 
     requests.post(url, data=json_data, headers=headers)
 
@@ -145,5 +147,3 @@ def warn(*args):
 
 def error(*args):
     post_glc_data(argsToGlcData(*args), 'ERROR')
-
-
