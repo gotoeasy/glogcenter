@@ -27,3 +27,7 @@
 
 /glc/www/web/src/pkgs/*/
 /glc/www/web/src/pkgs/index-pkgs.js
+
+/glc-python-client/build/
+/glc-python-client/dist/
+/glc-python-client/glogcenter.egg-info/
