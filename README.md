@@ -238,6 +238,9 @@ export GLC_TRACE_ID=12345
 ```
 
 ```python
+# 安装
+pip install glogcenter
+
 # 使用
 from glogcenter import glc
 
