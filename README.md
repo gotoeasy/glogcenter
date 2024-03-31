@@ -199,7 +199,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 ## 使用`golang`语言的项目，提供工具包，开箱即用
 ```shell
 # 方式1）通过环境变量自动配置，程序直接使用cmn.Debug(...)写日志即可
-export GLC_ENABLE=true # 此配置默认false，要生效必须配置为true
+export GLC_ENABLE=true # 此配置默认false，要发送日志中心必须配置为true
 export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add'
 export GLC_API_KEY='X-GLC-AUTH:glogcenter'
 export GLC_SYSTEM=demo
@@ -229,12 +229,14 @@ func main() {
 
 ## 使用`python`语言的项目，提供工具包，开箱即用
 ```shell
-# 暂时以下环境变量简化支持
-# GLC_API_URL配置时控制台不打印，否则打印
-export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add'
-export GLC_API_KEY='X-GLC-AUTH:glogcenter'
-export GLC_SYSTEM=demo
-export GLC_TRACE_ID=12345
+# 支持以下环境变量配置
+export GLC_ENABLE=true # 默认false，要发送日志中心必须配置为true
+export GLC_ENABLE_CONSOLE_LOG=true # 默认true，控制台不打印时配置为false
+export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add' # 未配置时将取消发送
+export GLC_API_KEY='X-GLC-AUTH:glogcenter' # 这是默认值，按需修改
+export GLC_SYSTEM=default  # 默认default，按需修改
+export GLC_LOG_LEVEL=debug # 日志级别（debug/info/warn/error），默认debug
+export GLC_TRACE_ID=12345  # 默认空
 ```
 
 ```python

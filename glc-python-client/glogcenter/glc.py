@@ -69,13 +69,11 @@ class GlcData:
 
 
 def post_glc_data(glc_data, logLevel):
-    if not glc_data:
+    if os.getenv('GLC_ENABLE') != 'true':
         return
 
     url = os.getenv('GLC_API_URL')
-    if url is None:
-        # 不发日志中心就打印日志，否则不打印
-        print(get_current_time(), logLevel, glc_data.text)
+    if not url:
         return
 
     data = {
@@ -93,7 +91,7 @@ def post_glc_data(glc_data, logLevel):
 
     headers = {'Content-Type': 'application/json', 'X-GLC-AUTH': 'glogcenter'}
     glc_api_key = os.getenv('GLC_API_KEY') # X-GLC-AUTH:glogcenter
-	if glc_api_key and ':' in glc_api_key:
+    if glc_api_key and ':' in glc_api_key:
         key_parts = glc_api_key.split(':')
         headers[key_parts[0]] = key_parts[1]
 
@@ -135,15 +133,59 @@ def argsToGlcData(*args):
 
     return glc_data
 
+def get_log_level():
+    level = os.getenv('GLC_LOG_LEVEL')
+    if level is None:
+        return 0
+
+    level = level.lower()
+
+    if 'debug' in level:
+        return 0
+    if 'info' in level:
+        return 1
+    if 'warn' in level:
+        return 2
+    if 'error' in level:
+        return 3
+
 
 def debug(*args):
-    post_glc_data(argsToGlcData(*args), 'DEBUG')
+    if get_log_level() <= 0:
+        glc_data = argsToGlcData(*args)
+        if not glc_data:
+            return
+
+        if os.getenv('GLC_ENABLE_CONSOLE_LOG') != 'false':
+            print(get_current_time(), '[DEBUG]', glc_data.text)
+        post_glc_data(glc_data, 'DEBUG')
 
 def info(*args):
-    post_glc_data(argsToGlcData(*args), 'INFO')
+    if get_log_level() <= 1:
+        glc_data = argsToGlcData(*args)
+        if not glc_data:
+            return
+
+        if os.getenv('GLC_ENABLE_CONSOLE_LOG') != 'false':
+            print(get_current_time(), ' [INFO]', glc_data.text)
+        post_glc_data(glc_data, 'INFO')
 
 def warn(*args):
-    post_glc_data(argsToGlcData(*args), 'WARN')
+    if get_log_level() <= 2:
+        glc_data = argsToGlcData(*args)
+        if not glc_data:
+            return
+
+        if os.getenv('GLC_ENABLE_CONSOLE_LOG') != 'false':
+            print(get_current_time(), ' [WARN]', glc_data.text)
+        post_glc_data(glc_data, 'WARN')
 
 def error(*args):
-    post_glc_data(argsToGlcData(*args), 'ERROR')
+    if get_log_level() <= 3:
+        glc_data = argsToGlcData(*args)
+        if not glc_data:
+            return
+
+        if os.getenv('GLC_ENABLE_CONSOLE_LOG') != 'false':
+            print(get_current_time(), '[ERROR]', glc_data.text)
+        post_glc_data(glc_data, 'ERROR')
