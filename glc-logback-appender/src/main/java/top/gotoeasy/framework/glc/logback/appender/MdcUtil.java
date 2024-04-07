@@ -11,27 +11,75 @@ public class MdcUtil {
     public static final String USER = "user";
 
     public static void setUser(String user) {
-        MDC.put(USER, user);
+        try {
+            MDC.put(USER, user);
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    public static String getUser() {
+        try {
+            return MDC.get(USER);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public static void setClientIp(String clientip) {
-        MDC.put(CLIENT_IP, clientip);
+        try {
+            MDC.put(CLIENT_IP, clientip);
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    public static String getClientIp() {
+        try {
+            return MDC.get(CLIENT_IP);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public static void setTraceId(String traceid) {
-        MDC.put(TRACE_ID, traceid);
+        try {
+            MDC.put(TRACE_ID, traceid);
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    public static String getTraceId() {
+        try {
+            return MDC.get(TRACE_ID);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public static void removeUser() {
-        MDC.remove(USER);
+        try {
+            MDC.remove(USER);
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     public static void removeClientIp() {
-        MDC.remove(CLIENT_IP);
+        try {
+            MDC.remove(CLIENT_IP);
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     public static void removeTraceId() {
-        MDC.remove(TRACE_ID);
+        try {
+            MDC.remove(TRACE_ID);
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     public static void clear() {
