@@ -139,7 +139,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.14.1</version>
+    <version>0.14.2</version>
 </dependency>
 ```
 
@@ -263,6 +263,16 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
+### 版本`0.15.0`
+
+- [x] 新增`定位相邻检索`功能，非常适合快速定位进行上下文查询的场景
+- [x] 新增Python客户端工具包，方便Python语言的项目接入日志中心
+- [x] 修复一些已知问题
+
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
+
 ### 版本`0.14.2`
 
 - [x] 修复#32 隐蔽的权限控制错误问题
@@ -277,10 +287,6 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 - [x] 日志新增用户字段，界面新增用户的精确检索条件，当要做特定用户维度的日志审计时，这会显得非常实用
 - [x] 包`glc-logback-appender`同步升级，新增MDC存取用户的接口
 - [x] 修复已知问题
-
-
-<details>
-<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.13.0`
 
