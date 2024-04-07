@@ -28,6 +28,9 @@ type SearchCondition struct {
 	CurrentStoreName string   // 隐藏条件，当前日志文档ID所属的日志仓
 	CurrentId        uint32   // 隐藏条件，当前日志文档ID
 	Forward          bool     // 隐藏条件，是否向前检索（玩下滚动查询）
+	OldNearId        uint32   // 隐藏条件，相邻检索时的旧ID
+	NewNearId        uint32   // 隐藏条件，相邻检索时的新ID
+	NearStoreName    string   // 隐藏条件，相邻检索时新ID对应的日志仓
 	Kws              []string // 【内部用】解析条件所得的检索关键词，非直接输入的检索文本
 	SearchSize       int      // 【内部用】需要查询多少件（跨仓检索时可能多次检索，中间会内部调整）
 	Systems          []string // 【内部用】有权限的系统名（一定有值，第一个元素是“*”时表示全部）
@@ -96,6 +99,14 @@ func SearchWordIndex(storeName string, cond *SearchCondition) *SearchResult {
 		widxs = append(widxs, widxStorage)
 	}
 	return findSame(cond, minDocumentId, maxDocumentId, storeLogData, widxs...)
+}
+
+// 按ID查取日志
+func GetLogDataModelById(storeName string, id uint32) *logdata.LogDataModel {
+	storeLogData := storage.NewLogDataStorageHandle(storeName) // 数据
+	ldm := storeLogData.GetLogDataModel(id)
+	ldm.StoreName = storeName // 日志仓名称未序列化，前端要使用，这里补足赋值
+	return ldm
 }
 
 // 无关键词时走全量检索
@@ -193,6 +204,7 @@ func SearchLogData(storeName string, cond *SearchCondition) *SearchResult {
 			}
 
 			md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
+			md.StoreName = storeLogData.GetStoreName() // 日志仓名称未序列化，前端要使用，这里补足赋值
 			if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 				rs.Data = append(rs.Data, md)
 				rsCnt++
@@ -251,6 +263,7 @@ func SearchLogData(storeName string, cond *SearchCondition) *SearchResult {
 				}
 
 				md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
+				md.StoreName = storeLogData.GetStoreName() // 日志仓名称未序列化，前端要使用，这里补足赋值
 				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 					rs.Data = append(rs.Data, md)
 					rsCnt++
@@ -306,6 +319,7 @@ func SearchLogData(storeName string, cond *SearchCondition) *SearchResult {
 				}
 
 				md := storeLogData.GetLogDataDocument(i).ToLogDataModel()
+				md.StoreName = storeLogData.GetStoreName() // 日志仓名称未序列化，前端要使用，这里补足赋值
 				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 					rs.Data = append(rs.Data, md)
 					rsCnt++
@@ -355,11 +369,52 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 	}
 
 	// 找匹配位置并排除没结果的情景
-	pos := totalCount // 默认检索最新第一页
-	if cond.CurrentId > 0 {
-		pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, cond.CurrentId) // 有相对文档ID时找相对位置
-		if pos == 0 || (pos == 1 && cond.Forward) || (pos == totalCount && !cond.Forward) {
-			return rs // 找不到、或最后条还要向后、或最前条还要向前，都是找不到
+	var pos uint32
+	if cond.Forward {
+		pos = totalCount // 向后检索更加旧的日志，游标从大开始递降
+		if cond.NewNearId > 0 {
+			// 相邻检索
+			nearId := cond.NewNearId - 1                                  // 查找比定位日志小的旧日志
+			pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, nearId) // 有相对文档ID时找相对位置
+			for pos == 0 && nearId >= minDocumentId {
+				nearId--
+				pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, nearId)
+			}
+			if pos == 0 {
+				return rs // 找不到
+			}
+			pos++ // 找到，后续会减1排除本条找到的日志，但相邻检索时本条日志是需要的，所以加1处理
+		} else {
+			// 普通检索
+			if cond.CurrentId > 0 {
+				pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, cond.CurrentId) // 有相对文档ID时找相对位置
+				if pos <= 1 {
+					return rs // 找不到、或最后条还要向后
+				}
+			}
+		}
+	} else {
+		pos = 1 // 向前检索更加新的日志，游标从小开始递增
+		if cond.NewNearId > 0 {
+			// 相邻检索
+			nearId := cond.NewNearId + 1                                  // 查找比定位日志大的新日志
+			pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, nearId) // 有相对文档ID时找相对位置
+			for pos == 0 && nearId <= maxDocumentId {
+				nearId++
+				pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, nearId)
+			}
+			if pos == 0 {
+				return rs // 找不到
+			}
+			pos-- // 找到，后续会加1排除本条找到的日志，但相邻检索时本条日志是需要的，所以减1处理
+		} else {
+			// 普通检索
+			if cond.CurrentId > 0 {
+				pos = minIdx.idxdocStorage.GetWordDocSeq(minIdx.word, cond.CurrentId) // 有相对文档ID时找相对位置
+				if pos == 0 || pos == totalCount {
+					return rs //  找不到、或最前条还要向前
+				}
+			}
 		}
 	}
 
@@ -429,6 +484,7 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 				// 找到则加入结果
 				if flg {
 					md := storeLogData.GetLogDataModel(docId)
+					md.StoreName = storeLogData.GetStoreName() // 日志仓名称未序列化，前端要使用，这里补足赋值
 					if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 						rsCnt++
 						rs.Data = append(rs.Data, md)
@@ -444,10 +500,11 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 			tmpMinPos--        // 当前最短索引可能不变，得正常减1，若变化则会被覆盖没有关系
 		}
 	} else {
-		// 有相对文档ID且是前一页方向（注：暂未使用，未经测试）
+		// 有相对文档ID且是前一页方向
 		pos++
 		var ary []*logdata.LogDataModel
-		for i := pos; i <= totalCount; i++ {
+		total := storeLogData.TotalCount() // 当前日志最大件数
+		for i := pos; i <= total; i++ {
 			// 取值
 			docId := minIdx.idxwordStorage.GetDocId(minIdx.word, i)
 
@@ -500,6 +557,7 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 			// 找到则加入结果
 			if flg {
 				md := storeLogData.GetLogDataModel(docId)
+				md.StoreName = storeLogData.GetStoreName() // 日志仓名称未序列化，前端要使用，这里补足赋值
 				if noLogLevels || cmn.ContainsIngoreCase(allloglevels, md.LogLevel) {
 					rsCnt++
 					ary = append(ary, md)

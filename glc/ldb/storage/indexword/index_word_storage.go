@@ -166,7 +166,7 @@ func (s *WordIndexStorage) Add(word string, docId uint32) error {
 	}
 
 	// 保存建好的索引数
-	s.setTotalCount(word, seq)
+	err = s.setTotalCount(word, seq)
 	if err != nil {
 		cmn.Error("保存关键词反向索引件数失败", err)
 		return err // 忽略事务问题，可下回重建

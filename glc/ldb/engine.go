@@ -2,6 +2,7 @@ package ldb
 
 import (
 	"glc/com"
+	"glc/conf"
 	"glc/ldb/search"
 	"glc/ldb/storage"
 	"glc/ldb/storage/indexword"
@@ -152,7 +153,49 @@ func (e *Engine) Search(cond *search.SearchCondition) *search.SearchResult {
 		rs = search.SearchLogData(e.storeName, cond)
 	} else {
 		// 多关键词查询模式
-		rs = search.SearchWordIndex(e.storeName, cond)
+		if cond.NewNearId > 0 {
+			// 相邻检索模式的判断及条件准备
+			max := conf.GetPageSize()
+			leftSize := 20
+			cond.CurrentId = cond.NewNearId
+			isForward := cond.OldNearId < 1 || cond.NewNearId < cond.OldNearId // 是否向下检索更多的旧日志
+
+			// 搜索更多的新数据
+			// 反向检索前x条
+			cond.Forward = false
+			if isForward {
+				cond.SearchSize = leftSize
+			} else {
+				cond.SearchSize = max - leftSize
+			}
+			rs = search.SearchWordIndex(e.storeName, cond)
+			// 定位日志1条固定（不管是否满足检索条件）
+			ldm := search.GetLogDataModelById(cond.NearStoreName, cond.NewNearId)
+			// 正向检索剩余件数
+			cond.Forward = true
+			cond.SearchSize = max - len(rs.Data)
+			rsForward := search.SearchWordIndex(e.storeName, cond)
+
+			// 正向件数不够，反向重查来凑
+			if len(rsForward.Data) < cond.SearchSize && len(rs.Data) == leftSize {
+				cond.Forward = false
+				cond.SearchSize = max - len(rsForward.Data)
+				rs = search.SearchWordIndex(e.storeName, cond)
+			}
+
+			// 拼接检索结果
+			rs.Data = append(rs.Data, ldm)
+			rs.Data = append(rs.Data, rsForward.Data...)
+			// 检索结果最大匹配件数修正
+			if len(rs.Data)-1 < max {
+				rs.Count = cmn.IntToString(len(rs.Data) - 1)
+			}
+
+		} else {
+			// 普通检索
+			rs = search.SearchWordIndex(e.storeName, cond)
+		}
+
 	}
 
 	if maxMatchCount < cmn.StringToUint32(rs.Count, 0) {

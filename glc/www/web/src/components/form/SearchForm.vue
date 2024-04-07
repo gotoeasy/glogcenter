@@ -5,8 +5,8 @@
         <el-input v-model="formData.searchKeys" placeholder="请输入关键词检索，支持多关键词" input-style="width:500px;height: 30px"
           maxlength="1000" @keyup.enter="fnSearch">
           <template #append>
-            <el-button type="primary" class="c-btn-search" style="height:30px;color: white; background-color:#0081dd"
-              @click="fnSearch">
+            <el-button type="primary" class="c-btn-search" style="height:30px;color:white"
+              :style="{ backgroundColor: searchFormNormalMode ? '#0081dd' : '#e6a23c' }" @click="fnSearch">
               <el-icon>
                 <Search />
               </el-icon>
@@ -14,7 +14,10 @@
             </el-button>
           </template>
         </el-input>
-        <GxButton icon="refresh-left" style="margin-left:108px;" @click="fnReset">重 置</GxButton>
+        <GxButton icon="refresh-left" style="margin-left:108px;" @click="fnReset">
+          <span v-if="searchFormNormalMode">重 置</span>
+          <span v-else title="取消定位相邻检索">取 消</span>
+        </GxButton>
         <el-badge is-dot :hidden="noMoreSearchCondition" style="margin-left:12px;" type="primary" class="c-btn-badge">
           <el-button circle @click="() => (moreVisible = !moreVisible)">
             <el-icon>
@@ -32,7 +35,7 @@
       <el-divider style="margin: 0 0 10px" />
 
       <el-row justify="center">
-        <el-button type="primary" class="c-btn" @click="fnSearch">
+        <el-button :type="searchFormNormalMode ? 'primary' : 'warning'" class="c-btn" @click="fnSearch">
           <el-icon size="14">
             <Search />
           </el-icon>
@@ -73,6 +76,24 @@ const moreVisible = ref(false);
 
 $emitter.on("defaultStorageCondtion", v => defaultData.value.storage = v);
 
+// 检索模式(普通/相邻)
+const searchFormNormalMode = ref(true);
+const tmpFormDataNormal = {};
+const setSearchNormalMode = (normal = false) => {
+  if (searchFormNormalMode.value && !normal) {
+    // 正切换模式，保存普通检索的条件，用于取消时恢复
+    tmpFormDataNormal.storage = formData.value.storage || '';
+    tmpFormDataNormal.system = formData.value.system || '';
+    tmpFormDataNormal.loglevel = [...(formData.value.loglevel || [])];
+    tmpFormDataNormal.datetime = [...(formData.value.datetime || [])];
+    tmpFormDataNormal.user = formData.value.user || '';
+    tmpFormDataNormal.searchKeys = formData.value.searchKeys || '';
+  }
+  searchFormNormalMode.value = normal;
+  moreVisible.value = false; // 收起，避免点相邻检索时还展开着条件
+}
+$emitter.on("searchFormNormalMode", setSearchNormalMode);
+
 const emit = defineEmits(['search']);
 
 const fnSearch = () => {
@@ -83,19 +104,33 @@ $emitter.on("fnSearch", fnSearch);
 
 const fnReset = () => {
 
-  const keys = Object.keys(formData.value);
-  for (const key of keys) {
-    if (!formData.value[key] && !defaultData.value[key]) {
-      continue;
-    } else if (!formData.value[key] && defaultData.value[key]) {
-      formData.value[key] = defaultData.value[key];
-    } else if (formData.value[key] && !defaultData.value[key]) {
-      formData.value[key] = null;
-    } else if (Array.isArray(defaultData.value[key])) {
-      formData.value[key] = defaultData.value[key].slice(0);
-    } else {
-      formData.value[key] = defaultData.value[key];
-    }
+  if (!searchFormNormalMode.value) {
+    // 【取消】相邻检索模式 --> 默认检索模式，恢复正常检索的条件
+    searchFormNormalMode.value = true;
+    $emitter.emit("searchNearMode", false);
+
+    formData.value.storage = tmpFormDataNormal.storage;
+    formData.value.system = tmpFormDataNormal.system;
+    !formData.value.loglevel && (formData.value.loglevel = []);
+    formData.value.loglevel.splice(0, formData.value.loglevel.length);
+    formData.value.loglevel.push(...(tmpFormDataNormal.loglevel || []));
+    !formData.value.datetime && (formData.value.datetime = []);
+    formData.value.datetime.splice(0, formData.value.datetime.length);
+    formData.value.datetime.push(...(tmpFormDataNormal.datetime || []));
+    formData.value.user = tmpFormDataNormal.user;
+    formData.value.searchKeys = tmpFormDataNormal.searchKeys;
+  } else {
+    // 【重置】正常检索时的重置
+    formData.value.storage = defaultData.value.storage;
+    formData.value.system = defaultData.value.system;
+    !formData.value.loglevel && (formData.value.loglevel = []);
+    formData.value.loglevel.splice(0, formData.value.loglevel.length);
+    formData.value.loglevel.push(...(defaultData.value.loglevel || []));
+    !formData.value.datetime && (formData.value.datetime = []);
+    formData.value.datetime.splice(0, formData.value.datetime.length);
+    formData.value.datetime.push(...(defaultData.value.datetime || []));
+    formData.value.user = defaultData.value.user;
+    formData.value.searchKeys = '';
   }
 
   moreVisible.value = false;
@@ -103,47 +138,50 @@ const fnReset = () => {
 }
 
 const noMoreSearchCondition = computed(() => {
-  for (const [key, value] of Object.entries(formData.value)) {
-    if (key == 'searchKeys') {
-      continue; // 忽略不提示小蓝点
-    }
-    if (key == 'storage') {
-      if (!defaultData.value.storage) {
-        continue; // 初始化时日志仓还没拿到，忽略不提示小蓝点
-      } else if (defaultData.value.storage == value) {
-        continue; // 和默认的日志仓条件一样，忽略不提示小蓝点
-      }
-      if (!value) return false; // 日志仓条件清空时，显示小蓝点
-    }
-    if (value) {
-      if (Array.isArray(value)) {
-        if (!defaultData.value[key]) {
-          if (!value.length) {
-            continue;
-          } else {
-            return false;
-          }
-        } else {
 
-          if (value.length != defaultData.value[key].length) {
-            return false;
-          }
-          for (let i = 0; i < value.length; i++) {
-            if (value[i] != defaultData.value[key][i]) {
-              return false;
-            }
-          }
-        }
+  // 相邻检索模式下，级别时间用户任一有填写即有修改
+  if (!searchFormNormalMode.value) {
+    if ((formData.value.loglevel || []).length) return false;
+    const ary = formData.value.datetime || ['', ''];
+    !ary.length && ary.push(...['', '']);
+    if (ary.length != 2 || ary[0] || ary[1]) return false;
+    if (formData.value.user) return false;
+    return true;
+  }
 
-      } else if (value != defaultData.value[key]) {
-        return false;
-      }
-    } else if (defaultData.value[key]) {
+  // 普通检索模式下，逐个比较展开的条件字段
+  if ((formData.value.storage || '') != (defaultData.value.storage || '')) {
+    return false;
+  }
+  if ((formData.value.system || '') != (defaultData.value.system || '')) {
+    return false;
+  }
+  if ((formData.value.user || '') != (defaultData.value.user || '')) {
+    return false;
+  }
+
+  // 日志
+  const formDataLoglevel = formData.value.loglevel || [];
+  const defaultDataLoglevel = defaultData.value.loglevel || [];
+  if (formDataLoglevel.length != defaultDataLoglevel.length) {
+    return false;
+  }
+  for (let i = 0; i < formDataLoglevel.length; i++) {
+    if (!defaultDataLoglevel.includes(formDataLoglevel[i])) {
       return false;
     }
   }
+
+  // 时间范围
+  const formDataDatetime = formData.value.datetime || [];
+  !formDataDatetime.length && formDataDatetime.push(...['', '']);
+  const defaultDataDatetime = defaultData.value.datetime || [];
+  !defaultDataDatetime.length && defaultDataDatetime.push(...['', '']);
+  if (formDataDatetime.length != defaultDataDatetime.length || formDataDatetime[0] != defaultDataDatetime[0] || formDataDatetime[1] != defaultDataDatetime[1]) {
+    return false;
+  }
+
   return true;
 })
 
 </script>
-

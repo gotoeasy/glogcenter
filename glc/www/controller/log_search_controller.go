@@ -44,6 +44,9 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	cond.CurrentStoreName = req.GetFormParameter("currentStoreName")          // 滚动查询时定位用日志仓
 	cond.CurrentId = cmn.StringToUint32(req.GetFormParameter("currentId"), 0) // 滚动查询时定位用ID
 	cond.Forward = cmn.StringToBool(req.GetFormParameter("forward"), true)    // 是否向下滚动查询
+	cond.OldNearId = cmn.StringToUint32(req.GetFormParameter("oldNearId"), 0) // 相邻检索旧ID
+	cond.NewNearId = cmn.StringToUint32(req.GetFormParameter("newNearId"), 0) // 相邻检索新ID
+	cond.NearStoreName = req.GetFormParameter("nearStoreName")                // 相邻检索时新ID对应的日志仓
 	cond.DatetimeFrom = req.GetFormParameter("datetimeFrom")                  // 日期范围（From）
 	cond.DatetimeTo = req.GetFormParameter("datetimeTo")                      // 日期范围（To）
 	cond.OrgSystem = cmn.Trim(req.GetFormParameter("system"))                 // 系统

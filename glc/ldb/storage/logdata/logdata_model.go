@@ -25,6 +25,7 @@ type LogDataModel struct {
 	LogLevel   string `json:"loglevel,omitempty"`   // 日志级别（debug、info、warn、error）
 	User       string `json:"user,omitempty"`       // 用户
 	Detail     string `json:"detail,omitempty"`     // 【内部字段】多行时的详细日志信息，通常是包含错误堆栈等的日志内容
+	StoreName  string `json:"storename,omitempty"`  // 日志仓名称（未存储，仅赋值给前端使用）
 }
 
 func (d *LogDataModel) ToJson() string {
