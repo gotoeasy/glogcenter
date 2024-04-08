@@ -364,7 +364,7 @@ func findSame(cond *SearchCondition, minDocumentId uint32, maxDocumentId uint32,
 
 	// 简单检查排除没结果的情景
 	totalCount := minIdx.idxwordStorage.GetTotalCount(minIdx.word)
-	if totalCount == 0 || (totalCount == 1 && cond.CurrentId > 0) {
+	if totalCount == 0 || (cond.NewNearId == 0 && totalCount == 1 && cond.CurrentId > 0) {
 		return rs // 索引件数0、或只有1条又还要跳过，都是找不到
 	}
 

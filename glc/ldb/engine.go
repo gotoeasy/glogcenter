@@ -155,19 +155,18 @@ func (e *Engine) Search(cond *search.SearchCondition) *search.SearchResult {
 		// 多关键词查询模式
 		if cond.NewNearId > 0 {
 			// 相邻检索模式的判断及条件准备
-			max := conf.GetPageSize()
-			leftSize := 20
+			max := conf.GetNearSearchSize()
 			cond.CurrentId = cond.NewNearId
 			isForward := cond.OldNearId < 1 || cond.NewNearId < cond.OldNearId // 是否向下检索更多的旧日志
 
 			// 搜索更多的新数据
 			// 反向检索前x条
-			cond.Forward = false
-			if isForward {
-				cond.SearchSize = leftSize
-			} else {
-				cond.SearchSize = max - leftSize
+			leftSize := 20
+			if !isForward {
+				leftSize = max - leftSize
 			}
+			cond.Forward = false
+			cond.SearchSize = leftSize
 			rs = search.SearchWordIndex(e.storeName, cond)
 			// 定位日志1条固定（不管是否满足检索条件）
 			ldm := search.GetLogDataModelById(cond.NearStoreName, cond.NewNearId)
