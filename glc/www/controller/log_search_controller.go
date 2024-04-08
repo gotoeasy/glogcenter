@@ -153,6 +153,10 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	result.Total = cmn.Uint32ToString(total)                                      // 总件数
 	result.Count = cmn.Uint32ToString(count)                                      // 最大匹配检索（笼统，在最大查取件数（5000件）内查完时，前端会改成精确的和结果一样的件数）
 	result.TimeMessage = "耗时" + getTimeInfo(time.Since(startTime).Milliseconds()) // 查询耗时
+	if cond.NewNearId > 0 && len(result.Data) == 0 {
+		// 相邻检索时确保能返回定位日志
+		result.Data = append(result.Data, search.GetLogDataModelById(cond.NearStoreName, cond.NewNearId))
+	}
 	return gweb.Result(result)
 }
 

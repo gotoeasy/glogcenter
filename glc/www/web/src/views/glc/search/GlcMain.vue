@@ -221,8 +221,10 @@ const fnSearchNear = (row) => {
 
   if (searchNearMode.value) {
     // 相邻检索模式下，继续进行相邻检索，需使用输入的条件进一步筛选
-    oldNearId.value = newNearId.value;
-    newNearId.value = row.id;
+    if (newNearId.value != row.id) {
+      oldNearId.value = newNearId.value;
+      newNearId.value = row.id;
+    }
   } else {
     // 普通检索模式下，进行相邻检索
     oldNearId.value = 0;
@@ -352,10 +354,10 @@ function search() {
   data.datetimeFrom = (formData.value.datetime || ['', ''])[0];
   data.datetimeTo = (formData.value.datetime || ['', ''])[1];
   data.user = formData.value.user;
-  if (searchNearMode.value && newNearId.value) {
+  if (searchNearMode.value) {
     data.oldNearId = oldNearId.value;
     data.newNearId = newNearId.value;
-    data.nearStoreName = newNearId.value ? nearStoreName.value : '';
+    data.nearStoreName = nearStoreName.value;
   }
 
   // 保存好滚动检索的输入条件，保持和检索时一致，避免修改输入再滚动查询而出现矛盾结果
