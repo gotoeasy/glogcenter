@@ -36,8 +36,8 @@
 - [x] 日志吞食量每秒近万条，闲时建索引每秒数千条，满足大多项目场景 `【广泛适用】`
 - [x] 支持多关键词全文检索，支持多维度线索查询，支持定位相邻查询 `【功能丰富】`
 - [x] 内置提供VUE实现的查询管理界面，页面简洁大方，操作习惯自然 `【体验优秀】`
-- [x] 提供docker镜像，支持容器化部署，支持个性化环境变量配置 `【部署简便】`
-- [x] 提供java/go/python等客户端工具包，日志收集信手拈来 `【集成方便】`
+- [x] 提供docker镜像，支持容器化部署，支持个性化环境变量配置 `【部署方便】`
+- [x] 提供java/go/python等客户端工具包，日志收集信手拈来 `【集成简单】`
 - [x] 支持登录验证，秘钥校验，权限控制，黑白名单等安全设定 `【安全可靠】`
 - [x] 支持多服务集群模式部署，提供服务稳定性保障、数据冗余性保障 `【高可用保障】`
 - [x] 上至央企大项目下至本地调试，已历经众多案例磨炼，表现出色 `【生产级别品质】`
@@ -198,10 +198,13 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 ```shell
 # 方式1）通过环境变量自动配置，程序直接使用cmn.Debug(...)写日志即可
 export GLC_ENABLE=true # 此配置默认false，要发送日志中心必须配置为true
-export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add'
-export GLC_API_KEY='X-GLC-AUTH:glogcenter'
-export GLC_SYSTEM=demo
+export GLC_ENABLE_CONSOLE_LOG=true # 默认true，控制台不打印时配置为false
+export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add' # 未配置时将取消发送
+export GLC_API_KEY='X-GLC-AUTH:glogcenter' # 这是默认值，按需修改
+export GLC_SYSTEM=default  # 默认default，按需修改
 export GLC_LOG_LEVEL=debug # 日志级别（debug/info/warn/error）
+export GLC_TRACE_ID=12345  # 默认空，跨进程调用等一些特殊场景使用
+export GLC_PRINT_SRC_LINE=true # 是否打印源码行号，go语言专用，默认false
 ```
 
 ```golang
@@ -234,7 +237,7 @@ export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add' # 未配置时将取�
 export GLC_API_KEY='X-GLC-AUTH:glogcenter' # 这是默认值，按需修改
 export GLC_SYSTEM=default  # 默认default，按需修改
 export GLC_LOG_LEVEL=debug # 日志级别（debug/info/warn/error），默认debug
-export GLC_TRACE_ID=12345  # 默认空
+export GLC_TRACE_ID=12345  # 默认空，跨进程调用等一些特殊场景使用
 ```
 
 ```python
