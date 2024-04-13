@@ -28,6 +28,8 @@
 <br>
 演示地址(网络可能不稳定)： https://glc.gotoeasy.top
 <br>
+GLC智能助手(懒得看可以直接问)： https://ai.youdao.com/saas/qanything/#/bots/C9BA280AA796491F/share
+<br>
 <br>
 
 ## 特点
