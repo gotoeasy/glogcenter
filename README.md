@@ -28,8 +28,6 @@
 <br>
 演示地址(网络可能不稳定)： https://glc.gotoeasy.top
 <br>
-GLC智能助手(懒得看可以直接问)： https://ai.youdao.com/saas/qanything/#/bots/C9BA280AA796491F/share
-<br>
 <br>
 
 ## 特点
@@ -268,6 +266,7 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 
 ### 版本`0.15.1`
 
+- [x] 新增`GLC智能助手`，可以随时解答日志中心的相关问题
 - [x] 修复#38：系统名大小写可能引起筛选不起作用
 
 
