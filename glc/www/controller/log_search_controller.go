@@ -49,7 +49,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 	cond.NearStoreName = req.GetFormParameter("nearStoreName")                // 相邻检索时新ID对应的日志仓
 	cond.DatetimeFrom = req.GetFormParameter("datetimeFrom")                  // 日期范围（From）
 	cond.DatetimeTo = req.GetFormParameter("datetimeTo")                      // 日期范围（To）
-	cond.OrgSystem = cmn.Trim(req.GetFormParameter("system"))                 // 系统
+	cond.OrgSystem = cmn.ToLower(cmn.Trim(req.GetFormParameter("system")))    // 系统
 	cond.User = cmn.ToLower(cmn.Trim(req.GetFormParameter("user")))           // 用户
 	cond.Loglevel = cmn.ToLower(req.GetFormParameter("loglevel"))             // 单选条件
 	cond.Loglevels = cmn.Split(cond.Loglevel, ",")                            // 多选条件
