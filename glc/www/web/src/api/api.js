@@ -59,16 +59,20 @@ export const getUserMenu = async () => {
     component: '/glc/storages/StoragesMain',
     openInner: true,
   });
-  menus.push({
-    path: '/glc/sysuser',
-    title: '用户管理',
-    icon: 'users',
-    component: '/glc/sysuser/SysuserMain',
-    openInner: true,
-    role: 'admin',
-  });
 
-  const rs = await $post('/v1/sys/chatai', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' });
+  let rs = await $post('/v1/user/enableLogin', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' });
+  if (rs.success && rs.result) {
+    menus.push({
+      path: '/glc/sysuser',
+      title: '用户管理',
+      icon: 'users',
+      component: '/glc/sysuser/SysuserMain',
+      openInner: true,
+      role: 'admin',
+    });
+  }
+
+  rs = await $post('/v1/sys/chatai', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' });
   if (rs.success && rs.result) {
     menus.push({
       path: '/glc/chatai',
