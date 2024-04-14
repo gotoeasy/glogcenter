@@ -16,6 +16,11 @@ import (
 var glcLatest string = ""
 var glcOrigin string = ""
 
+// 查询是否开启智能助手
+func ChatAiController(req *gweb.HttpRequest) *gweb.HttpResult {
+	return gweb.Result(conf.IsEnableChatAi())
+}
+
 // 查询是否测试模式
 func TestModeController(req *gweb.HttpRequest) *gweb.HttpResult {
 	return gweb.Result(conf.IsTestMode())

@@ -67,5 +67,17 @@ export const getUserMenu = async () => {
     openInner: true,
     role: 'admin',
   });
+
+  const rs = await $post('/v1/sys/chatai', {}, null, { 'Content-Type': 'application/x-www-form-urlencoded' });
+  if (rs.success && rs.result) {
+    menus.push({
+      path: '/glc/chatai',
+      title: 'GLC智能助手',
+      icon: 'ai',
+      component: 'https://ai.youdao.com/saas/qanything/#/bots/C9BA280AA796491F/share',
+      openInner: true,
+    });
+  }
+
   return (menuState.aryMenu = menus);
 };
