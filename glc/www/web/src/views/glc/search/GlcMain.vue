@@ -72,7 +72,7 @@
     </GxToolbar>
 
     <GxTable ref="table" v-loading="showTableLoadding" :row-class-name="tableRowClassName" scrollbar-always-on
-      :enable-header-contextmenu="true" :enable-first-expand="true" stripe :tid="tid" :data="tableData"
+      :enable-header-contextmenu="false" :enable-first-expand="true" stripe :tid="tid" :data="tableData"
       :height="tableHeight" class="c-gx-table c-glc-table" row-key="id">
       <template #$operation="{ row }">
         <div title="定位相邻检索">
