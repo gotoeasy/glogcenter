@@ -16,7 +16,7 @@ export const staticRouters = [
     redirect: '/glc/search',
   },
   {
-    path: '/login',
+    path: '/glc/login',
     component: () => import('~/views/login/Login.vue'), // 登录路由，必有
   },
   {

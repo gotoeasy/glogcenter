@@ -163,7 +163,7 @@ const fnOpenChangePswDialog = () => {
 async function logout() {
   if (await $msg.confirm('确定要退出系统吗？')) {
     userLogout();
-    router.push('/login');
+    router.push('/glc/login');
   }
 }
 
@@ -194,7 +194,7 @@ function normalizeVer(ver) {
 
 </script>
 
-<style  lang="scss">
+<style lang="scss">
 div.el-popper.el-dropdown__popper.el-popper {
   margin-top: -8px;
   margin-left: 8px;
@@ -227,4 +227,3 @@ div.el-popper.el-dropdown__popper.el-popper {
   }
 }
 </style>
-

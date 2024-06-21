@@ -79,7 +79,7 @@ function search() {
       document.querySelector('.c-glc-table .el-scrollbar__wrap').scrollTop = 0; // 滚动到顶部
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
-      router.push('/login');
+      router.push('/glc/login');
     }
   }).finally(() => {
     showTableLoadding.value = false;
@@ -97,7 +97,7 @@ async function remove(row) {
         search();
       } else if (rs.code == 403) {
         userLogout(); // 403 时登出
-        router.push('/login');
+        router.push('/glc/login');
       } else {
         $msg.error(rs.message);
       }

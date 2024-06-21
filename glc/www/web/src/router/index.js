@@ -6,7 +6,7 @@ import { enableLogin } from '~/api';
 import { staticRouters } from './static.routers';
 
 // 白名单
-const WHITE_LIST = ['/login'];
+const WHITE_LIST = ['/glc/login'];
 
 // 此处不能初始化，否则无法持久化
 let tabsState = null;
@@ -43,7 +43,7 @@ router.beforeEach(async (to, from, next) => {
   if (tokenStore.needLogin == 'true') {
     if (!tokenStore.token) {
       const redirect = encodeURIComponent(to.fullPath);
-      return next({ path: '/login', query: { redirect } }); // 跳转登录页，并附带目标页参数
+      return next({ path: '/glc/login', query: { redirect } }); // 跳转登录页，并附带目标页参数
     }
   }
 
@@ -53,7 +53,7 @@ router.beforeEach(async (to, from, next) => {
       await initRouters();
     } catch (e) {
       tokenStore.$reset();
-      return next({ path: '/login' }); // 系统打开连菜单数据都取不到，多数是服务器停止之类，无法继续，清空登录令牌后跳转停留到登录页面
+      return next({ path: '/glc/login' }); // 系统打开连菜单数据都取不到，多数是服务器停止之类，无法继续，清空登录令牌后跳转停留到登录页面
     }
     return next({ ...to, replace: true });
   }

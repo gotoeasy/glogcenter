@@ -268,7 +268,7 @@ onMounted(async () => {
 
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
-      router.push('/login');
+      router.push('/glc/login');
     }
   });
 
@@ -411,7 +411,7 @@ function search() {
 
     } else if (rs.code == 403) {
       userLogout(); // 403 时登出
-      router.push('/login');
+      router.push('/glc/login');
     }
   }).finally(() => {
     showTableLoadding.value = false;

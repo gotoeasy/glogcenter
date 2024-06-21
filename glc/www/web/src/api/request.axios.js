@@ -4,13 +4,13 @@ import { $msg, $emitter, useTokenStore } from '~/pkgs';
 import { mockUrls } from '~/config/mock-urls.config';
 
 let tokenStore = null;
-const { VITE_AXIOS_BASE_URL, VITE_DEV_DOMAIN_URL, VITE_API_DOMAIN_PATH, VITE_DEV_MOCK } = import.meta.env;
+const { VITE_DEV_DOMAIN_URL, VITE_API_DOMAIN_PATH, VITE_DEV_MOCK } = import.meta.env;
 
 const msgSet = new Set();
 
 // 创建请求实例
 const axiosInstance = axios.create({
-  baseURL: VITE_AXIOS_BASE_URL,
+  baseURL: VITE_API_DOMAIN_PATH,
   timeout: config.TIMEOUT, // 指定请求超时的毫秒数
 });
 
