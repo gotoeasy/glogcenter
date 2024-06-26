@@ -52,9 +52,10 @@
 
 <br>
 
-## `docker`单机部署模式简易示例(镜像拉取有困难？呃...问下智能助手)
+## `docker`单机部署模式简易示例
 ```shell
 # 快速体验（其中通过GLC_TEST_MODE=true开启测试模式，页面上会显示生成测试数据的按钮，方便测试或快速体验）
+# 镜像拉取有困难？呃...问下智能助手
 docker run -d -p 8080:8080 -e GLC_TEST_MODE=true gotoeasy/glc
 
 # 外挂数据目录
