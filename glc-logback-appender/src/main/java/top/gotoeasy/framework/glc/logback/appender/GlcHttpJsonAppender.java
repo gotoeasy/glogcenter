@@ -55,7 +55,8 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
      * 为不依赖第三方包，仅作java原生包简单实现，性能较差<br>
      * 实际使用时若有性能问题可继承重写实现
      * 
-     * @param text 日志
+     * @param text  日志
+     * @param event ILoggingEvent
      */
     protected void submitToGlogCenter(String text, ILoggingEvent event) {
         if (text == null) {

@@ -83,7 +83,8 @@ public class GlcAmqpAppender extends AppenderBase<ILoggingEvent> {
     /**
      * 发送日志到RabbitMQ<br>
      * 
-     * @param text 日志
+     * @param text  日志
+     * @param event ILoggingEvent
      */
     protected void sendToRabbitMQ(String text, ILoggingEvent event) {
         if (text == null) {
