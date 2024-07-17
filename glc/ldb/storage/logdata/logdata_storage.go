@@ -325,7 +325,7 @@ func (s *LogDataStorage) loadMetaData() {
 	if sysmntStore.GetStorageDataCount(s.storeName) != s.currentCount {
 		sysmntStore.SetStorageDataCount(s.storeName, s.currentCount)
 	}
-	if sysmntStore.GetStorageIndexCount(s.storeName) != s.currentCount {
+	if sysmntStore.GetStorageIndexCount(s.storeName) != s.indexedCount {
 		sysmntStore.SetStorageIndexCount(s.storeName, s.indexedCount)
 	}
 }
@@ -345,7 +345,7 @@ func (s *LogDataStorage) saveMetaData() {
 		idxw := indexword.NewWordIndexStorage(s.StoreName())
 		idxw.SaveIndexedCount(s.savedIndexedCount)                         // 保存索引总件数
 		sysmntStore := sysmnt.NewSysmntStorage()                           // 系统管理存储器
-		sysmntStore.SetStorageIndexCount(s.storeName, s.savedCurrentCount) // 保存索引总件数
+		sysmntStore.SetStorageIndexCount(s.storeName, s.savedIndexedCount) // 保存索引总件数
 		cmn.Info("保存LogDataStorage已建索引件数:", s.savedIndexedCount)
 	}
 }
