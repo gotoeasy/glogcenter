@@ -133,6 +133,10 @@ func (s *LogDataStorage) readyGo() {
 				break
 			}
 			s.saveLogData(data) // 保存日志数据
+
+			if conf.IsCreateIndexSync() {
+				s.createInvertedIndex() // 按配置要求同步生成反向索引
+			}
 		default:
 			// 空时再生成索引，一次一条日志，有空则生成直到全部完成
 			n := s.createInvertedIndex() // 生成反向索引
