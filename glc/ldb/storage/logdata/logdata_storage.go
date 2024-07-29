@@ -34,6 +34,8 @@ type LogDataStorage struct {
 	closing           bool               // 是否关闭中状态
 	mu                sync.Mutex         // 锁
 	wg                sync.WaitGroup     // 计数
+	muIdx             sync.Mutex         // 建索引锁
+
 }
 
 var zeroUint32Bytes []byte = cmn.Uint32ToBytes(0)
@@ -133,12 +135,11 @@ func (s *LogDataStorage) readyGo() {
 				break
 			}
 			s.saveLogData(data) // 保存日志数据
-
-			if conf.IsCreateIndexSync() {
-				s.createInvertedIndex() // 按配置要求同步生成反向索引
-			}
 		default:
-			// 空时再生成索引，一次一条日志，有空则生成直到全部完成
+			// 空时再生成索引，多协程跑起来加快速度，再来一次单条同步用于判断，有空则生成直到全部完成
+			for i := 0; i < conf.GetGoMaxProcessIdx()-1; i++ {
+				go s.createInvertedIndex() // 多协程跑起来加快速度
+			}
 			n := s.createInvertedIndex() // 生成反向索引
 
 			// 索引生成完成后，等待接收保存日志
@@ -178,17 +179,21 @@ func (s *LogDataStorage) saveLogData(model *LogDataModel) {
 // 创建日志索引（一次建一条日志的索引）,没有可建索引时返回0
 func (s *LogDataStorage) createInvertedIndex() int {
 
+	s.muIdx.Lock() // 索引锁，建索引略需时间，手动控制不做全称锁
 	// 索引信息和日志数量相互比较，判断是否继续创建索引
 	if s.TotalCount() == 0 || s.indexedCount >= s.TotalCount() {
+		s.muIdx.Unlock()
 		return 0 // 没有新的日志需要建索引
 	}
 
-	s.indexedCount++                               // 下一条要建索引的日志id
-	docm, err := s.GetLogDataModel(s.indexedCount) // 取出日志模型数据
+	docm, err := s.GetLogDataModel(s.indexedCount + 1) // 取出日志模型数据
 	if err != nil {
+		s.muIdx.Unlock()
 		cmn.Error("取日志模型数据失败：", s.indexedCount, err)
 		return 2
 	}
+	s.indexedCount++ // 下一条要建索引的日志id
+	s.muIdx.Unlock()
 
 	// 整理生成关键词
 	var adds []string

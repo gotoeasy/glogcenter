@@ -51,6 +51,7 @@ var minioPassword string
 var minioBucket string
 var enableUploadMinio bool
 var goMaxProcess int
+var goMaxProcessIdx int
 var enableCors bool
 var pageSize int
 var nearSearchSize int
@@ -61,7 +62,6 @@ var aryWhite []string
 var aryBlack []string
 var ipAddCity bool
 var enableChatAi bool
-var createIndexSync bool
 
 func init() {
 	UpdateConfigByEnv()
@@ -101,18 +101,13 @@ func UpdateConfigByEnv() {
 	minioBucket = cmn.GetEnvStr("GLC_MINIO_BUCKET", "")                                // 【X】MINIO桶名，默认“”
 	enableUploadMinio = cmn.GetEnvBool("GLC_ENABLE_UPLOAD_MINIO", false)               // 【X】是否开启上传备份至MINIO服务器，默认false
 	goMaxProcess = getGoMaxProcessConf(cmn.GetEnvInt("GLC_GOMAXPROCS", -1))            // 使用的最大CPU数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
+	goMaxProcessIdx = getGoMaxProcessConf(cmn.GetEnvInt("GLC_GOMAXPROCS_IDX", -1))     // 创建索引使用的最大协程数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
 	enableCors = cmn.GetEnvBool("GLC_ENABLE_CORS", false)                              // 是否允许跨域，默认false
 	pageSize = getPageSizeConf(cmn.GetEnvInt("GLC_PAGE_SIZE", 100))                    // 每次检索件数，默认100（有效范围1~1000）
 	nearSearchSize = getNearSearchSizeConf(cmn.GetEnvInt("GLC_NEAR_SEARCH_SIZE", 200)) // 定位相邻检索的查询件数，默认200（有效范围50~1000）
 	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)                   // 是否检索日志的全部行（日志可能有换行），默认false仅第一行
 	testMode = cmn.GetEnvBool("GLC_TEST_MODE", false)                                  // 是否测试模式，默认false
 	enableChatAi = cmn.GetEnvBool("GLC_ENABLE_CHATAI", true)                           // 是否开启GLC智能助手，默认true
-	createIndexSync = cmn.GetEnvBool("GLC_CREATE_INDEX_SYNC", false)                   // 是否同步创建索引，默认false
-}
-
-// 取配置： 是否同步创建索引
-func IsCreateIndexSync() bool {
-	return createIndexSync
 }
 
 // 取配置： 是否开启GLC智能助手
@@ -186,6 +181,11 @@ func getPageSizeConf(n int) int {
 // 取配置： 是否允许跨域，可通过环境变量“GLC_ENABLE_CROSS”设定，默认false
 func IsEnableCors() bool {
 	return enableCors
+}
+
+// 取配置： 创建索引使用的最大协程数量，默认是最大CPU数量（设定值不在实际数量范围是按最大看待）
+func GetGoMaxProcessIdx() int {
+	return goMaxProcessIdx
 }
 
 // 取配置： 使用的最大CPU数量，可通过环境变量“GLC_GOMAXPROCS”设定，默认最大CPU数量
