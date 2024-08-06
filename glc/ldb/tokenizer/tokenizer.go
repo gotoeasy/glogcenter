@@ -15,7 +15,7 @@ var sego *cmn.TokenizerSego
 // 初始化装载字典
 func init() {
 	_, filename, _, _ := runtime.Caller(0) // 当前go文件所在路径
-	dictfile := filepath.Join(filepath.Dir(filename), "dict.txtc")
+	dictfile := filepath.Join(filepath.Dir(filename), "dict.txt")
 	sego = cmn.NewTokenizerSego(dictfile)
 }
 
