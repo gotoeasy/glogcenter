@@ -269,6 +269,15 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
+### 版本`0.16.0`
+
+- [x] 分词优化
+- [x] 大幅提升建索引速度（强烈推荐使用固态硬盘）
+
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
+
 ### 版本`0.15.2`
 
 - [x] 支持#44： 方便ngnix目录方式代理
@@ -286,9 +295,6 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 - [x] 新增Python客户端工具包，方便Python语言的项目接入日志中心
 - [x] 修复一些已知问题
 
-
-<details>
-<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.14.2`
 
