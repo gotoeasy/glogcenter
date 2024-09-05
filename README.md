@@ -261,7 +261,7 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 ```
 
 
-## 支持零侵入收集docker容器日志，仅`0.17.0`及以上版本适用
+## 支持零侵入收集docker容器日志 (仅`0.17.0`及以上版本适用)
 ```shell
 # 1) 使用 fluentd 收集日志（为啥？因为较高版本docker已默认支持）
 # 本仓库中 fluent.conf 是简单配置示意，其中包含转发日志到GLC
@@ -290,7 +290,7 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 ### 版本`0.17.0`
 
 - [x] 零侵入支持docker容器日志、文件等各种日志的收集
-- [x] 增加接口 `/glc/v1/log/add`，用以支持一次接收多条日志
+- [x] 增加接口 `/glc/v1/log/addBatch`，用以支持一次接收多条日志
 
 ### 版本`0.16.0`
 
