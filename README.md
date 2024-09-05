@@ -74,16 +74,16 @@ docker run -d -p 8080:8080 -v /glc:/glogcenter gotoeasy/glc
 
 # 服务1
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.51:8080 \
-       -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
-       gotoeasy/glc
+  -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+  gotoeasy/glc
 # 服务2
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.52:8080 \
-       -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
-       gotoeasy/glc
+  -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+  gotoeasy/glc
 # 服务3
 docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172.27.59.53:8080 \
-       -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
-       gotoeasy/glc
+  -e GLC_CLUSTER_URLS=http://172.27.59.51:8080;http://172.27.59.52:8080;http://172.27.59.53:8080 \
+  gotoeasy/glc
 ```
 
 
@@ -149,9 +149,9 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 ```xml
 <!-- logback配置例子1，发送至 glogcenter -->
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
-    <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!-- 可通过环境变量 GLC_API_URL 设定 -->
-    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!-- 可通过环境变量 GLC_API_KEY 设定 -->
-    <system>demo</system>                                       <!-- 可通过环境变量 GLC_SYSTEM 设定 -->
+    <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!--可通过环境变量GLC_API_URL设定-->
+    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!--可通过环境变量GLC_API_KEY设定-->
+    <system>demo</system>                                       <!--可通过环境变量GLC_SYSTEM设定 -->
     <layout>
         <pattern><![CDATA[%m %n]]></pattern>
     </layout>
@@ -261,12 +261,13 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 ```
 
 
-## 支持零侵入收集docker容器日志 (仅`0.17.0`及以上版本适用)
+## 支持零侵入收集docker容器日志 (适用`0.17.0`及以上版本)
 ```shell
 # 1) 使用 fluentd 收集日志（为啥？因为较高版本docker已默认支持）
 # 本仓库中 fluent.conf 是简单配置示意，其中包含转发日志到GLC
-# 官方镜像的时区不合适，懒得改可用 gotoeasy/fluentd:v1.17-1-zh 替代
-docker run -d -p 24224:24224 -p 24224:24224/udp -v ./fluent.conf:/fluentd/etc/fluent.conf fluentd:v1.17-1
+# 官方镜像的时区不合适，懒得改可直接用 gotoeasy/fluentd:v1.17-1-zh 替代
+docker run -d -p 24224:24224 -p 24224:24224/udp \
+       -v ./fluent.conf:/fluentd/etc/fluent.conf fluentd:v1.17-1
 
 # 2) 运行容器时指定日志驱动，指向 fluentd 服务端口
 docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:24224 <你的镜像>
@@ -289,8 +290,8 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 
 ### 版本`0.17.0`
 
-- [x] 零侵入支持docker容器日志、文件等各种日志的收集
-- [x] 增加接口 `/glc/v1/log/addBatch`，用以支持一次接收多条日志
+- [x] 零侵入支持`docker`容器日志、文件等各种日志的收集
+- [x] 增加接口 `/glc/v1/log/addBatch`，支持一次接收多条日志
 
 ### 版本`0.16.0`
 
