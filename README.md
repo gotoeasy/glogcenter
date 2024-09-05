@@ -43,6 +43,13 @@
 - [x] 上至央企大项目下至本地调试，已历经众多案例磨炼，表现出色 `【生产级别品质】`
 
 
+## 概要图
+<div align=center>
+<img src="https://gotoeasy.github.io/screenshots/glogcenter/glcsummary.png"/>
+</div>
+
+
+## 部分截图
 <div align=center>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/storage.png"/>
