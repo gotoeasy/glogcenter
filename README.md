@@ -271,8 +271,10 @@ docker run -d -p 24224:24224 -p 24224:24224/udp -v ./fluent.conf:/fluentd/etc/fl
 # 2) 运行容器时指定日志驱动，指向 fluentd 服务端口
 docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:24224 <你的镜像>
 
-# 已经搞定啦，fluentd会把日志发到GLC（这个必开就不用说了）
+# 已经搞定啦，fluentd会把日志发到GLC （这个必开就不用说了）
 # 接下来，去折腾 fluent.conf 就行，举一反三，但凡 fluentd 支持收集的东西都可以框进来
+
+# 当然，这种日志在显示上有一定不足，但瑕不掩瑜，有时这么做还是很值得的
 ```
 
 
