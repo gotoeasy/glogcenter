@@ -216,8 +216,8 @@ func (s *LogDataStorage) createInvertedIndex() int {
 	kws := tokenizer.CutForSearchEx(tgtStr, adds, nil) // 两数组参数的元素可以重复或空白，会被判断整理
 
 	// 每个关键词都创建反向索引
+	idxw := indexword.NewWordIndexStorage(s.StoreName())
 	for _, word := range kws {
-		idxw := indexword.NewWordIndexStorage(s.StoreName())
 		idxw.Add(word, cmn.StringToUint32(docm.Id, 0)) // 日志ID加入索引
 	}
 	// cmn.Debug("创建日志索引：", cmn.StringToUint32(docm.Id, 0))

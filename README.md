@@ -261,6 +261,22 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 ```
 
 
+## 支持零侵入收集docker容器日志，仅`0.17.0`及以上版本适用
+```shell
+# 1) 使用 fluentd 收集日志（为啥？因为较高版本docker已默认支持）
+# 本仓库中 fluent.conf 是简单配置示意，其中包含转发日志到GLC
+# 官方镜像的时区不合适，懒得改可用 gotoeasy/fluentd:v1.17-1-zh 替代
+docker run -d -p 24224:24224 -p 24224:24224/udp -v ./fluent.conf:/fluentd/etc/fluent.conf fluentd:v1.17-1
+
+# 2) 运行容器时指定日志驱动，指向 fluentd 服务端口
+docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:24224 <你的镜像>
+
+# 已经搞定啦，fluentd会把日志发到GLC（这个必开就不用说了）
+# 接下来，去折腾 fluent.conf 就行，举一反三，但凡 fluentd 支持收集的东西都可以框进来
+```
+
+
+
 ## 更新履历
 
 ### 开发版`latest`
@@ -268,6 +284,11 @@ glc.error("gd参数顺序无关", gd, "用法如同log库，但对GlcData做了�
 - [ ] 日志审计、告警
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.17.0`
+
+- [x] 零侵入支持docker容器日志、文件等各种日志的收集
+- [x] 增加接口 `/glc/v1/log/add`，用以支持一次接收多条日志
 
 ### 版本`0.16.0`
 

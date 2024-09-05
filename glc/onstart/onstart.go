@@ -35,6 +35,7 @@ func Run() {
 
 		// 控制器
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/add", controller.JsonLogAddController)                         // 添加日志
+		gweb.RegisterController(method.POST, contextPath+"/v1/log/addBatch", controller.JsonLogAddBatchController)               // 添加日志数组
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/addTestData", controller.JsonLogAddTestDataController)         // 添加测试日志（仅测试模式有效）
 		gweb.RegisterController(method.POST, contextPath+conf.LogTransferAdd, controller.JsonLogTransferAddController)           // 日志数据转发添加日志
 		gweb.RegisterController(method.POST, contextPath+"/v1/log/search", controller.LogSearchController)                       // 查询日志

@@ -9,6 +9,35 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
+// 添加日志（JSON数组提交方式）
+func JsonLogAddBatchController(req *gweb.HttpRequest) *gweb.HttpResult {
+
+	// 开启API秘钥校验时才检查
+	if conf.IsEnableSecurityKey() && req.GetHeader(conf.GetHeaderSecurityKey()) != conf.GetSecurityKey() {
+		return gweb.Error(403, "未经授权的访问，拒绝服务")
+	}
+
+	var mds []logdata.LogDataModel
+	err := req.BindJSON(&mds)
+	if err != nil {
+		cmn.Error("请求参数有误", err)
+		return gweb.Error500(err.Error())
+	}
+
+	for i := 0; i < len(mds); i++ {
+		md := &mds[i]
+		md.Text = cmn.Trim(md.Text)
+		if md.Text != "" {
+			addDataModelLog(md)
+			if conf.IsClusterMode() {
+				go TransferGlc(conf.LogTransferAdd, md.ToJson()) // 转发其他GLC服务
+			}
+		}
+	}
+	return gweb.Ok()
+
+}
+
 // 添加日志（JSON提交方式）
 func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 
@@ -25,10 +54,11 @@ func JsonLogAddController(req *gweb.HttpRequest) *gweb.HttpResult {
 	}
 
 	md.Text = cmn.Trim(md.Text)
-	addDataModelLog(md)
-
-	if conf.IsClusterMode() {
-		go TransferGlc(conf.LogTransferAdd, md.ToJson()) // 转发其他GLC服务
+	if md.Text != "" {
+		addDataModelLog(md)
+		if conf.IsClusterMode() {
+			go TransferGlc(conf.LogTransferAdd, md.ToJson()) // 转发其他GLC服务
+		}
 	}
 
 	return gweb.Ok()
