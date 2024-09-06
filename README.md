@@ -14,7 +14,7 @@
 <br>
 
 <p align="center">
-    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.21.4-brightgreen.svg"></a>
+    <a href="https://golang.google.cn"><img src="https://img.shields.io/badge/golang-1.23.1-brightgreen.svg"></a>
     <a href="https://hub.docker.com/r/gotoeasy/glc"><img src="https://img.shields.io/docker/pulls/gotoeasy/glc"></a>
     <a href="https://github.com/gotoeasy/glogcenter/releases/latest"><img src="https://img.shields.io/github/release/gotoeasy/glogcenter.svg"></a>
     <a href="https://github.com/gotoeasy/glogcenter/blob/master/LICENSE"><img src="https://img.shields.io/github/license/gotoeasy/glogcenter"></a>
@@ -149,7 +149,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.16.0</version>
+    <version>0.17.0</version>
 </dependency>
 ```
 
@@ -227,7 +227,7 @@ func main() {
     // 这里用手动初始化替代环境变量自动配置方式，更多选项详见GlcOptions字段说明
     cmn.SetGlcClient(cmn.NewGlcClient(&cmn.GlcOptions{
         ApiUrl:      "http://ip:port/glc/v1/log/add",
-        Enable:      true,
+        Enable:      "true",
     }))
 
     cmn.Debug("这是Debug级别日志")
@@ -299,6 +299,7 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 
 - [x] 零侵入支持`docker`容器日志、文件等各种日志的收集
 - [x] 增加接口 `/glc/v1/log/addBatch`，支持一次接收多条日志
+- [x] 升级使用`Go1.23.1`进行编译
 
 ### 版本`0.16.0`
 

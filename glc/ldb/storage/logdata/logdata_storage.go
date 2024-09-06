@@ -144,7 +144,7 @@ func (s *LogDataStorage) readyGo() {
 
 			// 索引生成完成后，等待接收保存日志
 			if n < 1 {
-				cmn.Info("空闲等待接收日志")
+				cmn.Debug("空闲等待接收日志")
 				data := <-s.storeChan // 没有索引可生成时，等待storeChan
 				s.wg.Done()
 				if data == nil {
