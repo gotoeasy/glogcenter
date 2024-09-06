@@ -59,6 +59,7 @@ func SystemNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
 		username := GetUsernameByToken(req.GetToken())
 		mnt := sysmnt.NewSysmntStorage()
 		if username == conf.GetUsername() {
+			// 管理员
 			names := mnt.GetSysUsernames()
 			var all []string
 			var m map[string]bool = make(map[string]bool)
@@ -74,12 +75,24 @@ func SystemNamesController(req *gweb.HttpRequest) *gweb.HttpResult {
 					}
 				}
 			}
+			if len(all) == 0 {
+				all = GetAllSystemNames() // 所有系统
+			}
 			return gweb.Result(all)
 		} else {
+			// 非管理员
 			user := mnt.GetSysUser(username)
-			if user != nil && user.Systems != "*" {
-				return gweb.Result(cmn.Split(user.Systems, ",")) // 管理员及全部权限的用户以外，按设定的系统返回
+			if user != nil {
+				if user.Systems == "*" {
+					return gweb.Result(GetAllSystemNames()) // 所有系统
+				}
+				return gweb.Result(cmn.Split(user.Systems, ",")) // 按设定的系统
 			}
+		}
+	} else {
+		all := GetAllSystemNames()
+		if len(all) > 0 {
+			return gweb.Result(all)
 		}
 	}
 

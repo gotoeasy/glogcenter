@@ -5,9 +5,12 @@ import (
 	"glc/gweb"
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
+	"sort"
 
 	"github.com/gotoeasy/glang/cmn"
 )
+
+var mapSystem = make(map[string]string)
 
 // 添加日志（JSON数组提交方式）
 func JsonLogAddBatchController(req *gweb.HttpRequest) *gweb.HttpResult {
@@ -99,5 +102,23 @@ func addDataModelLog(data *logdata.LogDataModel) {
 		}
 	}
 
+	// 缓存系统名称备用查询
+	system := cmn.ToLower(cmn.Trim(data.System))
+	if system != "" && mapSystem[system] == "" {
+		mapSystem[system] = cmn.Trim(data.System)
+	}
+
 	engine.AddLogDataModel(data)
+}
+
+// 服务启动以来缓存的所有系统名称
+func GetAllSystemNames() []string {
+	rs := []string{}
+	for _, value := range mapSystem {
+		rs = append(rs, value)
+	}
+	sort.Slice(rs, func(i, j int) bool {
+		return rs[i] < rs[j]
+	})
+	return rs
 }
