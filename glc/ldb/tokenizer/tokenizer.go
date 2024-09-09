@@ -4,19 +4,36 @@
 package tokenizer
 
 import (
-	"path/filepath"
-	"runtime"
+	"embed"
+	"glc/conf"
 
 	"github.com/gotoeasy/glang/cmn"
+)
+
+var (
+	//go:embed dict.txt
+	dictionary embed.FS
 )
 
 var sego *cmn.TokenizerSego
 
 // 初始化装载字典
 func init() {
-	_, filename, _, _ := runtime.Caller(0) // 当前go文件所在路径
-	dictfile := filepath.Join(filepath.Dir(filename), "dict.txt")
-	sego = cmn.NewTokenizerSego(dictfile)
+
+	// 默认字典，不存在时尝试从go:embed复制
+	defaultDictFile := "/glogcenter/.dictionary/dict.txt"
+	if !cmn.IsExistFile(defaultDictFile) {
+		bts, err := dictionary.ReadFile("dict.txt")
+		if err == nil {
+			cmn.WriteFileBytes(defaultDictFile, bts)
+		}
+	}
+
+	// 加载字典，自定义字典+默认字典
+	dicFiles, _ := cmn.GetFiles(conf.GetDictDir(), ".txt")
+	dicFiles = append(dicFiles, defaultDictFile)
+
+	sego = cmn.NewTokenizerSego(dicFiles...)
 }
 
 // 按搜索引擎模式进行分词后返回分词数组

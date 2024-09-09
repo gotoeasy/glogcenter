@@ -62,6 +62,7 @@ var aryWhite []string
 var aryBlack []string
 var ipAddCity bool
 var enableChatAi bool
+var dictDir string
 
 func init() {
 	UpdateConfigByEnv()
@@ -108,6 +109,12 @@ func UpdateConfigByEnv() {
 	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)                   // 是否检索日志的全部行（日志可能有换行），默认false仅第一行
 	testMode = cmn.GetEnvBool("GLC_TEST_MODE", false)                                  // 是否测试模式，默认false
 	enableChatAi = cmn.GetEnvBool("GLC_ENABLE_CHATAI", true)                           // 是否开启GLC智能助手，默认true
+	dictDir = cmn.GetEnvStr("GLC_DICT_DIR", "")                                        // 自定义的字典文件（*.txt）所在目录
+}
+
+// 取配置： 自定义的字典文件（*.txt）所在目录
+func GetDictDir() string {
+	return dictDir
 }
 
 // 取配置： 是否开启GLC智能助手
