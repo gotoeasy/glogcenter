@@ -299,7 +299,7 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 ### 版本`0.17.1`
 
 - [x] 支持自定义分词字典
-- [x] 增加字典目录环境变量`GLC_DICT_DIR`，支持多个`*.txt`字典文件。比如设定为`/opt`，启动时使用`-v /your-dict-dir:/opt`把映射字典目录
+- [x] 增加字典目录环境变量`GLC_DICT_DIR`，支持多个`*.txt`字典文件。比如环境变量设定为`/opt`，启动时使用`-v /your-dict-dir:/opt`映射好字典目录就行
 - [x] 一些细节优化
 
 ### 版本`0.17.0`
