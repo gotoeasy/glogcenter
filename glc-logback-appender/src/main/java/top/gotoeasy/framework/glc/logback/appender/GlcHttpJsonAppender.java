@@ -139,6 +139,14 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
         if (apiUrl != null) {
             apiUrl = apiUrl.trim();
             if (!"".equals(apiUrl)) {
+                if (!apiUrl.endsWith("/glc/v1/log/add")) {
+                    // 允许省略接口路径，默认自动补足以简化使用
+                    if (apiUrl.endsWith("/")) {
+                        apiUrl += "glc/v1/log/add";
+                    } else {
+                        apiUrl += "/glc/v1/log/add";
+                    }
+                }
                 setGlcApiUrl(apiUrl);
             }
         }
