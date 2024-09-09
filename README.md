@@ -121,6 +121,7 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_IP_ADD_CITY`对IP字段是否自动附加城市信息，默认`false`
 - [x] `GLC_NEAR_SEARCH_SIZE`定位相邻检索时的检索件数，默认200，有效范围50-1000
 - [x] `GLC_ENABLE_CHATAI`是否开启GLC智能助手，默认true，会在菜单栏显示
+- [x] `GLC_DICT_DIR`自定义分词字典文件(*.txt)的存放目录，默认空
 
 
 ## 接口
@@ -295,20 +296,26 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
 
+### 版本`0.17.1`
+
+- [x] 支持自定义分词字典
+- [x] 增加字典目录环境变量`GLC_DICT_DIR`，支持多个`*.txt`字典文件
+- [x] 一些细节优化
+
 ### 版本`0.17.0`
 
 - [x] 零侵入支持`docker`容器日志、文件等各种日志的收集
 - [x] 增加接口 `/glc/v1/log/addBatch`，支持一次接收多条日志
 - [x] 升级使用`Go1.23.1`进行编译
 
+
+<details>
+<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
+
 ### 版本`0.16.0`
 
 - [x] 分词优化
 - [x] 大幅提升建索引速度（强烈推荐使用固态硬盘）
-
-
-<details>
-<summary><strong><mark>更多历史版本更新履历</mark></strong></summary> 
 
 ### 版本`0.15.2`
 
