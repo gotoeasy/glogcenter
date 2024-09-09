@@ -76,6 +76,12 @@ def post_glc_data(glc_data, logLevel):
     if not url:
         return
 
+    # 允许省略接口路径，默认自动补足以简化使用
+    if not url.endswith("/glc/v1/log/add"):
+      if not url.endswith("/"):
+        url += "/"
+      url += "glc/v1/log/add"
+
     data = {
         'text': glc_data.text,
         'date': glc_data.date,
