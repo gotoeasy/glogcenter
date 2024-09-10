@@ -62,7 +62,6 @@
 ## `docker`单机部署模式简易示例
 ```shell
 # 快速体验（其中通过GLC_TEST_MODE=true开启测试模式，页面上会显示生成测试数据的按钮，方便测试或快速体验）
-# 镜像拉取有困难？呃...问下智能助手
 docker run -d -p 8080:8080 -e GLC_TEST_MODE=true gotoeasy/glc
 
 # 外挂数据目录
@@ -150,16 +149,16 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 <dependency>
     <groupId>top.gotoeasy</groupId>
     <artifactId>glc-logback-appender</artifactId>
-    <version>0.17.0</version>
+    <version>0.17.1</version>
 </dependency>
 ```
 
 ```xml
 <!-- logback配置例子1，发送至 glogcenter -->
 <appender name="GLC" class="top.gotoeasy.framework.glc.logback.appender.GlcHttpJsonAppender">
-    <glcApiUrl>http://127.0.0.1:8080/glc/v1/log/add</glcApiUrl> <!--可通过环境变量GLC_API_URL设定-->
-    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>                <!--可通过环境变量GLC_API_KEY设定-->
-    <system>demo</system>                                       <!--可通过环境变量GLC_SYSTEM设定 -->
+    <glcApiUrl>http://127.0.0.1:8080/</glcApiUrl> <!--可通过环境变量 GLC_API_URL 设定-->
+    <glcApiKey>X-GLC-AUTH:glogcenter</glcApiKey>  <!--可通过环境变量 GLC_API_KEY 设定-->
+    <system>demo</system>                         <!--可通过环境变量 GLC_SYSTEM 设定 -->
     <layout>
         <pattern><![CDATA[%m %n]]></pattern>
     </layout>
@@ -212,7 +211,7 @@ curl -X POST -d '{"system":"demo", "date":"2023-01-01 01:02:03.456","text":"demo
 # 方式1）通过环境变量自动配置，程序直接使用cmn.Debug(...)写日志即可
 export GLC_ENABLE=true # 此配置默认false，要发送日志中心必须配置为true
 export GLC_ENABLE_CONSOLE_LOG=true # 默认true，控制台不打印时配置为false
-export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add' # 未配置时将取消发送
+export GLC_API_URL='http://127.0.0.1:8080/' # 未配置时将取消发送
 export GLC_API_KEY='X-GLC-AUTH:glogcenter' # 这是默认值，按需修改
 export GLC_SYSTEM=default  # 默认default，按需修改
 export GLC_LOG_LEVEL=debug # 日志级别（debug/info/warn/error）
@@ -227,7 +226,7 @@ import "github.com/gotoeasy/glang/cmn"
 func main() {
     // 这里用手动初始化替代环境变量自动配置方式，更多选项详见GlcOptions字段说明
     cmn.SetGlcClient(cmn.NewGlcClient(&cmn.GlcOptions{
-        ApiUrl:      "http://ip:port/glc/v1/log/add",
+        ApiUrl:      "http://127.0.0.1:8080/",
         Enable:      "true",
     }))
 
@@ -246,7 +245,7 @@ func main() {
 # 支持以下环境变量配置
 export GLC_ENABLE=true # 默认false，要发送日志中心必须配置为true
 export GLC_ENABLE_CONSOLE_LOG=true # 默认true，控制台不打印时配置为false
-export GLC_API_URL='http://127.0.0.1:8080/glc/v1/log/add' # 未配置时将取消发送
+export GLC_API_URL='http://127.0.0.1:8080/' # 未配置时将取消发送
 export GLC_API_KEY='X-GLC-AUTH:glogcenter' # 这是默认值，按需修改
 export GLC_SYSTEM=default  # 默认default，按需修改
 export GLC_LOG_LEVEL=debug # 日志级别（debug/info/warn/error），默认debug
