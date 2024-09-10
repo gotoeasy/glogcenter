@@ -6,6 +6,7 @@ package tokenizer
 import (
 	"embed"
 	"glc/conf"
+	"path/filepath"
 
 	"github.com/gotoeasy/glang/cmn"
 )
@@ -25,7 +26,7 @@ func init() {
 	if !cmn.IsExistFile(defaultDictFile) {
 		bts, err := dictionary.ReadFile("dict.zip")
 		if err == nil {
-			cmn.UnZipBytes(bts, defaultDictFile)
+			cmn.UnZipBytes(bts, filepath.Dir(defaultDictFile))
 		}
 	}
 
