@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	//go:embed dict.txt
+	//go:embed dict.zip
 	dictionary embed.FS
 )
 
@@ -23,9 +23,9 @@ func init() {
 	// 默认字典，不存在时尝试从go:embed复制
 	defaultDictFile := "/glogcenter/.dictionary/dict.txt"
 	if !cmn.IsExistFile(defaultDictFile) {
-		bts, err := dictionary.ReadFile("dict.txt")
+		bts, err := dictionary.ReadFile("dict.zip")
 		if err == nil {
-			cmn.WriteFileBytes(defaultDictFile, bts)
+			cmn.UnZipBytes(bts, defaultDictFile)
 		}
 	}
 
