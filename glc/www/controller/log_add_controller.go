@@ -10,7 +10,7 @@ import (
 	"github.com/gotoeasy/glang/cmn"
 )
 
-var cacheSystem = cmn.NewCache(time.Duration(24) * time.Hour)
+var cacheSystem = cmn.NewCache(time.Duration(24)*time.Hour, true)
 
 // 添加日志（JSON数组提交方式）
 func JsonLogAddBatchController(req *gweb.HttpRequest) *gweb.HttpResult {
