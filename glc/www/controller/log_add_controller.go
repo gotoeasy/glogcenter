@@ -5,6 +5,7 @@ import (
 	"glc/gweb"
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
+	"sort"
 	"time"
 
 	"github.com/gotoeasy/glang/cmn"
@@ -112,5 +113,15 @@ func addDataModelLog(data *logdata.LogDataModel) {
 
 // 缓存近1天的系统名称
 func GetAllSystemNames() []string {
-	return cacheSystem.Values()
+	var rs []string
+	vals := cacheSystem.Values()
+	for _, val := range vals {
+		if str, ok := val.(string); ok {
+			rs = append(rs, str)
+		}
+	}
+	sort.Slice(rs, func(i, j int) bool {
+		return rs[i] < rs[j]
+	})
+	return rs
 }
