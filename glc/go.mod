@@ -6,7 +6,7 @@ require (
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-contrib/gzip v1.0.1
 	github.com/gin-gonic/gin v1.10.0
-	github.com/gotoeasy/glang v0.21.2
+	github.com/gotoeasy/glang v0.21.3
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/streadway/amqp v1.1.0
 	github.com/syndtr/goleveldb v1.0.0
@@ -33,7 +33,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gotoeasy/sego v1.0.1 // indirect
+	github.com/gotoeasy/sego v1.1.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jxskiss/base62 v1.1.0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect

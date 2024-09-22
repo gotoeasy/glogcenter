@@ -4,16 +4,9 @@
 package tokenizer
 
 import (
-	"embed"
 	"glc/conf"
-	"path/filepath"
 
 	"github.com/gotoeasy/glang/cmn"
-)
-
-var (
-	//go:embed dict.zip
-	dictionary embed.FS
 )
 
 var sego *cmn.TokenizerSego
@@ -21,19 +14,8 @@ var sego *cmn.TokenizerSego
 // 初始化装载字典
 func init() {
 
-	// 默认字典，不存在时尝试从go:embed复制
-	defaultDictFile := "/glogcenter/.dictionary/dict.txt"
-	if !cmn.IsExistFile(defaultDictFile) {
-		bts, err := dictionary.ReadFile("dict.zip")
-		if err == nil {
-			cmn.UnZipBytes(bts, filepath.Dir(defaultDictFile))
-		}
-	}
-
-	// 加载字典，自定义字典+默认字典
+	// 加载用户词典
 	dicFiles, _ := cmn.GetFiles(conf.GetDictDir(), ".txt")
-	dicFiles = append(dicFiles, defaultDictFile)
-
 	sego = cmn.NewTokenizerSego(dicFiles...)
 }
 
