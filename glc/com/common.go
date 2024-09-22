@@ -5,8 +5,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"glc/conf"
-	"math/rand"
-	"net"
 	"os"
 	"path/filepath"
 	"sort"
@@ -88,16 +86,6 @@ func GetYyyymmdd(days int) string {
 	return time.Now().AddDate(0, 0, days).Format("20060102")
 }
 
-func Random() uint32 {
-	rand.Seed(time.Now().UnixNano())
-	for {
-		v := rand.Uint32()
-		if v != 0 {
-			return v
-		}
-	}
-}
-
 func Unique(s []string) []string {
 	m := make(map[string]struct{}, 0)
 	newS := make([]string, 0)
@@ -119,24 +107,6 @@ func GetLocalGlcUrl() string {
 		return "http://" + conf.GetServerIp() + ":" + conf.GetServerPort()
 	}
 
-	return "http://" + GetLocalIp() + ":" + conf.GetServerPort()
+	return "http://" + cmn.GetLocalIp() + ":" + conf.GetServerPort()
 
-}
-
-var localIp string
-
-func GetLocalIp() string {
-	if localIp != "" {
-		return localIp
-	}
-
-	addrs, err := net.InterfaceAddrs()
-	if err == nil {
-		for _, address := range addrs {
-			if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
-				localIp = ipnet.IP.String()
-			}
-		}
-	}
-	return localIp
 }

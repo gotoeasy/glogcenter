@@ -2,7 +2,6 @@ package ldb
 
 import (
 	"fmt"
-	"glc/com"
 	"glc/ldb/sysmnt"
 	"glc/ldb/tokenizer"
 	"testing"
@@ -16,9 +15,6 @@ func Test_CutWords(t *testing.T) {
 	cmn.Debug(ws)
 }
 
-func Test_GetIP(t *testing.T) {
-	cmn.Debug(com.GetLocalIp())
-}
 func Test_GetSubDirs(t *testing.T) {
 	rs := sysmnt.GetStorageList()
 
