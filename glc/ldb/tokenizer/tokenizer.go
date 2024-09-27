@@ -4,19 +4,15 @@
 package tokenizer
 
 import (
-	"glc/conf"
-
 	"github.com/gotoeasy/glang/cmn"
 )
 
+// 分词器
 var sego *cmn.TokenizerSego
 
-// 初始化装载字典
+// 初始化分词器
 func init() {
-
-	// 加载用户词典
-	dicFiles, _ := cmn.GetFiles(conf.GetDictDir(), ".txt")
-	sego = cmn.NewTokenizerSego(dicFiles...)
+	sego = cmn.NewTokenizerSego()
 }
 
 // 按搜索引擎模式进行分词后返回分词数组

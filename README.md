@@ -120,7 +120,6 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_IP_ADD_CITY`对IP字段是否自动附加城市信息，默认`false`
 - [x] `GLC_NEAR_SEARCH_SIZE`定位相邻检索时的检索件数，默认200，有效范围50-1000
 - [x] `GLC_ENABLE_CHATAI`是否开启GLC智能助手，默认true，会在菜单栏显示
-- [x] `GLC_DICT_DIR`自定义分词字典文件(*.txt)的存放目录，默认空
 
 
 ## 接口
@@ -293,6 +292,13 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 
 - [ ] 日志审计、告警
 - [ ] 集群支持动态删减节点（或是页面管理删除）
+
+
+### 版本`0.17.2`
+
+- [x] 修复：条件检索可能存在个别数据查不到
+- [x] 取消用户词典参数`GLC_DICT_DIR`的支持，配置不当会影响分词影响检索结果令人困惑，得不偿失
+- [x] 镜像缩小等优化
 
 
 ### 版本`0.17.1`
