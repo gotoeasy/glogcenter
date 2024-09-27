@@ -132,7 +132,7 @@ func (s *WordIndexStorage) SaveIndexedCount(count uint32) error {
 // 取关键词索引当前的文档数
 func (s *WordIndexStorage) GetTotalCount(word string) uint32 {
 	wordBytes := cmn.StringToBytes(word)
-	bt, err := s.leveldb.Get(com.JoinBytes(wordBytes, zeroUint32Bytes), nil) // TODO 是否有性能问题?
+	bt, err := s.leveldb.Get(com.JoinBytes(wordBytes, zeroUint32Bytes), nil)
 	if err != nil {
 		return 0
 	}
@@ -149,6 +149,8 @@ func (s *WordIndexStorage) Add(word string, docId uint32) error {
 
 	// 加关键词反向索引
 	s.lastTime = time.Now().Unix()
+	s.mu.Lock() // 确保计数正确 // TODO 性能问题影响几何？（理想情况下仅相同关键词才需要锁）
+	defer s.mu.Unlock()
 	seq := s.GetTotalCount(word)
 	seq++
 	err := s.leveldb.Put(com.JoinBytes(cmn.StringToBytes(word), cmn.Uint32ToBytes(seq)), cmn.Uint32ToBytes(docId), nil)
