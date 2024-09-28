@@ -6,12 +6,14 @@ import (
 	"glc/ldb"
 	"glc/ldb/storage/logdata"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/gotoeasy/glang/cmn"
 )
 
-var cacheSystem = cmn.NewCache(time.Duration(24)*time.Hour, true)
+var mapSystem = make(map[string]int64)
+var muSystem sync.Mutex
 
 // 添加日志（JSON数组提交方式）
 func JsonLogAddBatchController(req *gweb.HttpRequest) *gweb.HttpResult {
@@ -103,22 +105,39 @@ func addDataModelLog(data *logdata.LogDataModel) {
 		}
 	}
 
+	engine.AddLogDataModel(data)
+
 	// 缓存系统名称备用查询
 	if data.System != "" {
-		cacheSystem.Set(data.System, data.System)
+		if muSystem.TryLock() {
+			defer muSystem.Unlock()
+			mapSystem[data.System] = time.Now().UnixMilli()
+		}
 	}
 
-	engine.AddLogDataModel(data)
 }
 
-// 缓存近1天的系统名称
+// 取近1天缓存的系统名称并清理
 func GetAllSystemNames() []string {
+	var mapSet = make(map[string]bool)
 	var rs []string
-	vals := cacheSystem.Values()
-	for _, val := range vals {
-		if str, ok := val.(string); ok {
-			rs = append(rs, str)
+	var dels []string
+	now := time.Now().UnixMilli()
+	muSystem.Lock()
+	defer muSystem.Unlock()
+	for key, value := range mapSystem {
+		if now-value < 86400000 {
+			tmp := cmn.ToLower(key)
+			if _, has := mapSet[tmp]; !has {
+				rs = append(rs, key) // 一天内
+				mapSet[tmp] = true
+			}
+		} else {
+			dels = append(dels, key) // 超过1天待删除
 		}
+	}
+	for _, key := range dels {
+		delete(mapSystem, key)
 	}
 	sort.Slice(rs, func(i, j int) bool {
 		return rs[i] < rs[j]
