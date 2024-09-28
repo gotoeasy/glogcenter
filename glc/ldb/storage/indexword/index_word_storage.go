@@ -11,6 +11,7 @@ import (
 	"glc/ldb/status"
 	"glc/ldb/storage/indexdoc"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gotoeasy/glang/cmn"
@@ -20,13 +21,16 @@ import (
 )
 
 type WordIndexStorage struct {
-	storeName    string      // 存储目录
-	subPath      string      // 存储目录下的相对路径（存放数据）
-	leveldb      *leveldb.DB // leveldb
-	lastTime     int64       // 最后一次访问时间
-	indexedCount uint32      // 已建索引件数
-	closing      bool        // 是否关闭中状态
-	mu           sync.Mutex  // 锁
+	storeName      string      // 存储目录
+	subPath        string      // 存储目录下的相对路径（存放数据）
+	leveldb        *leveldb.DB // leveldb
+	lastTime       int64       // 最后一次访问时间
+	indexedCount   uint32      // 已建索引件数
+	closing        bool        // 是否关闭中状态
+	mu             sync.Mutex  // 锁
+	mapWordCounter sync.Map    // 单词索引计数器
+	mapWordCountMu sync.Mutex  // 锁
+
 }
 
 var zeroUint32Bytes []byte = cmn.Uint32ToBytes(0)
@@ -144,15 +148,40 @@ func (s *WordIndexStorage) setTotalCount(word string, cnt uint32) error {
 	return s.leveldb.Put(com.JoinBytes(cmn.StringToBytes(word), zeroUint32Bytes), cmn.Uint32ToBytes(cnt), nil)
 }
 
+func (s *WordIndexStorage) getWwordCounter(word string) *atomic.Value {
+	counter, ok := s.mapWordCounter.Load(word)
+	if ok {
+		return counter.(*atomic.Value)
+	}
+
+	s.mapWordCountMu.Lock()
+	defer s.mapWordCountMu.Unlock()
+	newCounter := new(atomic.Value)
+	newCounter.Store(s.GetTotalCount(word))
+	s.mapWordCounter.Store(word, newCounter)
+	return newCounter
+}
+
+func (s *WordIndexStorage) increaseWwordCount(word string) uint32 {
+	counter := s.getWwordCounter(word)
+	cnt := counter.Load().(uint32)
+	newCnt := cnt + 1
+	for {
+		if counter.CompareAndSwap(cnt, newCnt) {
+			break
+		}
+		cnt = counter.Load().(uint32)
+		newCnt = cnt + 1
+	}
+	return newCnt
+}
+
 // 添加关键词反向索引
 func (s *WordIndexStorage) Add(word string, docId uint32) error {
 
 	// 加关键词反向索引
 	s.lastTime = time.Now().Unix()
-	s.mu.Lock() // 确保计数正确 // TODO 性能问题影响几何？（理想情况下仅相同关键词才需要锁）
-	defer s.mu.Unlock()
-	seq := s.GetTotalCount(word)
-	seq++
+	seq := s.increaseWwordCount(word) // 取出已递增加1的数量
 	err := s.leveldb.Put(com.JoinBytes(cmn.StringToBytes(word), cmn.Uint32ToBytes(seq)), cmn.Uint32ToBytes(docId), nil)
 	if err != nil {
 		cmn.Error("保存关键词反向索引失败", err)
