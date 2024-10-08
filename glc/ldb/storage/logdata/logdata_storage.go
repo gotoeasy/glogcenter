@@ -136,10 +136,11 @@ func (s *LogDataStorage) readyGo() {
 			}
 			s.saveLogData(data) // 保存日志数据
 		default:
-			// 空时再生成索引，多协程跑起来加快速度，再来一次单条同步用于判断，有空则生成直到全部完成
-			for i := 0; i < conf.GetGoMaxProcessIdx()-1; i++ {
-				go s.createInvertedIndex() // 多协程跑起来加快速度
-			}
+			// 【确保索引顺序，取消多协程创建索引】
+			// // 空时再生成索引，多协程跑起来加快速度，再来一次单条同步用于判断，有空则生成直到全部完成
+			// for i := 0; i < conf.GetGoMaxProcessIdx()-1; i++ {
+			// 	go s.createInvertedIndex() // 多协程跑起来加快速度
+			// }
 			n := s.createInvertedIndex() // 生成反向索引
 
 			// 索引生成完成后，等待接收保存日志
