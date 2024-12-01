@@ -8,35 +8,32 @@ package storage
 
 import (
 	"glc/ldb/storage/logdata"
+	"sync"
 
 	"github.com/gotoeasy/glang/cmn"
 )
 
-var mapStorageHandle map[string](*LogDataStorageHandle)
+var mapStorageHandle sync.Map
 
 // 日志存储结构体
 type LogDataStorageHandle struct {
 	storage *logdata.LogDataStorage // 存储器
 }
 
-func init() {
-	mapStorageHandle = make(map[string](*LogDataStorageHandle))
-}
-
 // 创建日志存储
 func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
-
-	cacheStore := mapStorageHandle[storeName] // 缓存中的存储对象
-	if cacheStore != nil {
+	value, ok := mapStorageHandle.Load(storeName)
+	if ok && value != nil {
+		cacheStore := value.(*LogDataStorageHandle)
 		if !cacheStore.storage.IsClose() {
-			return cacheStore
+			return cacheStore // 缓存中未关闭的存储对象
 		}
 	}
 
 	store := &LogDataStorageHandle{
 		storage: logdata.NewLogDataStorage(storeName),
 	}
-	mapStorageHandle[storeName] = store
+	mapStorageHandle.Store(storeName, store)
 	return store
 }
 

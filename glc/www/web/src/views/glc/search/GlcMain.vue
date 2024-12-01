@@ -106,7 +106,7 @@ const { formData, visible, tableData, tableHeight, pageSettingStore, showTableLo
 const showTestBtn = ref(false); // 是否显示生成测试数据按钮
 const autoSearchMode = ref(false); // 自动查询
 const table = ref(); // 表格实例
-const tid = ref('v001500GlcMain'); // 表格ID
+const tid = ref('glcMain241130'); // 表格ID
 const info = ref(''); // 底部提示信息
 const storageOptions = ref([]) // 日志仓
 const systemSet = new Set();

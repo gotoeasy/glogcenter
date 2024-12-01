@@ -28,18 +28,20 @@ type DocIndexStorage struct {
 }
 
 var idxMu sync.Mutex
-var mapStorage map[string](*DocIndexStorage)
+var mapStorage sync.Map
 var mapStorageMu sync.Mutex
 
 func init() {
-	mapStorage = make(map[string](*DocIndexStorage))
 	cmn.OnExit(onExit) // 优雅退出
 }
 
 func getStorage(cacheName string) *DocIndexStorage {
-	cacheStore := mapStorage[cacheName]
-	if cacheStore != nil && !cacheStore.IsClose() {
-		return cacheStore // 缓存中未关闭的存储对象
+	value, ok := mapStorage.Load(cacheName)
+	if ok && value != nil {
+		cacheStore := value.(*DocIndexStorage)
+		if !cacheStore.IsClose() {
+			return cacheStore // 缓存中未关闭的存储对象
+		}
 	}
 	return nil
 }
@@ -81,7 +83,7 @@ func NewDocIndexStorage(storeName string) *DocIndexStorage { // 存储器，文�
 	}
 	store.leveldb = db
 	status.UpdateStorageStatus(storeName, true) // 更新状态：当前日志仓打开
-	mapStorage[cacheName] = store               // 缓存起来
+	mapStorage.Store(cacheName, store)          // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()
@@ -144,10 +146,10 @@ func (s *DocIndexStorage) Close() {
 	}
 
 	s.closing = true
-	s.leveldb.Close()             // 走到这里时没有db操作了，可以关闭
-	idxMu.Lock()                  // map锁
-	defer idxMu.Unlock()          // map解锁
-	mapStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
+	s.leveldb.Close()              // 走到这里时没有db操作了，可以关闭
+	idxMu.Lock()                   // map锁
+	defer idxMu.Unlock()           // map解锁
+	mapStorage.Delete(s.storeName) // 设空，下回GetStorage时自动再创建
 
 	cmn.Info("关闭DocIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
@@ -163,11 +165,12 @@ func (s *DocIndexStorage) IsClose() bool {
 }
 
 func onExit() {
-	for k := range mapStorage {
-		s := mapStorage[k]
-		if s != nil {
-			s.Close()
+	mapStorage.Range(func(key, value any) bool {
+		if value != nil {
+			cacheStore := value.(*DocIndexStorage)
+			cacheStore.Close()
 		}
-	}
+		return true
+	})
 	cmn.Info("退出DocIndexStorage")
 }

@@ -37,18 +37,20 @@ var zeroUint32Bytes []byte = cmn.Uint32ToBytes(0)
 var zeroUint16Bytes []byte = cmn.Uint16ToBytes(0) // 索引件数的key
 
 var idxMu sync.Mutex
-var mapStorage map[string](*WordIndexStorage)
+var mapStorage sync.Map
 var mapStorageMu sync.Mutex
 
 func init() {
-	mapStorage = make(map[string](*WordIndexStorage))
 	cmn.OnExit(onExit) // 优雅退出
 }
 
 func getStorage(cacheName string) *WordIndexStorage {
-	cacheStore := mapStorage[cacheName]
-	if cacheStore != nil && !cacheStore.IsClose() {
-		return cacheStore // 缓存中未关闭的存储对象
+	value, ok := mapStorage.Load(cacheName)
+	if ok && value != nil {
+		cacheStore := value.(*WordIndexStorage)
+		if !cacheStore.IsClose() {
+			return cacheStore // 缓存中未关闭的存储对象
+		}
 	}
 	return nil
 }
@@ -91,7 +93,7 @@ func NewWordIndexStorage(storeName string) *WordIndexStorage { // 存储器，�
 	store.leveldb = db
 	store.loadIndexedCount()                    // 加载已建索引件数
 	status.UpdateStorageStatus(storeName, true) // 更新状态：当前日志仓打开
-	mapStorage[cacheName] = store               // 缓存起来
+	mapStorage.Store(cacheName, store)          // 缓存起来
 
 	// 逐秒判断，若闲置超时则自动关闭
 	go store.autoCloseWhenMaxIdle()
@@ -234,10 +236,10 @@ func (s *WordIndexStorage) Close() {
 	}
 
 	s.closing = true
-	s.leveldb.Close()             // 走到这里时没有db操作了，可以关闭
-	idxMu.Lock()                  // map锁
-	defer idxMu.Unlock()          // map解锁
-	mapStorage[s.storeName] = nil // 设空，下回GetStorage时自动再创建
+	s.leveldb.Close()              // 走到这里时没有db操作了，可以关闭
+	idxMu.Lock()                   // map锁
+	defer idxMu.Unlock()           // map解锁
+	mapStorage.Delete(s.storeName) // 设空，下回GetStorage时自动再创建
 
 	cmn.Info("关闭WordIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }
@@ -253,11 +255,12 @@ func (s *WordIndexStorage) IsClose() bool {
 }
 
 func onExit() {
-	for k := range mapStorage {
-		s := mapStorage[k]
-		if s != nil {
-			s.Close()
+	mapStorage.Range(func(key, value any) bool {
+		if value != nil {
+			cacheStore := value.(*WordIndexStorage)
+			cacheStore.Close()
 		}
-	}
+		return true
+	})
 	cmn.Info("退出WordIndexStorage")
 }
