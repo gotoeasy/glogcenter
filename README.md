@@ -23,7 +23,7 @@
 <br>
 <br>
 国外仓库地址： https://github.com/gotoeasy/glogcenter <br>
-国内(仅同步)： https://gitee.com/gotoeasy/glogcenter
+国内（同步）： https://gitee.com/gotoeasy/glogcenter
 <br>
 <br>
 演示地址(网络可能不稳定)： https://glc.gotoeasy.top
@@ -293,6 +293,10 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 - [ ] 日志审计、告警
 - [ ] 集群支持动态删减节点（或是页面管理删除）
 
+
+### 版本`0.17.3`
+
+- [x] 优化修复一些已知问题（#57 #58 等）
 
 ### 版本`0.17.2`
 
