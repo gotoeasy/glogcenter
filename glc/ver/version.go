@@ -1,4 +1,4 @@
 package ver
 
 // 版本号，升级版本时修改
-const VERSION = "v0.17.3"
+const VERSION = "v0.17.4"
