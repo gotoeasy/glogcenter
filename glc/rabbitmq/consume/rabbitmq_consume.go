@@ -7,7 +7,7 @@ import (
 	"glc/conf"
 
 	"github.com/gotoeasy/glang/cmn"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type RabbitMQ struct {
