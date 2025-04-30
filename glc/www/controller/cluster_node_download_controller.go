@@ -40,5 +40,13 @@ func ClusterDownloadStoreDataController(req *gweb.HttpRequest) *gweb.HttpResult 
 	ctx.Header("Content-Transfer-Encoding", "binary")
 	ctx.File(tarfilename)
 
+	go deleteTarfilename(tarfilename)
+
 	return nil
+}
+
+func deleteTarfilename(tarfilename string) {
+	// 5分钟后删除
+	time.Sleep(5 * time.Minute)
+	cmn.RemoveAllFile(tarfilename)
 }

@@ -95,6 +95,7 @@ func checkAndCopyDataFromRemote() {
 			cmn.Info("本地无日志仓", k, "开始从", remoteStore.NodeUrl, "复制", remoteStore.Name)
 			tarfile, err := httpDownloadStoreFile(remoteStore.NodeUrl, remoteStore.Name) // 下载
 			if err != nil {
+				cmn.RemoveAllFile(tarfile)
 				continue
 			}
 
@@ -103,6 +104,7 @@ func checkAndCopyDataFromRemote() {
 			distDir := filepath.Join(conf.GetStorageRoot(), storeName)
 			cmn.MkdirAll(distDir)
 			cmn.UnTar(tarfile, distDir)
+			cmn.RemoveAllFile(tarfile)
 
 			// 保存信息
 			sysdb := sysmnt.NewSysmntStorage()
