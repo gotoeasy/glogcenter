@@ -119,7 +119,6 @@ docker run -d -p 8080:8080 -e GLC_CLUSTER_MODE=true -e GLC_SERVER_URL=http://172
 - [x] `GLC_BLACK_LIST`黑名单，多个用逗号分隔，黑白名单冲突时白名单优先，默认空白。可设定IP，最后段支持通配符，如`1.2.3.*`，也支持单个通配符`*`代表全部（也就是只允许内网或白名单指定使用），实验性质的支持区域名称（因为IP地域查询可能有误差）
 - [x] `GLC_IP_ADD_CITY`对IP字段是否自动附加城市信息，默认`false`
 - [x] `GLC_NEAR_SEARCH_SIZE`定位相邻检索时的检索件数，默认200，有效范围50-1000
-- [x] `GLC_ENABLE_CHATAI`是否开启GLC智能助手，默认true，会在菜单栏显示
 
 
 ## 接口
@@ -291,6 +290,12 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 ### 开发版`latest`
 
 - [ ] 日志审计、告警
+
+
+### 版本`0.17.6`
+
+- [x] 取消智能助手（AI发展引动难以满足的高期望值）
+- [x] 修复已知问题（#65、#70）
 
 
 ### 版本`0.17.5`
