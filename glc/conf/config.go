@@ -61,7 +61,6 @@ var tokenSalt string
 var aryWhite []string
 var aryBlack []string
 var ipAddCity bool
-var enableChatAi bool
 
 func init() {
 	UpdateConfigByEnv()
@@ -107,12 +106,6 @@ func UpdateConfigByEnv() {
 	nearSearchSize = getNearSearchSizeConf(cmn.GetEnvInt("GLC_NEAR_SEARCH_SIZE", 200)) // 定位相邻检索的查询件数，默认200（有效范围50~1000）
 	mulitLineSearch = cmn.GetEnvBool("GLC_SEARCH_MULIT_LINE", false)                   // 是否检索日志的全部行（日志可能有换行），默认false仅第一行
 	testMode = cmn.GetEnvBool("GLC_TEST_MODE", false)                                  // 是否测试模式，默认false
-	enableChatAi = cmn.GetEnvBool("GLC_ENABLE_CHATAI", true)                           // 是否开启GLC智能助手，默认true
-}
-
-// 取配置： 是否开启GLC智能助手
-func IsEnableChatAi() bool {
-	return enableChatAi
 }
 
 // 取配置： 定位相邻检索的查询件数，可通过环境变量“GLC_NEAR_SEARCH_SIZE”设定，默认200件

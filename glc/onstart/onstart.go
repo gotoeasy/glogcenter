@@ -57,7 +57,6 @@ func Run() {
 		gweb.RegisterController(method.POST, contextPath+conf.SysUserTransferChgPsw, controller.UserTransferChangePswController) // [用户]转发修改自己密码
 		gweb.RegisterController(method.POST, contextPath+conf.SysUserTransferSave, controller.UserTransferSaveController)        // [用户]转发保存
 		gweb.RegisterController(method.POST, contextPath+conf.SysUserTransferDel, controller.UserTransferDelController)          // [用户]转发删除
-		gweb.RegisterController(method.POST, contextPath+"/v1/sys/chatai", controller.ChatAiController)                          // 查询是否开启智能助手
 
 		// 集群操作接口
 		gweb.RegisterController(method.POST, contextPath+"/sys/cluster/info", controller.ClusterGetClusterInfoController)   // 获取集群信息
