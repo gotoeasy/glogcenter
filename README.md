@@ -54,7 +54,6 @@
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/glogcenter.png"/>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/storage.png"/>
 <img src="https://gotoeasy.github.io/screenshots/glogcenter/users.png"/>
-<img src="https://gotoeasy.github.io/screenshots/glogcenter/chatai.png"/>
 </div>
 
 <br>
