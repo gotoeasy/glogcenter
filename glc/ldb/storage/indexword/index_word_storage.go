@@ -240,6 +240,7 @@ func (s *WordIndexStorage) Close() {
 	idxMu.Lock()                   // map锁
 	defer idxMu.Unlock()           // map解锁
 	mapStorage.Delete(s.storeName) // 设空，下回GetStorage时自动再创建
+	s.mapWordCounter.Clear()       // 清空辅助回收
 
 	cmn.Info("关闭WordIndexStorage：", s.storeName+cmn.PathSeparator()+s.subPath)
 }

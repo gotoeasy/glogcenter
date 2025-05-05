@@ -14,6 +14,7 @@ import (
 )
 
 var mapStorageHandle sync.Map
+var mapStorageMu sync.Mutex
 
 // 日志存储结构体
 type LogDataStorageHandle struct {
@@ -28,6 +29,21 @@ func NewLogDataStorageHandle(storeName string) *LogDataStorageHandle {
 		if !cacheStore.storage.IsClose() {
 			return cacheStore // 缓存中未关闭的存储对象
 		}
+	}
+
+	// 删除缓存中已关闭的存储对象
+	mapStorageMu.Lock()
+	defer mapStorageMu.Unlock()
+	var delKeys []any
+	mapStorageHandle.Range(func(key, value any) bool {
+		s := value.(*LogDataStorageHandle)
+		if s.storage.IsClose() {
+			delKeys = append(delKeys, key)
+		}
+		return true
+	})
+	for _, key := range delKeys {
+		mapStorageHandle.Delete(key)
 	}
 
 	store := &LogDataStorageHandle{
