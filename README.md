@@ -27,6 +27,7 @@
 <br>
 <br>
 演示地址(网络可能不稳定)： https://glc.gotoeasy.top
+文档(By Zread)： https://zread.ai/gotoeasy/glogcenter
 <br>
 <br>
 
