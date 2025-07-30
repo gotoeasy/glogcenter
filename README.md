@@ -26,7 +26,7 @@
 国内（同步）： https://gitee.com/gotoeasy/glogcenter
 <br>
 <br>
-演示地址(网络可能不稳定)： https://glc.gotoeasy.top
+演示地址(网络可能不稳定)： https://glc.gotoeasy.top <br>
 文档(By Zread)： https://zread.ai/gotoeasy/glogcenter
 <br>
 <br>
