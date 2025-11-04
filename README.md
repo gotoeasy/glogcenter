@@ -293,6 +293,11 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 - [ ] 日志审计、告警
 
 
+### 版本`0.17.7`
+
+- [x] 新添配置项`GLC_ENABLE_BLACK_WHITE_LIST`，是否开启黑白名单，默认`false`
+
+
 ### 版本`0.17.6`
 
 - [x] 取消智能助手（AI发展引动难以满足的高期望值）
