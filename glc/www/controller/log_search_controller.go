@@ -26,7 +26,7 @@ func LogSearchController(req *gweb.HttpRequest) *gweb.HttpResult {
 
 	token := req.GetToken()
 	username := ""
-	if (!InWhiteList(req) && InBlackList(req)) || (conf.IsEnableLogin() && GetUsernameByToken(token) == "") {
+	if (conf.IsEnableBlackWhiteList() && !InWhiteList(req) && InBlackList(req)) || (conf.IsEnableLogin() && GetUsernameByToken(token) == "") {
 		return gweb.Error403() // 黑名单检查、登录检查
 	}
 	if conf.IsEnableLogin() {

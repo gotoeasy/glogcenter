@@ -23,7 +23,7 @@ func init() {
 
 func LoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 
-	if !InWhiteList(req) && InBlackList(req) {
+	if conf.IsEnableBlackWhiteList() && !InWhiteList(req) && InBlackList(req) {
 		return gweb.Error403() // 黑名单，访问受限
 	}
 	if !conf.IsEnableLogin() {
@@ -147,6 +147,10 @@ func getClientHash(req *gweb.HttpRequest) string {
 
 // 客户端IP是否在白名单中（内网地址总是在白名单中）
 func InWhiteList(req *gweb.HttpRequest) bool {
+	if !conf.IsEnableBlackWhiteList() {
+		return true
+	}
+
 	cityIp := cmn.GetCityIp(req.GinCtx.ClientIP())
 	if cmn.Contains(cityIp, "内网") {
 		return true
@@ -168,6 +172,10 @@ func InWhiteList(req *gweb.HttpRequest) bool {
 
 // 客户端IP是否在黑名单中（内网地址总是在白名单中）
 func InBlackList(req *gweb.HttpRequest) bool {
+	if !conf.IsEnableBlackWhiteList() {
+		return false
+	}
+
 	cityIp := cmn.GetCityIp(req.GinCtx.ClientIP())
 	for i := 0; i < len(conf.GetBlackList()); i++ {
 		item := conf.GetBlackList()[i]
