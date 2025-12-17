@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gotoeasy/glang/cmn"
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v3/disk"
 )
 
 type StorageResult struct {
