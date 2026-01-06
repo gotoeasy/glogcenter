@@ -3,8 +3,11 @@ package top.gotoeasy.framework.glc.logback.appender;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
@@ -26,10 +29,20 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
     private String headerKey;
     private String headerVal;
 
-    private int cnt = 0;
-    private boolean enableGlc = true;
 
-    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private boolean enableGlc = true;
+    private final AtomicInteger errorCount = new AtomicInteger(0); // 连续错误计数
+
+    // 熔断控制
+    private volatile long lastFailureTime = 0;
+    private static final long PAUSE_PERIOD_MS = 60 * 1000; // 失败后暂停发送60秒
+    private static final int QUEUE_SIZE = 5000; // 队列最大缓存日志数
+    private static final int CONNECT_TIMEOUT = 2000; // 连接超时缩短为2秒
+    private static final int READ_TIMEOUT = 3000;    // 读取超时3秒
+
+    // 线程池
+    private ExecutorService executor;
+
 
     @Override
     protected void append(ILoggingEvent event) {
@@ -38,23 +51,31 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
         }
 
         if (event == null || !isStarted()) {
-            if (cnt++ < 10) {
-                System.err.println("日志事件为空或该Appender未被初始化");
-            }
             return;
         }
 
-        // 异步发送日志到GLC
-        executor.execute(() -> {
-            submitToGlogCenter(layout.doLayout(event), event);
-        });
-    }
+        // 1. 熔断检查：如果最近发生过错误，且在冷却时间内，直接丢弃日志，不进入线程池
+        if (lastFailureTime > 0) {
+            if (System.currentTimeMillis() - lastFailureTime < PAUSE_PERIOD_MS) {
+                return; // 处于熔断期，跳过发送
+            } else {
+                // 过了冷却期，重置状态尝试发送
+                lastFailureTime = 0;
+            }
+        }
 
+        try {
+            // 2. 提交任务
+            executor.execute(() -> submitToGlogCenter(layout.doLayout(event), event));
+        } catch (Exception e) {
+            // 线程池满或其他异常，直接忽略，不影响业务
+        }
+    }
     /**
      * 发送日志到GLC<br>
      * 为不依赖第三方包，仅作java原生包简单实现，性能较差<br>
      * 实际使用时若有性能问题可继承重写实现
-     * 
+     *
      * @param text  日志
      * @param event ILoggingEvent
      */
@@ -93,8 +114,8 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
             if (headerKey != null && !"".equals(headerVal)) {
                 connection.setRequestProperty(headerKey, headerVal);
             }
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(CONNECT_TIMEOUT);
+            connection.setReadTimeout(READ_TIMEOUT);
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setUseCaches(false);
@@ -108,9 +129,14 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
             // 接收响应内筒
             connection.getContent();
             connection.disconnect();
+            // 发送成功，重置错误计数
+            errorCount.set(0);
         } catch (Exception e) {
-            if (cnt++ < 10) {
-                System.err.println("[GLC日志发送异常][地址：" + glcApiUrl + "][异常信息：" + e.getMessage() + "]");
+            // 记录失败时间，触发熔断
+            lastFailureTime = System.currentTimeMillis();
+            // 限制控制台报错频率：仅在连续错误的前3次打印，避免刷屏
+            if (errorCount.incrementAndGet() <= 3) {
+                System.err.println("[GLC日志发送异常][地址：" + glcApiUrl + "]发送日志失败(暂停发送" + (PAUSE_PERIOD_MS/1000) + "秒): " + e.getMessage());
             }
         } finally {
             try {
@@ -126,8 +152,24 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
     @Override
     public void start() {
         if (this.layout == null) {
-            System.err.println("Layout未被初始化");
+            addError("Layout未被初始化");
+            return;
         }
+        // 初始化线程池：单线程，有界队列，满载丢弃旧日志
+        // DiscardOldestPolicy: 当队列满时，抛弃最老的日志，保证新日志能尝试进入
+        // 也可以使用 DiscardPolicy 直接抛弃当前日志
+        executor = new ThreadPoolExecutor(
+                1, 1,
+                0L, TimeUnit.MILLISECONDS,
+                new ArrayBlockingQueue<>(QUEUE_SIZE),
+                r -> {
+                    Thread t = new Thread(r, "GLC-Appender-Thread");
+                    t.setDaemon(true); // 设置为守护线程，防止阻碍JVM关闭
+                    return t;
+                },
+                new ThreadPoolExecutor.DiscardPolicy() // 队列满时直接丢弃，不抛异常，保护主业务
+        );
+
         super.start();
 
         // 优先使用环境变量设定
@@ -172,6 +214,10 @@ public class GlcHttpJsonAppender extends AppenderBase<ILoggingEvent> {
     public void stop() {
         if (!isStarted()) {
             return;
+        }
+        // 关闭线程池
+        if (executor != null) {
+            executor.shutdownNow();
         }
         super.stop();
     }
