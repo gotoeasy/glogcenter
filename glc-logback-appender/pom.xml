@@ -5,7 +5,7 @@
 
 	<groupId>top.gotoeasy</groupId>
 	<artifactId>glc-logback-appender</artifactId>
-	<version>0.17.1</version>
+	<version>0.17.7</version>
 	<description>logback appender for glogcenter</description>
 
 	<repositories>
