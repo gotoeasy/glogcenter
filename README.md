@@ -293,6 +293,11 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 - [ ] 日志审计、告警
 
 
+### 版本`0.17.8`
+
+- [x] 增强IP地址查询功能
+
+
 ### 版本`0.17.7`
 
 - [x] 新添配置项`GLC_ENABLE_BLACK_WHITE_LIST`，是否开启黑白名单，默认`false`
