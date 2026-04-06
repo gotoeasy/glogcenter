@@ -58,8 +58,8 @@ github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeN
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/gotoeasy/glang v0.21.7 h1:EYZfMz9PACkJGwWX3MtzKcPRhAf453PW57w/hEVSF34=
-github.com/gotoeasy/glang v0.21.7/go.mod h1:yZSweTHxKIlIswXZnyq9g/4K8V6LAz4j1bbhU7dHnFQ=
+github.com/gotoeasy/glang v0.21.8 h1:xJf9taglAt47LPkJagdzcBRrCVcRhataz5ci2b+FsLw=
+github.com/gotoeasy/glang v0.21.8/go.mod h1:yZSweTHxKIlIswXZnyq9g/4K8V6LAz4j1bbhU7dHnFQ=
 github.com/gotoeasy/sego v1.1.0 h1:FJw7gxslsyseWm0T6vAIqbwqf1fIRWEvakHmQaUdO9k=
 github.com/gotoeasy/sego v1.1.0/go.mod h1:jISDCveFb3Hc8/wPIDIpNLtvk1QnWFPZSbI4+GPsVgA=
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
