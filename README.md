@@ -293,6 +293,11 @@ docker run -d -p --log-driver=fluentd --log-opt fluentd-address=192.168.169.170:
 - [ ] 日志审计、告警
 
 
+### 版本`0.17.9`
+
+- [x] 更新修复IP地址查询接口
+
+
 ### 版本`0.17.8`
 
 - [x] 增强IP地址查询功能
