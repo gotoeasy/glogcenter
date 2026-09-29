@@ -83,6 +83,11 @@ func UserTransferLoginController(req *gweb.HttpRequest) *gweb.HttpResult {
 		return gweb.Error(403, "未经授权的访问，拒绝服务")
 	}
 
+	// 登录功能关闭时会话缓存未初始化，直接忽略转发登录（与LoginController守卫一致）
+	if !conf.IsEnableLogin() {
+		return gweb.Ok()
+	}
+
 	loginuser := &sysmnt.SysUser{}
 	req.BindJSON(loginuser)
 	if loginuser.Username == conf.GetUsername() {

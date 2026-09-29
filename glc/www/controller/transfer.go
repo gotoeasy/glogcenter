@@ -26,7 +26,7 @@ func TransferGlc(uri string, jsonlog string) {
 	hosts := cmn.Split(ci.NodeUrls, ";")
 	for i := 0; i < len(hosts); i++ {
 		if hosts[i] != com.GetLocalGlcUrl() {
-			_, err := httpPostJson(hosts[i]+conf.GetContextPath()+"/v1/log/transferAdd", jsonlog)
+			_, err := httpPostJson(hosts[i]+conf.GetContextPath()+uri, jsonlog)
 			if err != nil {
 				cmn.Error("集群内数据转发失败", hosts[i], err)
 			}
