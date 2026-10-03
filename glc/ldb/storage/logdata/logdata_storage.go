@@ -135,7 +135,7 @@ func (s *LogDataStorage) readyGo() {
 				if !s.IsClose() {
 					close(s.storeChan) // 关闭通道
 				}
-				break
+				return
 			}
 			s.saveLogData(data) // 保存日志数据
 		default:
@@ -155,7 +155,7 @@ func (s *LogDataStorage) readyGo() {
 					if !s.IsClose() {
 						close(s.storeChan) // 关闭通道
 					}
-					break
+					return
 				}
 				s.saveLogData(data) // 保存日志数据
 			}
