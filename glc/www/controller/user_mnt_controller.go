@@ -178,7 +178,7 @@ func UserDelController(req *gweb.HttpRequest) *gweb.HttpResult {
 	}
 
 	if conf.IsClusterMode() {
-		go TransferGlc(conf.UserTransferLogin, user.ToJson()) // 转发其他GLC服务
+		go TransferGlc(conf.SysUserTransferDel, user.ToJson()) // 转发其他GLC服务
 	}
 
 	return gweb.Ok()
